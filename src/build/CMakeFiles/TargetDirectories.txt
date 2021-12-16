@@ -1,0 +1,2 @@
+/Users/russii/Desktop/code/KinectFusion/src/build/CMakeFiles/rebuild_cache.dir
+/Users/russii/Desktop/code/KinectFusion/src/build/CMakeFiles/edit_cache.dir
