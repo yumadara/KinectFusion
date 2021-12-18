@@ -11,6 +11,8 @@ project(kinect_fusion_project)
 
 # Set variables here
 set(LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs CACHE PATH "Path to lib folder")
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src CACHE PATH "Path to src folder")
+set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/ CACHE PATH "Path to free image library")
 
 # Only for Mac OS
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -23,14 +25,15 @@ endif()
 
 find_package(Eigen3 REQUIRED)
 
-# Add subdirectories for includes
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories(${LIBRARY_DIR}/eigen)
-include_directories(${LIBRARY_DIR}/free_image_helper)
+# Add source directories for includes
+include_directories(${SOURCE_DIR})
+include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
 
-# Set some variables
-set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/)
-set(FreeImageHelper_IMPLEMENTATION ${LIBRARY_DIR}/free_image_helper/FreeImageHelper.cpp)
+# Define our source files
+set(SOURCES ${SOURCE_DIR}/utils/src/FreeImageHelper.cpp)
+
+# Add libraries directories for includes
+include_directories(${LIBRARY_DIR}/eigen)
 
 # Link libraries here
 link_directories(${FreeImage_LIBRARY_DIR})
@@ -44,7 +47,7 @@ enable_testing() # For Google test unit tests
 add_executable(
     DataPipelineTest # Test name
     test/DataPipelineTest.cpp # Test file
-    ${FreeImageHelper_IMPLEMENTATION}
+    ${SOURCES}
 )
 # Link test with google test library
 target_link_libraries(

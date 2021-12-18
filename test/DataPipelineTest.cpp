@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <utils/include/VirtualSensor.h>
-#include <utils/include/PointCloud.h>
+#include <VirtualSensor.h>
+#include <PointCloud.h>
 
 /// @brief Basic test to check that data pipeline works
 TEST(DataPipelineTest, CheckDataPipeline) {
