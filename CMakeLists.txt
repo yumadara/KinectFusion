@@ -21,6 +21,20 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     link_directories(/usr/local/lib)
 endif()
 
+find_package(Eigen3 REQUIRED)
+
+# Add subdirectories for includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${LIBRARY_DIR}/eigen)
+include_directories(${LIBRARY_DIR}/free_image_helper)
+
+# Set some variables
+set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/)
+set(FreeImageHelper_IMPLEMENTATION ${LIBRARY_DIR}/free_image_helper/FreeImageHelper.cpp)
+
+# Link libraries here
+link_directories(${FreeImage_LIBRARY_DIR})
+
 # Add google test library for unit tests
 add_subdirectory(${LIBRARY_DIR}/googletest)
 
@@ -30,15 +44,17 @@ enable_testing() # For Google test unit tests
 add_executable(
     DataPipelineTest # Test name
     test/DataPipelineTest.cpp # Test file
+    ${FreeImageHelper_IMPLEMENTATION}
 )
 # Link test with google test library
 target_link_libraries(
     DataPipelineTest # Out test
     gtest # Google Test library
     gtest_main
+    freeimage
+    Eigen3::Eigen
 )
 
-include(GoogleTest)
-
 # Yes, we have tests!
+include(GoogleTest)
 gtest_discover_tests(DataPipelineTest)

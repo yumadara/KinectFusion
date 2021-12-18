@@ -144,7 +144,7 @@ public:
                 m_normals.push_back(p);
             }
 
-            delete ps;
+            delete[] ps;
         }
         else {
             double* ps = new double[3 * n];
@@ -163,7 +163,7 @@ public:
                 m_normals.push_back(p);
             }
 
-            delete ps;
+            delete[] ps;
         }
 
 
