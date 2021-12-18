@@ -1,0 +1,5 @@
+if(EXISTS "/Users/russii/Desktop/code/KinectFusion/libs/googletest/DataPipelineTest[1]_tests.cmake")
+  include("/Users/russii/Desktop/code/KinectFusion/libs/googletest/DataPipelineTest[1]_tests.cmake")
+else()
+  add_test(DataPipelineTest_NOT_BUILT DataPipelineTest_NOT_BUILT)
+endif()
