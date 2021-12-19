@@ -28,9 +28,11 @@ find_package(Eigen3 REQUIRED)
 # Add source directories for includes
 include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
+include_directories(${SOURCE_DIR}/data_preprocessing/include)
 
 # Define our source files
-set(SOURCES ${SOURCE_DIR}/utils/src/FreeImageHelper.cpp)
+set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
+            ${SOURCE_DIR}/data_preprocessing/src/data_frame.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)
@@ -46,8 +48,12 @@ enable_testing() # For Google test unit tests
 # Add tests
 add_executable(
     DataPipelineTest # Test name
+<<<<<<< HEAD
     test/DataPipelineTest.cpp # Test file
     test/VoxelTest.cpp
+=======
+    test/data_pipeline_test.cpp # Test file
+>>>>>>> 46605f32b3f3913bae3fdde4a3eada01c93e789c
     ${SOURCES}
 )
 #enable_testing()
@@ -59,7 +65,7 @@ add_executable(
 
 # Link test with google test library
 target_link_libraries(
-    DataPipelineTest # Out test
+    DataPipelineTest # Our test
     gtest # Google Test library
     gtest_main
     freeimage
