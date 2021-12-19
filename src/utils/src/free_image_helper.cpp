@@ -5,6 +5,8 @@
 
 //#pragma comment(lib, "FreeImage.lib")
 
+namespace kinect_fusion {
+
 FreeImage::FreeImage() : w(0), h(0), nChannels(0), data(nullptr)
 {
 }
@@ -401,4 +403,5 @@ bool FreeImageU16F::LoadImageFromFile(const std::string& filename, unsigned int 
 
 	return true;
 }
+} // namespace kinect_fusion
 

@@ -5,6 +5,8 @@
 
 #include "Eigen.h"
 
+namespace kinect_fusion {
+
 struct Vertex {
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -436,5 +438,6 @@ private:
 		return rotation;
 	}
 };
+} // namespace kinect_fusion
 
  

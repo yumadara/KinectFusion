@@ -3,6 +3,8 @@
 #include "simple_mesh.h"
 #include "Eigen.h"
 
+namespace kinect_fusion {
+
 class PointCloud {
 public:
     PointCloud() {}
@@ -211,6 +213,6 @@ public:
 private:
     std::vector<Vector3f> m_points;
     std::vector<Vector3f> m_normals;
-
 };
+} // namespace kinect_fusion
  

@@ -8,6 +8,8 @@
 #include "Eigen.h"
 #include "free_image_helper.h"
 
+namespace kinect_fusion {
+
 typedef unsigned char BYTE;
 
 // reads sensor files according to https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats
@@ -250,3 +252,4 @@ private:
 	std::vector<Eigen::Matrix4f> m_trajectory;
 	std::vector<double> m_trajectoryTimeStamps;
 };
+} // namespace kinect_fusion

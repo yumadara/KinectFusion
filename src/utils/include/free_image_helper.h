@@ -12,6 +12,8 @@
 #define MINF -std::numeric_limits<float>::infinity()
 #endif
 
+namespace kinect_fusion {
+
 struct FreeImage {
 
 	FreeImage();
@@ -75,3 +77,4 @@ struct FreeImageU16F {
 	unsigned int nChannels;
 	float* data;
 };
+} // namespace kinect_fusion
