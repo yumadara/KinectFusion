@@ -147,6 +147,10 @@ public:
 		return m_depthImageHeight;
 	}
 
+	unsigned int getDepthNumberOfPixels() {
+		return m_depthImageWidth * m_depthImageHeight;
+	}
+
 	// get current trajectory transformation
 	Eigen::Matrix4f getTrajectory() {
 		return m_currentTrajectory;
