@@ -47,8 +47,16 @@ enable_testing() # For Google test unit tests
 add_executable(
     DataPipelineTest # Test name
     test/DataPipelineTest.cpp # Test file
+    test/VoxelTest.cpp
     ${SOURCES}
 )
+#enable_testing()
+#add_executable(
+#    VoxelTest # Test name
+#    test/VoxelTest.cpp # Test file
+#    ${SOURCES}
+#)
+
 # Link test with google test library
 target_link_libraries(
     DataPipelineTest # Out test
