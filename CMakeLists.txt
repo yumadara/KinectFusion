@@ -30,7 +30,7 @@ include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
 
 # Define our source files
-set(SOURCES ${SOURCE_DIR}/utils/src/FreeImageHelper.cpp)
+set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)
@@ -46,12 +46,12 @@ enable_testing() # For Google test unit tests
 # Add tests
 add_executable(
     DataPipelineTest # Test name
-    test/DataPipelineTest.cpp # Test file
+    test/data_pipeline_test.cpp # Test file
     ${SOURCES}
 )
 # Link test with google test library
 target_link_libraries(
-    DataPipelineTest # Out test
+    DataPipelineTest # Our test
     gtest # Google Test library
     gtest_main
     freeimage
