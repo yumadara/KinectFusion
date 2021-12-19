@@ -28,9 +28,11 @@ find_package(Eigen3 REQUIRED)
 # Add source directories for includes
 include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
+include_directories(${SOURCE_DIR}/data_preprocessing/include)
 
 # Define our source files
-set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp)
+set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
+            ${SOURCE_DIR}/data_preprocessing/src/data_frame.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)

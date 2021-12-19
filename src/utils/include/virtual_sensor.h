@@ -6,22 +6,24 @@
 #include <fstream>
 
 #include "Eigen.h"
+
 #include "free_image_helper.h"
 
 namespace kinect_fusion {
 
 typedef unsigned char BYTE;
+typedef Eigen::Matrix<BYTE, Dynamic, Dynamic, Eigen::RowMajor> MatrixXByte;
+typedef Eigen::Matrix<float, Dynamic, Dynamic, Eigen::RowMajor> MatrixXf;
+
+constexpr std::size_t VIRTUAL_SENSOR_WIDTH = 640;
+constexpr std::size_t VIRTUAL_SENSOR_HEIGHT = 480;
+constexpr std::size_t NUMBER_OF_PIXELS = VIRTUAL_SENSOR_WIDTH * VIRTUAL_SENSOR_HEIGHT;
 
 // reads sensor files according to https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats
 class VirtualSensor {
 public:
 
 	VirtualSensor() : m_currentIdx(-1), m_increment(1) { }
-
-	~VirtualSensor() {
-		SAFE_DELETE_ARRAY(m_depthFrame);
-		SAFE_DELETE_ARRAY(m_colorFrame);
-	}
 
 	bool init(const std::string& datasetDir) {
 		m_baseDir = datasetDir;
@@ -36,10 +38,10 @@ public:
 		if (m_filenameDepthImages.size() != m_filenameColorImages.size()) return false;
 
 		// Image resolutions
-		m_colorImageWidth = 640;
-		m_colorImageHeight = 480;
-		m_depthImageWidth = 640;
-		m_depthImageHeight = 480;
+		m_colorImageWidth = VIRTUAL_SENSOR_WIDTH;
+		m_colorImageHeight = VIRTUAL_SENSOR_HEIGHT;
+		m_depthImageWidth = VIRTUAL_SENSOR_WIDTH;
+		m_depthImageHeight = VIRTUAL_SENSOR_HEIGHT;
 
 		// Intrinsics
 		m_colorIntrinsics << 525.0f, 0.0f, 319.5f,
@@ -51,11 +53,15 @@ public:
 		m_colorExtrinsics.setIdentity();
 		m_depthExtrinsics.setIdentity();
 
-		m_depthFrame = new float[m_depthImageWidth * m_depthImageHeight];
-		for (unsigned int i = 0; i < m_depthImageWidth * m_depthImageHeight; ++i) m_depthFrame[i] = 0.5f;
+		m_depthFrame = MatrixXf(m_depthImageHeight, m_depthImageWidth);
+		for (unsigned int i = 0; i < m_depthImageWidth * m_depthImageHeight; ++i) {
+			m_depthFrame.data()[i] = 0.5f;
+		}
 
-		m_colorFrame = new BYTE[4 * m_colorImageWidth * m_colorImageHeight];
-		for (unsigned int i = 0; i < 4 * m_colorImageWidth * m_colorImageHeight; ++i) m_colorFrame[i] = 255;
+		m_colorFrame = MatrixXByte(m_depthImageHeight, 4 * m_depthImageWidth);
+		for (unsigned int i = 0; i < 4 * m_colorImageWidth * m_colorImageHeight; ++i) {
+			m_colorFrame.data()[i] = 255;
+		}
 
 
 		m_currentIdx = -1;
@@ -72,7 +78,7 @@ public:
 
 		FreeImageB rgbImage;
 		rgbImage.LoadImageFromFile(m_baseDir + m_filenameColorImages[m_currentIdx]);
-		memcpy(m_colorFrame, rgbImage.data, 4 * 640 * 480);
+		memcpy(m_colorFrame.data(), rgbImage.data, 4 * NUMBER_OF_PIXELS);
 
 		// depth images are scaled by 5000 (see https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats)
 		FreeImageU16F dImage;
@@ -80,9 +86,9 @@ public:
 
 		for (unsigned int i = 0; i < m_depthImageWidth * m_depthImageHeight; ++i) {
 			if (dImage.data[i] == 0)
-				m_depthFrame[i] = MINF;
+				m_depthFrame.data()[i] = MINF;
 			else
-				m_depthFrame[i] = dImage.data[i] * 1.0f / 5000.0f;
+				m_depthFrame.data()[i] = dImage.data[i] * 1.0f / 5000.0f;
 		}
 
 		// find transformation (simple nearest neighbor, linear search)
@@ -106,12 +112,12 @@ public:
 	}
 
 	// get current color data
-	BYTE* getColorRGBX() {
+	MatrixXByte getColorRGBX() {
 		return m_colorFrame;
 	}
 
 	// get current depth data
-	float* getDepth() {
+	MatrixXf getDepth() {
 		return m_depthFrame;
 	}
 
@@ -223,8 +229,8 @@ private:
 	int m_increment;
 
 	// frame data
-	float* m_depthFrame;
-	BYTE* m_colorFrame;
+	MatrixXf m_depthFrame;
+	MatrixXByte m_colorFrame;
 	Eigen::Matrix4f m_currentTrajectory;
 
 	// color camera info
