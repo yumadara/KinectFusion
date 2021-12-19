@@ -3,6 +3,8 @@
 #include <virtual_sensor.h>
 #include <point_cloud.h>
 
+namespace kinect_fusion {
+	
 /// @brief Basic test to check that data pipeline works
 TEST(DataPipelineTest, CheckDataPipeline) {
 	std::string filenameIn{"../data/rgbd_dataset_freiburg1_xyz/"};
@@ -40,3 +42,4 @@ TEST(DataPipelineTest, CheckDataPipeline) {
 
 	EXPECT_NE(cameraIntrinsics, Eigen::Matrix3f::Zero());
 }
+} // namespace kinect_fusion
