@@ -9,7 +9,7 @@ namespace kinect_fusion {
 
     class FrameData {
         public:
-            FrameData(const MatrixXf& depths, std::size_t width, std::size_t height, const Eigen::Matrix3f& cameraIntrinstics);
+            FrameData(float* depths, std::size_t width, std::size_t height, const Eigen::Matrix3f& cameraIntrinstics);
 
         private:
             MatrixXf m_rowDepthMap;
