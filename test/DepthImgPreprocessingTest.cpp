@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/utils/include/DepthImgPreprocessing.h"
+#include "depth_preprocessing.h"
 // Demonstrate some basic assertions.
 TEST(DepthImgPreprocessingTest, BasicAssertions) {
 	// Expect two strings not to be equal.
