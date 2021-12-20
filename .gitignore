@@ -1,7 +1,5 @@
 **/build
 **/build/*
-**/data
-./data/*
 **/.DS_Store
 .vs
 **/out
