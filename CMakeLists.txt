@@ -13,8 +13,20 @@ find_package(Eigen3 REQUIRED)
 # Set variables here
 set(LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs CACHE PATH "Path to lib folder")
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src CACHE PATH "Path to src folder")
-set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/ CACHE PATH "Path to free image library")
+#set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/ CACHE PATH "Path to free image library")
 
+if(WIN32)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(FreeImage_INCLUDE_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/ CACHE PATH "Path to FreeImage header file")
+        set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/ CACHE PATH "Path to FreeImage .lib/.dll folder")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(FreeImage_INCLUDE_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x32/ CACHE PATH "Path to FreeImage header file")
+        set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x32/ CACHE PATH "Path to FreeImage .lib/.dll folder")
+    endif()
+endif(WIN32)
+
+
+set(Eigen3_DIR ${LIBRARY_DIR}/Eigen/share/eigen3/cmake CACHE PATH "Path to installed Eigen")
 # Only for Mac OS
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MAC_OS TRUE)
@@ -43,7 +55,7 @@ link_directories(${FreeImage_LIBRARY_DIR})
 
 # Add google test library for unit tests
 add_subdirectory(${LIBRARY_DIR}/googletest)
-include_directories(${LIBRARY_DIR}/eigen)
+
 enable_testing() # For Google test unit tests
 
 # Add tests
@@ -57,6 +69,7 @@ add_executable(
 add_executable(
     DepthImgPreprocessingTest # Test name
     test/DepthImgPreprocessingTest.cpp # Test file
+    ${SOURCES}
 )
 
 #enable_testing()
@@ -72,18 +85,14 @@ target_link_libraries(
     DataPipelineTest # Our test
     gtest # Google Test library
     gtest_main
-    opencv_imgproc
-    opencv_highgui
-    opencv_imgcodecs
+    Eigen3::Eigen
+    freeimage
 )
 
 target_link_libraries(
     DepthImgPreprocessingTest # Out test
     gtest # Google Test library
     gtest_main
-    opencv_imgproc
-    opencv_highgui
-    opencv_imgcodecs
     freeimage
     Eigen3::Eigen
 )
@@ -91,3 +100,4 @@ target_link_libraries(
 # Yes, we have tests!
 include(GoogleTest)
 gtest_discover_tests(DataPipelineTest)
+
