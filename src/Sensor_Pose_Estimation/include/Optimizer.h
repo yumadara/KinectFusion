@@ -7,14 +7,15 @@
 #include <ceres/rotation.h>
 #include <flann/flann.hpp>
 
-#include "SimpleMesh.h"
-#include "NearestNeighbor.h"
-#include "PointCloud.h"
-#include "ProcrustesAligner.h"
+#include "simple_mesh.h"
+#include "nearest_neighbor.h"
+#include "point_cloud.h"
+#include "procrustes_aligner.h"
 
 #define epsilon_theta 0.5
 #define epsilon_d 0.05 
 
+namespace kinect_fusion {
 /**
  * Helper methods for writing Ceres cost functions.
  */
@@ -505,3 +506,4 @@ private:
         return result;
     }
 };
+} // namespace kinect_fusion

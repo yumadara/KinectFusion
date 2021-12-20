@@ -8,4 +8,6 @@
 **/out/*
 **/lib/build
 **/lib/build/*
-
+**/lib/opencv-master/**
+**/src/out
+**/.vscode

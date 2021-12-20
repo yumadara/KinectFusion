@@ -15,5 +15,8 @@
 - Compile the code:\
 `cmake --build build`
 
-To run the tests:\
-`cd build && ctest`
+- To run the tests:\
+`ctest --test-dir build --output-on-failure`
+
+- To get aliases for all these commands:\
+`source aliases.sh`

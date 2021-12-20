@@ -12,6 +12,8 @@ find_package( OpenCV REQUIRED )
 find_package(Eigen3 REQUIRED)
 # Set variables here
 set(LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs CACHE PATH "Path to lib folder")
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src CACHE PATH "Path to src folder")
+set(FreeImage_LIBRARY_DIR ${LIBRARY_DIR}/FreeImage-3.18.0/Dist/x64/ CACHE PATH "Path to free image library")
 
 # Only for Mac OS
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -22,6 +24,23 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     link_directories(/usr/local/lib)
 endif()
 
+find_package(Eigen3 REQUIRED)
+
+# Add source directories for includes
+include_directories(${SOURCE_DIR})
+include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
+include_directories(${SOURCE_DIR}/data_preprocessing/include)
+
+# Define our source files
+set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
+            ${SOURCE_DIR}/data_preprocessing/src/data_frame.cpp)
+
+# Add libraries directories for includes
+include_directories(${LIBRARY_DIR}/eigen)
+
+# Link libraries here
+link_directories(${FreeImage_LIBRARY_DIR})
+
 # Add google test library for unit tests
 add_subdirectory(${LIBRARY_DIR}/googletest)
 include_directories(${LIBRARY_DIR}/eigen)
@@ -30,15 +49,27 @@ enable_testing() # For Google test unit tests
 # Add tests
 add_executable(
     DataPipelineTest # Test name
-    test/DataPipelineTest.cpp # Test file
+    test/VoxelTest.cpp
+    test/data_pipeline_test.cpp # Test file
+    ${SOURCES}
 )
+
 add_executable(
     DepthImgPreprocessingTest # Test name
     test/DepthImgPreprocessingTest.cpp # Test file
 )
+
+#enable_testing()
+#add_executable(
+#    VoxelTest # Test name
+#    test/VoxelTest.cpp # Test file
+#    ${SOURCES}
+#)
+
+
 # Link test with google test library
 target_link_libraries(
-    DataPipelineTest # Out test
+    DataPipelineTest # Our test
     gtest # Google Test library
     gtest_main
     opencv_imgproc
@@ -53,10 +84,10 @@ target_link_libraries(
     opencv_imgproc
     opencv_highgui
     opencv_imgcodecs
+    freeimage
     Eigen3::Eigen
 )
 
-include(GoogleTest)
-
 # Yes, we have tests!
+include(GoogleTest)
 gtest_discover_tests(DataPipelineTest)
