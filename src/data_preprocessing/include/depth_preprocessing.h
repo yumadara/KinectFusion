@@ -3,8 +3,8 @@
 #include <iostream>
 #include <math.h>
 #include "Eigen.h"
-using namespace std;
 
+using namespace std;
 
 float calculatePreprocessedValue(int p, int q, Matrix2f& source, float sigma_s, float sigma_r)
 {
@@ -35,6 +35,7 @@ void BilateralFilter(Matrix2f& source, Matrix2f& destination, float sigma_s, flo
 {
 	int rows = source.rows();
 	int cols = source.cols();
+
 	for (int i = 0; i != rows; i++)
 	{
 		for (int j = 0; j != cols; j++)

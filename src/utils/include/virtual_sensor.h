@@ -53,14 +53,14 @@ public:
 		m_colorExtrinsics.setIdentity();
 		m_depthExtrinsics.setIdentity();
 
-		m_depthFrame = MatrixXf(m_depthImageHeight, m_depthImageWidth);
+		m_depthFrame = std::make_shared<MatrixXf>(m_depthImageHeight, m_depthImageWidth);
 		for (unsigned int i = 0; i < m_depthImageWidth * m_depthImageHeight; ++i) {
-			m_depthFrame.data()[i] = 0.5f;
+			m_depthFrame->data()[i] = 0.5f;
 		}
 
-		m_colorFrame = MatrixXByte(m_depthImageHeight, 4 * m_depthImageWidth);
+		m_colorFrame = std::make_shared<MatrixXByte>(m_depthImageHeight, 4 * m_depthImageWidth);
 		for (unsigned int i = 0; i < 4 * m_colorImageWidth * m_colorImageHeight; ++i) {
-			m_colorFrame.data()[i] = 255;
+			m_colorFrame->data()[i] = 255;
 		}
 
 
@@ -78,7 +78,7 @@ public:
 
 		FreeImageB rgbImage;
 		rgbImage.LoadImageFromFile(m_baseDir + m_filenameColorImages[m_currentIdx]);
-		memcpy(m_colorFrame.data(), rgbImage.data, 4 * NUMBER_OF_PIXELS);
+		memcpy(m_colorFrame->data(), rgbImage.data, 4 * NUMBER_OF_PIXELS);
 
 		// depth images are scaled by 5000 (see https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats)
 		FreeImageU16F dImage;
@@ -86,9 +86,9 @@ public:
 
 		for (unsigned int i = 0; i < m_depthImageWidth * m_depthImageHeight; ++i) {
 			if (dImage.data[i] == 0)
-				m_depthFrame.data()[i] = MINF;
+				m_depthFrame->data()[i] = MINF;
 			else
-				m_depthFrame.data()[i] = dImage.data[i] * 1.0f / 5000.0f;
+				m_depthFrame->data()[i] = dImage.data[i] * 1.0f / 5000.0f;
 		}
 
 		// find transformation (simple nearest neighbor, linear search)
@@ -112,12 +112,12 @@ public:
 	}
 
 	// get current color data
-	MatrixXByte getColorRGBX() {
+	std::shared_ptr<MatrixXByte> getColorRGBX() {
 		return m_colorFrame;
 	}
 
 	// get current depth data
-	MatrixXf getDepth() {
+	std::shared_ptr<MatrixXf> getDepth() {
 		return m_depthFrame;
 	}
 
@@ -229,8 +229,8 @@ private:
 	int m_increment;
 
 	// frame data
-	MatrixXf m_depthFrame;
-	MatrixXByte m_colorFrame;
+	std::shared_ptr<MatrixXf> m_depthFrame;
+	std::shared_ptr<MatrixXByte> m_colorFrame;
 	Eigen::Matrix4f m_currentTrajectory;
 
 	// color camera info

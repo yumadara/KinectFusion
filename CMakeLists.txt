@@ -8,8 +8,11 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
 
 # Our project name
 project(kinect_fusion_project) 
-find_package( OpenCV REQUIRED )
+
+# FInd important libraries
+find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
+
 # Set variables here
 set(LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs CACHE PATH "Path to lib folder")
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src CACHE PATH "Path to src folder")
@@ -25,8 +28,8 @@ if(WIN32)
     endif()
 endif(WIN32)
 
-
 set(Eigen3_DIR ${LIBRARY_DIR}/Eigen/share/eigen3/cmake CACHE PATH "Path to installed Eigen")
+
 # Only for Mac OS
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(MAC_OS TRUE)
@@ -36,19 +39,17 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     link_directories(/usr/local/lib)
 endif()
 
-find_package(Eigen3 REQUIRED)
-
 # Add source directories for includes
 include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
 include_directories(${SOURCE_DIR}/data_preprocessing/include)
 
 # Define our source files
-set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
-            ${SOURCE_DIR}/data_preprocessing/src/data_frame.cpp)
+set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Link libraries here
 link_directories(${FreeImage_LIBRARY_DIR})
@@ -87,6 +88,7 @@ target_link_libraries(
     gtest_main
     Eigen3::Eigen
     freeimage
+    ${OpenCV_LIBS}
 )
 
 target_link_libraries(
@@ -95,6 +97,7 @@ target_link_libraries(
     gtest_main
     freeimage
     Eigen3::Eigen
+    ${OpenCV_LIBS}
 )
 
 # Yes, we have tests!
