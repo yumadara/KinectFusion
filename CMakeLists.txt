@@ -1,16 +1,19 @@
 # We use cmake 3.10 version
 cmake_minimum_required(VERSION 3.10)
-
+set(CMAKE_BUILD_TYPE Debug)
 # Let's use C++11. For example, GoogleTest requires at least C++11
 set(CMAKE_CXX_STANDARD 11)
 # Different configurations for debug and release, let us look professional
 set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE)
-
+IF(CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
 # Our project name
 project(kinect_fusion_project) 
 
 # FInd important libraries
-find_package(OpenCV REQUIRED)
+#find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 # Set variables here
@@ -43,7 +46,7 @@ endif()
 include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
 include_directories(${SOURCE_DIR}/data_preprocessing/include)
-
+include_directories(${SOURCE_DIR}/ray_casting/include)
 # Define our source files
 set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp)
 
@@ -60,6 +63,7 @@ add_subdirectory(${LIBRARY_DIR}/googletest)
 enable_testing() # For Google test unit tests
 
 # Add tests
+
 add_executable(
     DataPipelineTest # Test name
     test/VoxelTest.cpp
@@ -73,8 +77,29 @@ add_executable(
     ${SOURCES}
 )
 add_executable(
+    VoxelTest # Test name
+    test/VoxelTest.cpp # Test file
+    ${SOURCES}
+)
+add_executable(
     RayTest 
     test/ray_test.cpp
+    ${SOURCES}
+)
+add_executable(
+    CameraTest
+    test/CameraTest.cpp
+    ${SOURCES}
+)
+add_executable(
+    SurfaceTest
+    test/SurfaceTest.cpp
+    ${SOURCES}
+)
+
+add_executable(
+    RayCastingTest
+    test/RayCastingTest.cpp
     ${SOURCES}
 )
 #enable_testing()
@@ -111,6 +136,39 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
+target_link_libraries(
+    CameraTest # Out test
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
+)
+target_link_libraries(
+    SurfaceTest # Out test
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
+)
+target_link_libraries(
+    RayCastingTest # Out test
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
+)
+target_link_libraries(
+    VoxelTest # Out test
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
+)
+
 # Yes, we have tests!
 include(GoogleTest)
 gtest_discover_tests(DataPipelineTest)
