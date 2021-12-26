@@ -11,10 +11,10 @@ public:
 
     Voxel(int num_x, int num_y, int num_z,
     int origin_x, int origin_y, int origin_z) {
-    this->Distance =   new float[num_x * num_y * num_z];
-    this->Weight =  new float[num_x * num_y * num_z];
-    std::fill_n(this->Distance, num_x * num_y * num_z, defaultDistance); 
-    std::fill_n(this->Weight,num_x * num_y * num_z , defaultWeight); 
+    Distance.resize(num_x * num_y * num_z);
+    Weight.resize( num_x * num_y * num_z);
+    std::fill_n(Distance.begin(), num_x * num_y * num_z, defaultDistance); 
+    std::fill_n(Weight.begin(), num_x * num_y * num_z, defaultWeight); 
 
     originX = origin_x;
     originY = origin_y;
@@ -32,10 +32,7 @@ public:
     
     
 
-    ~Voxel(void){
-        delete [] Distance;
-        delete [] Weight;
-    }
+    
     bool isInBoundInt(int ordX, int ordY, int ordZ){
         if (ordX + originX >= numX || ordX + originX < 0){
             return false;
@@ -181,8 +178,8 @@ public:
 
 
 private:
-    float* Distance ;
-    float* Weight;
+    std::vector<float> Distance ;
+    std::vector<float> Weight;
     
 
 

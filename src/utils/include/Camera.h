@@ -44,8 +44,21 @@ class Camera{
     Matrix3f getRotation(){
         return this->rotation;
     }
+    //translate points from camera to world
     Vector3f cameraToWorld(Vector3f cameraFrame){
         return rotation * cameraFrame + translation;
+    }
+    //translate points from world to camera
+    Vector3f worldToCamera(Vector3f worldFrame){
+        return rotation.inverse() * (worldFrame - translation);
+    }
+    //translate vectors from camera to world
+    Vector3f cameraToWorldVector(Vector3f cameraFrame){
+        return rotation * cameraFrame;
+    }
+    //translate vectors from world to camera
+    Vector3f worldToCameraVector(Vector3f cameraFrame){
+        return rotation.inverse() * cameraFrame;
     }
     Vector3f getTranslation(){
         return this->translation;
