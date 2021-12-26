@@ -12,10 +12,10 @@ class RayCasting {
         this->maxDistance = maxDistance;
     }
     RayCasting(Voxel TSDF, Camera camera){
-        // this->camera = camera;
-        // this->TSDF = TSDF;
-        // Surface surface(camera);
-        // this->surface = surface;
+        this->camera = camera;
+        this->TSDF = TSDF;
+        Surface surface(camera);
+        this->surface = surface;
         this->minDistance = 400.;
         this->maxDistance = 8000.;
     }
@@ -29,9 +29,10 @@ class RayCasting {
     bool fill_pixel(int XInPixel, int YInPixel){
         Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(XInPixel), 1.);
         float stepLength =  TSDF.truncateDistance;
-        float currF = 0;
-        float lastF = 0;
+        
         Ray ray = Ray(stepLength, this->minDistance, this->maxDistance, direction);
+        float currF = TSDF.defaultDistance;
+        float lastF = TSDF.defaultDistance;
         while(true){
             Vector3f currLocationCamera = ray.getCurrLocation();
             Vector3f LastLocationCamera = ray.getLastLocation();
@@ -46,10 +47,12 @@ class RayCasting {
                 return false;
             }
             if (currF<=0 && lastF>=0){
-                Vector3f vertex = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF);
-                Vector3f normal = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
-                surface.setNormal(XInPixel, YInPixel, normal);
-                surface.setVertex(XInPixel, YInPixel, vertex);
+                Vector3f vertexWorld = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF);
+                Vector3f normalWorld = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
+                Vector3f vertexCamera = camera.worldToCameraVector(vertexWorld);
+                Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
+                surface.setNormal(XInPixel, YInPixel, normalCamera);
+                surface.setVertex(XInPixel, YInPixel, vertexCamera);
                 return true;
             }
             else{
