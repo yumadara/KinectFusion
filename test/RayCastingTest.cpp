@@ -62,12 +62,12 @@ TEST(RayCastingTest, CheckFill_Pixel) {
     RayCasting rayCastingRayCasting(TSDF, camera);
     rayCastingRayCasting.fill_pixel(0, 0);
     Surface surface = rayCastingRayCasting.getSurface();
-    EXPECT_NEAR(surface.getVertex(1,1)(0), 0.,0.0001);
-    EXPECT_NEAR(surface.getVertex(1,1)(1), 0.,0.0001);
-    EXPECT_NEAR(surface.getVertex(1,1)(2), 480.,0.0001);
-    EXPECT_NEAR(surface.getNormal(1,1)(0), 0.,0.0001);
-    EXPECT_NEAR(surface.getNormal(1,1)(1), 0.,0.0001);
-    EXPECT_NEAR(surface.getNormal(1,1)(2), 1.,0.0001);
+    EXPECT_NEAR(surface.getVertex(0,0)(0), 0.,0.0001);
+    EXPECT_NEAR(surface.getVertex(0,0)(1), 0.,0.0001);
+    EXPECT_NEAR(surface.getVertex(0,0)(2), 480.,0.0001);
+    EXPECT_NEAR(surface.getNormal(0,0)(0), 0.,0.0001);
+    EXPECT_NEAR(surface.getNormal(0,0)(1), 0.,0.0001);
+    EXPECT_NEAR(surface.getNormal(0,0)(2), -1.,0.0001);
     
 }
 
