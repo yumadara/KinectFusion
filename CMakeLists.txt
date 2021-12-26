@@ -66,7 +66,6 @@ enable_testing() # For Google test unit tests
 
 add_executable(
     DataPipelineTest # Test name
-    test/VoxelTest.cpp
     test/data_pipeline_test.cpp # Test file
     ${SOURCES}
 )
