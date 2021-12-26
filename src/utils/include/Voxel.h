@@ -25,8 +25,8 @@ public:
     }
     Voxel(int num_x, int num_y, int num_z,
     int origin_x, int origin_y, int origin_z, float defaultDistance, int defaultWeight) {
-    Distance =   new float[num_x * num_y * num_z];
-    Weight =  new float[num_x * num_y * num_z];
+    Distance.resize(num_x * num_y * num_z);
+    Weight.resize( num_x * num_y * num_z);
     defaultDistance = defaultDistance;
     defaultWeight = defaultWeight;
     std::fill_n(Distance, num_x * num_y * num_z, defaultDistance); 
