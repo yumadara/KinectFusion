@@ -99,7 +99,7 @@
         // Vector3i orig = volument.getOrig();
         const unsigned int k = 3;//TODO:??
         unsigned int i = 0;
-        const float defaut_dst = volument.getDauftDist();
+        const float defaut_dst = volument.getDefaultDist();
         while (sensor.processNextFrame() && i <= k) {
             float* depthMap_k_i = sensor.getDepth();
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
