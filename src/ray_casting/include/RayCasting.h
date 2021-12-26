@@ -33,7 +33,7 @@ class RayCasting {
         Ray ray = Ray(stepLength, this->minDistance, this->maxDistance, direction);
         float currF = TSDF.defaultDistance;
         float lastF = TSDF.defaultDistance;
-        while(true){
+        while(ray.isInBound()){
             Vector3f currLocationCamera = ray.getCurrLocation();
             Vector3f LastLocationCamera = ray.getLastLocation();
             Vector3f currLocationWorld = camera.cameraToWorld(currLocationCamera);
@@ -55,6 +55,7 @@ class RayCasting {
                 surface.setVertex(XInPixel, YInPixel, vertexCamera);
                 return true;
             }
+            
             else{
                 ray.step();
             }
