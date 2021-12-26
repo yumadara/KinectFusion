@@ -23,7 +23,22 @@ public:
     numY = num_y;
     numZ = num_z;
     }
-    
+    Voxel(int num_x, int num_y, int num_z,
+    int origin_x, int origin_y, int origin_z, float defaultDistance, int defaultWeight) {
+    Distance =   new float[num_x * num_y * num_z];
+    Weight =  new float[num_x * num_y * num_z];
+    defaultDistance = defaultDistance;
+    defaultWeight = defaultWeight;
+    std::fill_n(Distance, num_x * num_y * num_z, defaultDistance); 
+    std::fill_n(Weight,num_x * num_y * num_z , defaultWeight); 
+
+    originX = origin_x;
+    originY = origin_y;
+    originZ = origin_z;
+    numX = num_x;
+    numY = num_y;
+    numZ = num_z;
+    }
 
     
     Voxel() {
@@ -50,6 +65,10 @@ public:
         int ordY = ordFromCont(ordYf);
         int ordZ = ordFromCont(ordZf);
         return isInBoundInt(ordX, ordY, ordZ);
+    }
+    float getDefaultDist()
+    {
+        return defaultDistance;
     }
     float getDistanceFromInt(int ordX, int ordY, int ordZ){
         if (! isInBoundInt(ordX, ordY, ordZ)){
