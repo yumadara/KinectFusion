@@ -101,6 +101,11 @@ add_executable(
     test/RayCastingTest.cpp
     ${SOURCES}
 )
+add_executable(
+    ReconstructTest
+    test/recon_test.cpp
+    ${SOURCES}
+)
 #enable_testing()
 #add_executable(
 #    VoxelTest # Test name
