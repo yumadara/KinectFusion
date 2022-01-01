@@ -2,12 +2,10 @@
 
 #include <Eigen.h>
 
-#include <opencv2/core/mat.hpp>
+#include <type_definitions.h>
 
 namespace kinect_fusion {
-    typedef Eigen::Matrix<float, Dynamic, Dynamic, Eigen::RowMajor> MatrixXf;
-    typedef std::shared_ptr<MatrixXf> MatrixXfPointer;
-    
+
     constexpr std::size_t NUMBER_OF_LEVELS = 3;
 
     constexpr float SIGMA{0.1};
@@ -15,10 +13,14 @@ namespace kinect_fusion {
     /**
      * @brief Levels.
      */
-    enum Level : std::size_t {
+    enum class Level : std::size_t {
         First = 1U,
         Second = 2U,
         Third = 3U
+    };
+
+    constexpr Level LEVELS[NUMBER_OF_LEVELS] {
+        Level::First, Level::Second, Level::Third
     };
 
     class FrameData {
@@ -26,71 +28,95 @@ namespace kinect_fusion {
             /**
              * @brief Construct a new Frame Data object
              * 
-             * @param depths depth map from sensor
-             * @param width of depth map
-             * @param height of depth map
-             * @param cameraIntrinstics camera instinstics
+             * @param[in] cameraIntrinstics Camera instinstics, or K matrix
+             * @param[in] height Camera height, i.e. number of rows
+             * @param[in] width Camera width, i.e. number of columns
              */
-            FrameData(const MatrixXfPointer& depths, std::size_t width, std::size_t height, const Eigen::Matrix3f& cameraIntrinstics);
+            FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t height, std::size_t width);
+
+            /**
+             * @brief Update frame data values with new depths map.
+             * 
+             * @param depths Depths map from depth camera
+             */
+            void updateValues(const Map2Df& depths);
 
         private:
             /**
+             * @brief Fill vertex map given depths values and camera instinsics using
+             * VertexMap(row, column) = DepthMap(row, column) * K^(-1) * (row, column, 1);
+             * 
+             * @param[in] depths Depth map
+             * @param[in] cameraIntrinsics Camera intrinsics, or K matrix
+             * @param[out] vertexMap Vertex map that should be filled
+             */
+            static void fillVertexMap(const Map2Df& depths, const Eigen::Matrix3f& cameraIntrinsics, Map2DVector3f& vertexMap);
+
+            /**
+             * @brief Fill normal map given vertex map (V) using
+             * NormalMap(row, col) = (V(row + 1, col) − V(row, col)) × (V(row, col + 1) - V(row, col))
+             * NormalMap(row, col) = NormalMap(row, col) / || NormalMap(row, col) ||
+             * 
+             * @param[in] vertexMap Vertex map
+             * @param[out] normalMap Normal Map, which should be filled
+             */
+            static void fillNormalMap(const Map2DVector3f& vertexMap, Map2DVector3f& normalMap);
+
+            /**
+             * @brief Fill next level depth map from previous depth map by block averaging pixels values and
+             * subsampling with halve resolution.
+             * 
+             * @note nextDepthMap should have 2 times smaller dimensions than previousDepthMap.
+             * @note While block averaging, if some block pixel value is too far away from central pixel, 
+             * it will be ignored.
+             * 
+             * @param[in] previousDepthMap Depth map which should be subsampled
+             * @param[out] nextDepthMap Depth map in which to subsampled depth map will be written.
+             */
+            static void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap);
+
+            /**
+             * @brief Get index of m_filteredDepthMaps, m_normalMaps, or other maps in this class, from the level.
+             * 
+             * @param level Level, as described in KinectFusion paper
+             * @return std::size_t index of corresponding maps
+             */
+            inline std::size_t getIndex(Level level) {
+                return static_cast<std::size_t>(level) - 1U;
+            }
+
+            /**
              * @brief Row depth map from sensor
              */
-            cv::Mat_<float> m_rowDepthMap;
+            Map2Df m_rowDepthMap;
+
+
+            Map2Df m_filteredDepthMaps[NUMBER_OF_LEVELS];
 
             /**
-             * @brief Filtered depth maps for different levels
+             * @brief Vertex maps for different levels (i.e. V matrices).
              */
-            cv::Mat_<float> m_depthMaps[NUMBER_OF_LEVELS];
+            Map2DVector3f m_vertexMaps[NUMBER_OF_LEVELS];
 
             /**
-             * @brief Normal maps based on filtered depth maps for different levels
+             * @brief Normal maps based on vertex maps for different levels (i.e. N matrices).
              */
-            cv::Mat_<float> m_normalMaps[NUMBER_OF_LEVELS];
+            Map2DVector3f m_normalMaps[NUMBER_OF_LEVELS];
             
             /**
-             * @brief Camera instrinstics for different levels.
+             * @brief Camera instrinstics for different levels, i.e. K.
+             * 
+             * @note Since the images on different levels have different resolutions, camera instrinstics change accordingly.
              */
             Eigen::Matrix3f m_cameraIntrinstics[NUMBER_OF_LEVELS];
 
             /**
-             * @brief Convert Eigen Matrix to cv::Mat structure.
-             * 
-             * @param matrix Pointer to the eigen matrix
-             * @return cv::Mat_<float> 
-             */
-            static cv::Mat_<float> Convert(const MatrixXfPointer& matrix);
-
-            /**
-             * @brief Get the Camera Intrinstics for specific level;
+             * @brief Get the Camera Intrinstics for specific level.
              * 
              * @param originalCameraIntrinstics Camera Intrinstics for level 0, or real camera intrinstics
              * @param level for which camera intrinstics should be computed
              * @return Eigen::Matrix3f camera intrinstics for this elvel.
              */
-            static Eigen::Matrix3f getLevelCameraIntrinstics(const Eigen::Matrix3f& originalCameraIntrinstics, Level level);
-
-            /**
-             * @brief Get the normal map given the depth map.
-             * 
-             * @param depths Depth map for which normal map should be computed
-             * @return cv::Mat_<float> Normal map
-             */
-            static cv::Mat_<float> GetNormalMap(const cv::Mat_<float>& depths);
-
-            /**
-             * @brief Subsample the depths for next level to half resolution, using averages and disregarding values 
-             * that are more than 3 sigmas greater/smaller than the central pixel.
-             * 
-             * @param depths Depth map
-             * @return cv::Mat_<float> Depth map for next level
-             */
-            static cv::Mat_<float> Subsample(const cv::Mat_<float>& depths);
-
-
-
-
-            
+            static Eigen::Matrix3f computeLevelCameraIntrinstics(const Eigen::Matrix3f& originalCameraIntrinstics, Level level);            
     };
 } // namespace kinect_fusion
