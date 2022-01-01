@@ -9,6 +9,10 @@ IF(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
+
+# Create compile_commands.json in build for visual studio code
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Our project name
 project(kinect_fusion_project) 
 
@@ -47,8 +51,10 @@ include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
 include_directories(${SOURCE_DIR}/data_preprocessing/include)
 include_directories(${SOURCE_DIR}/ray_casting/include)
+
 # Define our source files
-set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp)
+set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
+            ${SOURCE_DIR}/data_preprocessing/src/data_frame.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)
@@ -75,11 +81,11 @@ add_executable(
     test/DepthImgPreprocessingTest.cpp # Test file
     ${SOURCES}
 )
-add_executable(
-    VoxelTest # Test name
-    test/VoxelTest.cpp # Test file
-    ${SOURCES}
-)
+# add_executable(
+#     VoxelTest # Test name
+#     test/VoxelTest.cpp # Test file
+#     ${SOURCES}
+# )
 add_executable(
     RayTest 
     test/ray_test.cpp
@@ -96,22 +102,17 @@ add_executable(
     ${SOURCES}
 )
 
-add_executable(
-    RayCastingTest
-    test/RayCastingTest.cpp
-    ${SOURCES}
-)
+# add_executable(
+#     RayCastingTest
+#     test/RayCastingTest.cpp
+#     ${SOURCES}
+# )
 add_executable(
     ReconstructTest
     test/recon_test.cpp
     ${SOURCES}
 )
 #enable_testing()
-#add_executable(
-#    VoxelTest # Test name
-#    test/VoxelTest.cpp # Test file
-#    ${SOURCES}
-#)
 
 
 # Link test with google test library
@@ -156,16 +157,25 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
+# target_link_libraries(
+#     RayCastingTest # Out test
+#     gtest # Google Test library
+#     gtest_main
+#     freeimage
+#     Eigen3::Eigen
+#     ${OpenCV_LIBS}
+# )
+# target_link_libraries(
+#     VoxelTest # Out test
+#     gtest # Google Test library
+#     gtest_main
+#     freeimage
+#     Eigen3::Eigen
+#     ${OpenCV_LIBS}
+# )
+
 target_link_libraries(
-    RayCastingTest # Out test
-    gtest # Google Test library
-    gtest_main
-    freeimage
-    Eigen3::Eigen
-    ${OpenCV_LIBS}
-)
-target_link_libraries(
-    VoxelTest # Out test
+    ReconstructTest # Out test
     gtest # Google Test library
     gtest_main
     freeimage

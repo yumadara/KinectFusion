@@ -38,10 +38,10 @@ public:
 	SimpleMesh(VirtualSensor& sensor, const Matrix4f& cameraPose, float edgeThreshold = 0.01f) {
 		// Get ptr to the current depth frame.
 		// Depth is stored in row major (get dimensions via sensor.GetDepthImageWidth() / GetDepthImageHeight()).
-		float* depthMap = sensor.getDepth();
+		float* depthMap = sensor.getDepth().data();
 		// Get ptr to the current color frame.
 		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
-		BYTE* colorMap = sensor.getColorRGBX();
+		BYTE* colorMap = sensor.getColorRGBX().data();
 
 		// Get depth intrinsics.
 		Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
