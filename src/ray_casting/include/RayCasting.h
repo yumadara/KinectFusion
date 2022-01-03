@@ -47,9 +47,9 @@ class RayCasting {
                 return false;
             }
             if (currF<=0 && lastF>=0){
-                Vector3f vertexWorld = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF);
+                Vector3f vertexCamera = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF);
                 Vector3f normalWorld = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
-                Vector3f vertexCamera = camera.worldToCameraVector(vertexWorld);
+                //Vector3f vertexCamera = camera.worldToCameraVector(vertexWorld);
                 Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
                 surface.setNormal(XInPixel, YInPixel, normalCamera);
                 surface.setVertex(XInPixel, YInPixel, vertexCamera);
@@ -58,18 +58,13 @@ class RayCasting {
             
             else{
                 ray.step();
-            }
-            
-            
+            }       
         }
 
     }
     Surface getSurface(){
         return surface;
     }
-
-
-    
 
 
     private:
