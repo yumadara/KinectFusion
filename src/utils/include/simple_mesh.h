@@ -48,7 +48,11 @@ public:
 		// Get ptr to the current color frame.
 		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
 		BYTE* colorMap = sensor.getColorRGBX().data();
+<<<<<<< HEAD
 >>>>>>> 8d95ff6... Almost finish data frame implementation (surface measurement)
+=======
+>>>>>>> e8df95e20759c3de156e182b00c48a972bc37f56
+>>>>>>> 8b3b20528207f1d76f0a1bafcc90c6aa59bbf235
 
 		// Get depth intrinsics.
 		Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
