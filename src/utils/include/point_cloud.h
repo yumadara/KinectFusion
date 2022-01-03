@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simple_mesh.h"
+//#include "simple_mesh.h"
 #include "Eigen.h"
 
 namespace kinect_fusion {
@@ -9,34 +9,34 @@ class PointCloud {
 public:
     PointCloud() {}
 
-    PointCloud(const SimpleMesh& mesh) {
-        const auto& vertices = mesh.getVertices();
-        const auto& triangles = mesh.getTriangles();
-        const unsigned nVertices = vertices.size();
-        const unsigned nTriangles = triangles.size();
+    //PointCloud(const SimpleMesh& mesh) {
+    //    const auto& vertices = mesh.getVertices();
+    //    const auto& triangles = mesh.getTriangles();
+    //    const unsigned nVertices = vertices.size();
+    //    const unsigned nTriangles = triangles.size();
 
-        // Copy vertices.
-        m_points.reserve(nVertices);
-        for (const auto& vertex : vertices) {
-            m_points.push_back(Vector3f{ vertex.position.x(), vertex.position.y(), vertex.position.z()});
-        }
+    //    // Copy vertices.
+    //    m_points.reserve(nVertices);
+    //    for (const auto& vertex : vertices) {
+    //        m_points.push_back(Vector3f{ vertex.position.x(), vertex.position.y(), vertex.position.z()});
+    //    }
 
-        // Compute normals (as an average of triangle normals).
-        m_normals = std::vector<Vector3f>(nVertices, Vector3f::Zero());
-        for (size_t i = 0; i < nTriangles; i++) {
-            const auto& triangle = triangles[i];
-            Vector3f faceNormal = (m_points[triangle.idx1] - m_points[triangle.idx0]).cross(m_points[triangle.idx2] - m_points[triangle.idx0]);
+    //    // Compute normals (as an average of triangle normals).
+    //    m_normals = std::vector<Vector3f>(nVertices, Vector3f::Zero());
+    //    for (size_t i = 0; i < nTriangles; i++) {
+    //        const auto& triangle = triangles[i];
+    //        Vector3f faceNormal = (m_points[triangle.idx1] - m_points[triangle.idx0]).cross(m_points[triangle.idx2] - m_points[triangle.idx0]);
 
-            m_normals[triangle.idx0] += faceNormal;
-            m_normals[triangle.idx1] += faceNormal;
-            m_normals[triangle.idx2] += faceNormal;
-        }
-        for (size_t i = 0; i < nVertices; i++) {
-            m_normals[i].normalize();
-        }
-    }
+    //        m_normals[triangle.idx0] += faceNormal;
+    //        m_normals[triangle.idx1] += faceNormal;
+    //        m_normals[triangle.idx2] += faceNormal;
+    //    }
+    //    for (size_t i = 0; i < nVertices; i++) {
+    //        m_normals[i].normalize();
+    //    }
+    //}
 
-    PointCloud(float* depthMap, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const unsigned width, const unsigned height, unsigned downsampleFactor = 1, float maxDistance = 0.1f) {
+    PointCloud(std::shared_ptr<MatrixXf> depthMap, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const unsigned width, const unsigned height, unsigned downsampleFactor = 1, float maxDistance = 0.1f) {
         // Get depth intrinsics.
         float fovX = depthIntrinsics(0, 0);
         float fovY = depthIntrinsics(1, 1);
@@ -58,7 +58,8 @@ public:
             // For every pixel in a row.
             for (int u = 0; u < width; ++u) {
                 unsigned int idx = v * width + u; // linearized index
-                float depth = depthMap[idx];
+                //auto depth = (*depthMap)[idx];
+                float depth = (*depthMap)(v, u);
                 if (depth == MINF) {
                     pointsTmp[idx] = Vector3f(MINF, MINF, MINF);
                 }
@@ -77,8 +78,8 @@ public:
             for (int u = 1; u < width - 1; ++u) {
                 unsigned int idx = v * width + u; // linearized index
 
-                const float du = 0.5f * (depthMap[idx + 1] - depthMap[idx - 1]);
-                const float dv = 0.5f * (depthMap[idx + width] - depthMap[idx - width]);
+                const float du = 0.5f * ((*depthMap)(v,u+1)- (*depthMap)(v,u-1));
+                const float dv = 0.5f * ((*depthMap)(v+1,u) - (*depthMap)(v-1,u));
                 if (!std::isfinite(du) || !std::isfinite(dv) || abs(du) > maxDistanceHalved || abs(dv) > maxDistanceHalved) {
                     normalsTmp[idx] = Vector3f(MINF, MINF, MINF);
                     continue;

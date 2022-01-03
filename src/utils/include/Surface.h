@@ -10,12 +10,8 @@ class Surface{
         vertexMap.resize(camera.pictureHeightInPixel * camera.pictureWidthInPixel);
         normalMap.resize(camera.pictureHeightInPixel * camera.pictureWidthInPixel);
         
-        
-        
         std::fill(vertexMap.begin(), vertexMap.end(), defaultValue);
         std::fill(normalMap.begin(), normalMap.end(), defaultValue);
-
-
     }
     Surface(){
        
