@@ -49,12 +49,13 @@ endif()
 # Add source directories for includes
 include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
-include_directories(${SOURCE_DIR}/data_preprocessing/include)
+include_directories(${SOURCE_DIR}/surface_measurement/include)
 include_directories(${SOURCE_DIR}/ray_casting/include)
 
 # Define our source files
 set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
-            ${SOURCE_DIR}/data_preprocessing/src/data_frame.cpp)
+            ${SOURCE_DIR}/surface_measurement/src/data_frame.cpp
+            ${SOURCE_DIR}/surface_measurement/src/surface_measurement.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)
