@@ -4,7 +4,7 @@
 
 // Demonstrate some basic assertions.
 TEST(DepthImgPreprocessingTest, BasicAssertions) {
-	std::string filenameIn = std::string("/mnt/d/Users/chiyu/1 semester/KinectFusion/data/rgbd_dataset_freiburg1_xyz/");
+	std::string filenameIn = std::string("../data/rgbd_dataset_freiburg1_xyz/");
 	std::string filenameBaseOut = std::string("mesh_");
 
 	// Load video
