@@ -82,23 +82,7 @@ add_executable(
     test/DepthImgPreprocessingTest.cpp # Test file
     ${SOURCES}
 )
-<<<<<<< HEAD
-#add_executable(
- #   VoxelTest # Test name
- #   test/VoxelTest.cpp # Test file
-    #${SOURCES}
-#)
-=======
-# add_executable(
-#     VoxelTest # Test name
-#     test/VoxelTest.cpp # Test file
-#     ${SOURCES}
-# )
-<<<<<<< HEAD
->>>>>>> 8d95ff6... Almost finish data frame implementation (surface measurement)
-=======
->>>>>>> e8df95e20759c3de156e182b00c48a972bc37f56
->>>>>>> 8b3b20528207f1d76f0a1bafcc90c6aa59bbf235
+
 add_executable(
     RayTest 
     test/ray_test.cpp
@@ -115,7 +99,6 @@ add_executable(
     ${SOURCES}
 )
 
-<<<<<<< HEAD
 add_executable(
     RayCastingTest
     test/RayCastingTest.cpp
@@ -137,12 +120,7 @@ add_executable(
     test/projectiveCorrespondenceSearchTest.cpp # Test file
     ${SOURCES}
 )
-=======
-# add_executable(
-#     RayCastingTest
-#     test/RayCastingTest.cpp
-#     ${SOURCES}
-# )
+
 add_executable(
     ReconstructTest
     test/recon_test.cpp
@@ -150,11 +128,6 @@ add_executable(
 )
 #enable_testing()
 
-<<<<<<< HEAD
->>>>>>> 8d95ff6... Almost finish data frame implementation (surface measurement)
-=======
->>>>>>> e8df95e20759c3de156e182b00c48a972bc37f56
->>>>>>> 8b3b20528207f1d76f0a1bafcc90c6aa59bbf235
 
 # Link test with google test library
 target_link_libraries(
@@ -224,7 +197,7 @@ target_link_libraries(
 # )
 
 target_link_libraries(
-<<<<<<< HEAD
+
     RayCastingTest # Out test
     gtest # Google Test library
     gtest_main
@@ -235,13 +208,6 @@ target_link_libraries(
 
 target_link_libraries(
     VoxelTest # Out test
-=======
-    ReconstructTest # Out test
-<<<<<<< HEAD
->>>>>>> 8d95ff6... Almost finish data frame implementation (surface measurement)
-=======
->>>>>>> e8df95e20759c3de156e182b00c48a972bc37f56
->>>>>>> 8b3b20528207f1d76f0a1bafcc90c6aa59bbf235
     gtest # Google Test library
     gtest_main
     freeimage
