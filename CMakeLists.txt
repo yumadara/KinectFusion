@@ -9,6 +9,10 @@ IF(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
+
+# Create compile_commands.json in build for visual studio code
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Our project name
 project(kinect_fusion_project) 
 
@@ -45,10 +49,13 @@ endif()
 # Add source directories for includes
 include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
-include_directories(${SOURCE_DIR}/data_preprocessing/include)
+include_directories(${SOURCE_DIR}/surface_measurement/include)
 include_directories(${SOURCE_DIR}/ray_casting/include)
+
 # Define our source files
-set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp)
+set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
+            ${SOURCE_DIR}/surface_measurement/src/data_frame.cpp
+            ${SOURCE_DIR}/surface_measurement/src/surface_measurement.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)
@@ -75,11 +82,7 @@ add_executable(
     test/DepthImgPreprocessingTest.cpp # Test file
     ${SOURCES}
 )
-add_executable(
-    VoxelTest # Test name
-    test/VoxelTest.cpp # Test file
-    ${SOURCES}
-)
+
 add_executable(
     RayTest 
     test/ray_test.cpp
@@ -101,17 +104,29 @@ add_executable(
     test/RayCastingTest.cpp
     ${SOURCES}
 )
-add_executable(
-    ReconstructTest
-    test/recon_test.cpp
-    ${SOURCES}
-)
-#enable_testing()
 #add_executable(
-#    VoxelTest # Test name
-#    test/VoxelTest.cpp # Test file
+#    ReconstructTest
+#    test/recon_test.cpp
 #    ${SOURCES}
 #)
+#enable_testing()
+add_executable(
+    VoxelTest # Test name
+    test/VoxelTest.cpp # Test file
+    ${SOURCES}
+)
+#add_executable(
+#    CorrespondenceSearchTest # Test name
+#    test/projectiveCorrespondenceSearchTest.cpp # Test file
+#    ${SOURCES}
+#)
+
+#add_executable(
+#    ReconstructTest
+#    test/recon_test.cpp
+#    ${SOURCES}
+#)
+#enable_testing()
 
 
 # Link test with google test library
@@ -123,6 +138,14 @@ target_link_libraries(
     freeimage
     ${OpenCV_LIBS}
 )
+#target_link_libraries(
+#    ReconstructTest # Our test
+#    gtest # Google Test library
+#    gtest_main
+#    Eigen3::Eigen
+#    freeimage
+#    ${OpenCV_LIBS}
+#)
 
 target_link_libraries(
     DepthImgPreprocessingTest # Out test
@@ -156,7 +179,9 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
+
 target_link_libraries(
+
     RayCastingTest # Out test
     gtest # Google Test library
     gtest_main
@@ -164,6 +189,7 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
+
 target_link_libraries(
     VoxelTest # Out test
     gtest # Google Test library
@@ -172,6 +198,15 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
+#target_link_libraries(
+#    CorrespondenceSearchTest
+#    gtest # Google Test library
+#    gtest_main
+#    freeimage
+#    Eigen3::Eigen
+ #   ${OpenCV_LIBS}
+#)
+
 
 # Yes, we have tests!
 include(GoogleTest)

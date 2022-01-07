@@ -101,7 +101,7 @@
         unsigned int i = 0;
         const float defaut_dst = volument.getDefaultDist();
         while (sensor.processNextFrame() && i <= k) {
-            float* depthMap_k_i = sensor.getDepth();
+            float* depthMap_k_i = sensor.getDepth().data();
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
             const Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
             const unsigned width = sensor.getDepthImageWidth();
