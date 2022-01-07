@@ -79,7 +79,7 @@
             //         std::cout << "BUG" << std::endl;
             Vector2i x = globalToScreen(depthIntrinsics, depthExtrinsics, vertex_k[i]);
             const float lamda = Lamda(depthIntrinsics, x);
-            unsigned int indx = x.x()*width+ x.y();
+            unsigned int indx = x.x()*width + x.y();//TODO: why
             if (indx<length){
                 float depth_k_i = depth_k[indx];
                 if(depth_k_i == MINF)
