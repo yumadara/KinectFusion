@@ -5,7 +5,9 @@
 namespace kinect_fusion {
 
 /**
- * @brief 2D map wrapper for row major array with columns and rows. 
+ * @brief 2D map wrapper for row major array with rows and columns. 
+ * 
+ * @note Is mainly used of map pixels as (row, column) to values.
  * 
  * @tparam T Type of values
  */
