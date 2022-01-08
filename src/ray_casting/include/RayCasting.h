@@ -65,10 +65,12 @@ class RayCasting {
         }
 
     }
-    Surface& getSurface(){
+    Surface& getSurface() {
         return surface;
     }
-
+    Camera& getCamera() {
+        return camera;
+    }
 
     private:
     Voxel TSDF;
