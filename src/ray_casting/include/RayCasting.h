@@ -65,7 +65,7 @@ class RayCasting {
         }
 
     }
-    Surface getSurface(){
+    Surface& getSurface(){
         return surface;
     }
 
