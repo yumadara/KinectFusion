@@ -1,7 +1,11 @@
 #pragma once
+
 #include <cassert>
+
 #include "Eigen.h"
-#include <Camera.h>
+
+#include <camera.h>
+
 class Surface{
     public:
     Surface(Camera camera){
@@ -13,9 +17,7 @@ class Surface{
         std::fill(vertexMap.begin(), vertexMap.end(), defaultValue);
         std::fill(normalMap.begin(), normalMap.end(), defaultValue);
     }
-    Surface(){
-       
-    }
+    Surface() {}
 
     void setVertex(int X, int Y, Vector3f value){
         this->vertexMap[Y * camera.pictureWidthInPixel + X ] = value;
@@ -37,17 +39,7 @@ class Surface{
         return this->camera.pictureWidthInPixel;
     }
 
-    std::vector<Vector3f> getVertexMap(){
-        return this-> vertexMap;
-    }
-    std::vector<Vector3f> getNormalMap(){
-        return this-> normalMap;
-    }
-
-
     private:
-    
-
     std::vector<Vector3f> vertexMap;
     std::vector<Vector3f> normalMap;
     Camera camera;

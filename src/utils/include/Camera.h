@@ -1,9 +1,10 @@
 #pragma once
+
 #include <cassert>
+
 #include "Eigen.h"
 
-
-class Camera{
+class Camera {
     public:
     Camera(Vector3f translation, Matrix3f rotation, Matrix3f inverseCalibrationMatrix,
     int pictureHeightInPixel, int pictureWidthInPixel,
@@ -11,8 +12,8 @@ class Camera{
         init(translation,rotation, inverseCalibrationMatrix,
         pictureHeightInPixel, pictureWidthInPixel,
         originXInPixel, originYInPixel);
-        
     }
+
     Camera(){
         Vector3f translation = Vector3f(0.,0.,0.);
         Matrix3f rotation = Matrix3f::Identity();
@@ -28,7 +29,7 @@ class Camera{
     }
     void init(Vector3f translation, Matrix3f rotation, Matrix3f inverseCalibrationMatrix,
     int pictureHeightInPixel, int pictureWidthInPixel,
-    int originXInPixel, int originYInPixel){
+    int originXInPixel, int originYInPixel) {
         assert (rotationIsValid(rotation));
         this->rotation = rotation;
         this->translation = translation;
@@ -71,11 +72,4 @@ class Camera{
     private:
     Vector3f translation;
     Matrix3f rotation;
-    
-    
-
-    
-
-
-
 };

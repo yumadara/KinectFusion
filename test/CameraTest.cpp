@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <Camera.h>
+#include <camera.h>
+
 #include "Eigen.h"
 
 /// @brief Basic test to check that data pipeline works

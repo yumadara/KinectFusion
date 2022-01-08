@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <RayCasting.h>
-#include <Camera.h>
+
+#include <camera.h>
 #include <Voxel.h>
+
 /// @brief Basic test to check that data pipeline works
 TEST(RayCastingTest, CheckCastingConstruction) {
     Camera camera;

@@ -1,7 +1,9 @@
+#include <math.h>
+
 #include "Eigen.h"
-#include <Surface.h>
-#include "virtual_sensor.h"
-#include <math.h> 
+
+#include <surface.h>
+#include <virtual_sensor.h>
 
 class projectiveCorrespondence {
 public:
