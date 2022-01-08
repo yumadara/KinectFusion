@@ -15,13 +15,11 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
 
             m_cameraIntrinstics[index] = computeLevelCameraIntrinstics(cameraIntrinstics, level);
 
-            m_normalMaps[index] = Map2DVector3f(current_height, current_width);
-            m_vertexMaps[index] = Map2DVector3f(current_height, current_width);
-            m_filteredDepthMaps[index] = Map2Df(current_height, current_width);
+            m_surfaces[index] = Surface(current_height, current_width);
         } 
     }
 
-    void FrameData::updateValues(const Map2Df&  depths) {
+    void FrameData::updateValues(const Map2Df& depths) {
         m_rowDepthMap = depths;
 
         m_filteredDepthMaps[0] = depths;
@@ -29,8 +27,8 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
             subsample(m_filteredDepthMaps[i], m_filteredDepthMaps[i + 1]);
         }
         for (std::size_t i = 0; i < NUMBER_OF_LEVELS; i++) {
-            fillVertexMap(m_filteredDepthMaps[i], m_cameraIntrinstics[i], m_vertexMaps[i]);
-            fillNormalMap(m_vertexMaps[i], m_normalMaps[i]);
+            fillVertexMap(m_filteredDepthMaps[i], m_cameraIntrinstics[i], m_surfaces[i].getVertexMap());
+            fillNormalMap(m_surfaces[i].getVertexMap(), m_surfaces[i].getNormalMap());
         }
     }
 

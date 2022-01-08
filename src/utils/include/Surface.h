@@ -46,6 +46,14 @@ class Surface {
             return vertexMap.getWidth();
         }
 
+        inline Map2DVector3f& getVertexMap() {
+            return vertexMap;
+        }
+
+        inline Map2DVector3f& getNormalMap() {
+            return normalMap;
+        }
+
     private:
         Map2DVector3f vertexMap;
         Map2DVector3f normalMap;

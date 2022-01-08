@@ -2,7 +2,7 @@
 
 #include <Eigen.h>
 
-#include <type_definitions.h>
+#include <surface.h>
 
 namespace kinect_fusion {
 
@@ -26,6 +26,24 @@ class FrameData {
          */
         void updateValues(const Map2Df& depths);
 
+        /**
+         * @brief Get the surface with normal and vertex maps for the first level.
+         * 
+         * @return Surface& Wrapper around normal and vertex maps
+         */
+        Surface& getSurface() {
+            return m_surfaces[0];
+        }
+
+        /**
+         * @brief Get the surface with normal and vertex maps for the given level.
+         * 
+         * @return Surface& Wrapper around normal and vertex maps
+         */
+        Surface& getSurface(Level level) {
+            return m_surfaces[getIndex(level)];
+        }
+
     private:
         /**
          * @brief Get index of m_filteredDepthMaps, m_normalMaps, or other maps in this class, from the level.
@@ -46,14 +64,9 @@ class FrameData {
         Map2Df m_filteredDepthMaps[NUMBER_OF_LEVELS];
 
         /**
-         * @brief Vertex maps for different levels (i.e. V matrices).
+         * @brief Vertex and normal maps for different levels (i.e. V matrices).
          */
-        Map2DVector3f m_vertexMaps[NUMBER_OF_LEVELS];
-
-        /**
-         * @brief Normal maps based on vertex maps for different levels (i.e. N matrices).
-         */
-        Map2DVector3f m_normalMaps[NUMBER_OF_LEVELS];
+        Surface m_surfaces[NUMBER_OF_LEVELS];
         
         /**
          * @brief Camera instrinstics for different levels, i.e. K.
