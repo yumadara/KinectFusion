@@ -2,7 +2,7 @@
 
 #include <Ray.h>
 
-
+namespace kinect_fusion {
 
 /// @brief Basic test to check that Ray works
 TEST(RayTest, CheckRayConstruction) {
@@ -24,7 +24,6 @@ TEST(VoxelTest, CheckStep) {
     EXPECT_NEAR(ray.getLastLocation()(0), 120.,0.0001);
     EXPECT_NEAR(ray.getLastLocation()(1), 160.,0.0001);
     EXPECT_NEAR(ray.getLastLocation()(2), 0.,0.0001);
-
 }
 
 TEST(VoxelTest, CheckIsInBound) {
@@ -35,4 +34,6 @@ TEST(VoxelTest, CheckIsInBound) {
     ray.step();
     EXPECT_FALSE(ray.isInBound());
 }
+
+} // namespace kinect_fusion
 

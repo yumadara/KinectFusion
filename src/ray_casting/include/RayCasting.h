@@ -5,6 +5,8 @@
 #include <camera.h>
 #include <surface.h>
 
+namespace kinect_fusion {
+
 class RayCasting {
     public:
     RayCasting(Voxel TSDF, Camera camera, float minDistance, float maxDistance){
@@ -15,7 +17,7 @@ class RayCasting {
     RayCasting(Voxel TSDF, Camera camera){
         this->camera = camera;
         this->TSDF = TSDF;
-        Surface surface(camera);
+        Surface surface(camera.getHeight(), camera.getWidth());
         this->surface = surface;
         this->minDistance = 400.;
         this->maxDistance = 8000.;
@@ -75,8 +77,6 @@ class RayCasting {
     Surface surface;
     float minDistance;
     float maxDistance;
-    
-
-
-
 };
+
+} // namespace kinect_fusion

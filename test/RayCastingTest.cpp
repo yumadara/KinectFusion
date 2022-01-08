@@ -5,6 +5,8 @@
 #include <camera.h>
 #include <Voxel.h>
 
+namespace kinect_fusion {
+
 /// @brief Basic test to check that data pipeline works
 TEST(RayCastingTest, CheckCastingConstruction) {
     Camera camera;
@@ -70,8 +72,9 @@ TEST(RayCastingTest, CheckFill_Pixel) {
     EXPECT_NEAR(surface.getNormal(0,0)(0), 0.,0.0001);
     EXPECT_NEAR(surface.getNormal(0,0)(1), 0.,0.0001);
     EXPECT_NEAR(surface.getNormal(0,0)(2), -1.,0.0001);
-    
 }
+
+} // namespace kinect_fusion
 
 
 

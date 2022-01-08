@@ -4,6 +4,8 @@
 
 #include "Eigen.h"
 
+namespace kinect_fusion {
+
 /// @brief Basic test to check that data pipeline works
 TEST(CameraTest, CheckCameraConstruction) {
     Vector3f translation = Vector3f(0.,0.,0.);
@@ -34,4 +36,6 @@ TEST(CameraTest, CheckCameraToWorld) {
     Vector3f worldFrame = camera.cameraToWorld(cameraFrame);
     EXPECT_NEAR((worldFrame-cameraFrame).array().abs().sum(), 0., 0.0001);
 }
+
+} // namespace kinect_fusion
 

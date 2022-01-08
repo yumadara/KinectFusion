@@ -23,9 +23,14 @@ class Map2D {
          * 
          * @param height Number of rows
          * @param width Number of columns
+         * @param initialValue Initial value for the array
          */
-        Map2D(std::size_t height, std::size_t width) : dataVector(height * width), m_height(height), m_width(width) 
-        {}
+        Map2D(std::size_t height, std::size_t width, const T& initialValue = T()) : 
+            dataVector(height * width, initialValue), 
+            m_height(height), 
+            m_width(width) 
+        {
+        }
 
         /**
          * @brief Get value at specific index from underlying array.
@@ -51,6 +56,15 @@ class Map2D {
         }
         inline const T& get(std::size_t row, std::size_t column) const {
             return dataVector[column + row * m_width];
+        }
+
+        /**
+         * @brief Set value at specific row and column
+         * 
+         * @param index Index a which the value should be set
+         */
+        inline void set(std::size_t row, std::size_t column, const T& value) {
+            get(row, column) = value;
         }
 
         /**
@@ -92,7 +106,7 @@ class Map2D {
          * 
          * @return std::size_t Number of rows, or height.
          */
-        inline std::size_t height() const {
+        inline std::size_t getHeight() const {
             return m_height;
         }
 
@@ -101,7 +115,7 @@ class Map2D {
          * 
          * @return std::size_t Number of columns, or width.
          */
-        inline std::size_t width() const {
+        inline std::size_t getWidth() const {
             return m_width;
         }
 
@@ -156,4 +170,5 @@ constexpr std::size_t NUMBER_OF_LEVELS = 3;
 constexpr Level LEVELS[NUMBER_OF_LEVELS] {
     Level::First, Level::Second, Level::Third
 };
-}
+
+} // namespace kinect_fusion

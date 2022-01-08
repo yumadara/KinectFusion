@@ -1,6 +1,7 @@
 #pragma once
 #include "Eigen.h"
 
+namespace kinect_fusion {
 
 class Ray {
     public:
@@ -41,8 +42,6 @@ class Ray {
     Vector3f direction;
     Vector3f currLocation;
     Vector3f lastLocation;
-    
-
-
-
 };
+
+} // namespace kinect_fusion

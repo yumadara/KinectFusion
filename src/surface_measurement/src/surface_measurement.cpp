@@ -18,9 +18,9 @@ void fillVertexMap(const Map2Df& depths, const Eigen::Matrix3f& depthIntrinsics,
 
             // For every pixel row.
     #pragma omp parallel for
-            for (int row = 0; row < depths.height(); ++row) {
+            for (int row = 0; row < depths.getHeight(); ++row) {
                 // For every pixel in a row.
-                for (int col = 0; col < depths.width(); ++col) {
+                for (int col = 0; col < depths.getWidth(); ++col) {
                     std::size_t idx = depths.getIndex(row, col); // linearized index
                     float depth = depths.get(idx);
                     if (depth == MINF) {
@@ -37,11 +37,11 @@ void fillVertexMap(const Map2Df& depths, const Eigen::Matrix3f& depthIntrinsics,
 void fillNormalMap(const Map2DVector3f& vertexMap, Map2DVector3f& normalMap) {
 
 #pragma omp parallel for
-    for (std::size_t row = 1; row < vertexMap.height() - 1; ++row) {
-        for (std::size_t col = 1; col < vertexMap.width() - 1; ++col) {
+    for (std::size_t row = 1; row < vertexMap.getHeight() - 1; ++row) {
+        for (std::size_t col = 1; col < vertexMap.getWidth() - 1; ++col) {
             std::size_t idx = vertexMap.getIndex(row, col); // linearized index
 
-            auto firstVector{vertexMap.get(idx + vertexMap.width()) - vertexMap.get(idx)};
+            auto firstVector{vertexMap.get(idx + vertexMap.getWidth()) - vertexMap.get(idx)};
             auto secondVector{vertexMap.get(idx + 1) - vertexMap.get(idx)};
 
             if (!firstVector.allFinite() || !secondVector.allFinite()) {
@@ -56,8 +56,8 @@ void fillNormalMap(const Map2DVector3f& vertexMap, Map2DVector3f& normalMap) {
 
 void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap)
 {
-    for (int row = 0; row < previousDepthMap.height() - 1; row += 2) {
-        for (int col = 0; col < previousDepthMap.width() - 1; col += 2) {
+    for (int row = 0; row < previousDepthMap.getHeight() - 1; row += 2) {
+        for (int col = 0; col < previousDepthMap.getWidth() - 1; col += 2) {
             int topNeighbourRow = row - 1;
             int leftNeighbourCol = col - 1;
             int numberOfPixels = 9;

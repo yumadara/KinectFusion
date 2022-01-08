@@ -5,6 +5,9 @@
 #include <math.h> 
 #include <algorithm> 
 #include <vector>
+
+namespace kinect_fusion {
+
 class Voxel {
 public:
     
@@ -173,6 +176,7 @@ public:
         if (distance> truncateDistance){
             return truncateDistance;
         }
+        return defaultDistance;
     }
 
 
@@ -197,8 +201,7 @@ public:
 private:
     std::vector<float> Distance ;
     std::vector<float> Weight;
-    
-
-
 };
+
+} // namespace kinect_fusion
  

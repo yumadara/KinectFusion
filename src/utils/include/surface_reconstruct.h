@@ -5,6 +5,8 @@
 #include"point_cloud.h"
 #include"Voxel.h"
 #include"virtual_sensor.h"
+
+namespace kinect_fusion {
     //input float* depthMap = sensor.getDepth(); pixel coordinate x :(x,y) and corresponding global coordinate p_g :(x, y, z, 1)
     //
     //transform from current frame k to global frame : matrix4f
@@ -97,9 +99,9 @@
         }
         return sdf_k;
     }
-namespace kinect_fusion {
+
     // Voxel volument(Distance=NULL, Weight=0)I need a function to initial Distance and Weight 
-    void update_volument(kinect_fusion::VirtualSensor& sensor, Voxel& volument)
+    void update_volument(VirtualSensor& sensor, Voxel& volument)
     {
         // Vector3i orig = volument.getOrig();
         const unsigned int k = 3;//TODO:??
@@ -112,7 +114,7 @@ namespace kinect_fusion {
             const unsigned int width = sensor.getDepthImageWidth();
             const unsigned int height = sensor.getDepthImageHeight();
             
-            kinect_fusion::PointCloud PointCloud_k_i{sensor.getDepth(), sensor.getDepthIntrinsics(), sensor.getDepthExtrinsics(),  sensor.getDepthImageWidth(), sensor.getDepthImageHeight()};
+            PointCloud PointCloud_k_i{sensor.getDepth(), sensor.getDepthIntrinsics(), sensor.getDepthExtrinsics(),  sensor.getDepthImageWidth(), sensor.getDepthImageHeight()};
             std::vector<Vector3f> vertex_k_i = PointCloud_k_i.getPoints();
             const float mu = 0.1;//
             
@@ -136,4 +138,5 @@ namespace kinect_fusion {
         }
         
     }
- }
+
+} // namespace kinect_fusion

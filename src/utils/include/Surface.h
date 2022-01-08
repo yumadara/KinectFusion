@@ -4,44 +4,50 @@
 
 #include "Eigen.h"
 
-#include <camera.h>
+#include <type_definitions.h>
 
-class Surface{
+namespace kinect_fusion {
+
+class Surface {
     public:
-    Surface(Camera camera){
-        this->camera = camera;
-        Vector3f defaultValue = Vector3f::Zero();
-        vertexMap.resize(camera.pictureHeightInPixel * camera.pictureWidthInPixel);
-        normalMap.resize(camera.pictureHeightInPixel * camera.pictureWidthInPixel);
-        
-        std::fill(vertexMap.begin(), vertexMap.end(), defaultValue);
-        std::fill(normalMap.begin(), normalMap.end(), defaultValue);
-    }
-    Surface() {}
+        Surface(std::size_t height, std::size_t width) :
+            vertexMap(height, width, Vector3f::Zero()),
+            normalMap(height, width, Vector3f::Zero())
+            {}
 
-    void setVertex(int X, int Y, Vector3f value){
-        this->vertexMap[Y * camera.pictureWidthInPixel + X ] = value;
-    }
-    void setNormal(int X, int Y, Vector3f value){
-        this->normalMap[Y  * camera.pictureWidthInPixel + X ] = value;
-    }
-    Vector3f getVertex(int X, int Y){
-        return this->vertexMap[Y * camera.pictureWidthInPixel + X ];
-    }
-    Vector3f getNormal(int X, int Y){
-        return this->normalMap[Y * camera.pictureWidthInPixel + X ];
-    }
-    int getHeight(){
-        return this->camera.pictureHeightInPixel;
-    }
+        Surface() {}
 
-    int getWidth(){
-        return this->camera.pictureWidthInPixel;
-    }
+        inline void setVertex(std::size_t row, std::size_t column, const Vector3f& value) {
+            vertexMap.set(row, column, value);
+        }
+        inline void setNormal(std::size_t row, std::size_t column, const Vector3f& value) {
+            vertexMap.set(row, column, value);
+        }
+
+        inline Vector3f& getVertex(std::size_t row, std::size_t column) {
+            return vertexMap.get(row, column);
+        }
+        inline const Vector3f& getVertex(std::size_t row, std::size_t column) const {
+            return vertexMap.get(row, column);
+        }
+
+        inline Vector3f& getNormal(std::size_t row, std::size_t column) {
+            return vertexMap.get(row, column);
+        }
+        inline const Vector3f& getNormal(std::size_t row, std::size_t column) const {
+            return vertexMap.get(row, column);
+        }
+
+        inline std::size_t getHeight(){
+            return vertexMap.getHeight();
+        }
+
+        inline std::size_t getWidth(){
+            return vertexMap.getWidth();
+        }
 
     private:
-    std::vector<Vector3f> vertexMap;
-    std::vector<Vector3f> normalMap;
-    Camera camera;
-
-};
+        Map2DVector3f vertexMap;
+        Map2DVector3f normalMap;
+    };
+} // namespace kinect_fusion

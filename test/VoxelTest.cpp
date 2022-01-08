@@ -2,6 +2,7 @@
 
 // #include <Voxel.h>
 
+// namespace kinect_fusion {
 
 // /// @brief Basic test to check that data pipeline works
 // TEST(VoxelTest, CheckVoxelConstruction) {
@@ -58,7 +59,6 @@
 //     EXPECT_NEAR(vox.getNormal(3.,3.,3.)(0)-4, 0., 0.0001);
 //     EXPECT_NEAR(vox.getNormal(3.,3.,3.)(1)-0, 0., 0.0001);
 //     EXPECT_NEAR(vox.getNormal(3.,3.,3.)(2)-0, 0., 0.0001);
-
-    
-    
 // }
+
+// } // namespace kinect_fusion

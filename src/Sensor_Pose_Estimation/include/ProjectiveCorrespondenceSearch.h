@@ -5,12 +5,14 @@
 #include <surface.h>
 #include <virtual_sensor.h>
 
+namespace kinect_fusion {
+
 class projectiveCorrespondence {
 public:
 	projectiveCorrespondence(const std::vector<Eigen::Vector3f>& targetPoints, 
 		const Eigen::MatrixXf& previousTransformation,
 		const Eigen::MatrixXf& currentTransformation,
-		const kinect_fusion::VirtualSensor virtualSensor)
+		const VirtualSensor virtualSensor)
 	{
 		m_targetPoints = targetPoints;
 		//m_modelPoints = surfacePoints;
@@ -77,5 +79,7 @@ private:
 	Eigen::MatrixXf m_previousTransformation; //T_{g,k-1}
 	Eigen::MatrixXf m_currentTransformation; //T_{g,k}
 	Surface m_surface; // surface of last frame 
-	kinect_fusion::VirtualSensor m_virtualSensor;
+	VirtualSensor m_virtualSensor;
 };
+
+} // namespace kinect_fusion
