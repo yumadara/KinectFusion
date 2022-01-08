@@ -121,12 +121,12 @@ add_executable(
 #    ${SOURCES}
 #)
 
-#add_executable(
-#    ReconstructTest
-#    test/recon_test.cpp
-#    ${SOURCES}
-#)
-#enable_testing()
+add_executable(
+   ReconstructTest
+   test/recon_test.cpp
+   ${SOURCES}
+)
+# enable_testing()
 
 
 # Link test with google test library
@@ -138,14 +138,14 @@ target_link_libraries(
     freeimage
     ${OpenCV_LIBS}
 )
-#target_link_libraries(
-#    ReconstructTest # Our test
-#    gtest # Google Test library
-#    gtest_main
-#    Eigen3::Eigen
-#    freeimage
-#    ${OpenCV_LIBS}
-#)
+target_link_libraries(
+    ReconstructTest # Our test
+    gtest # Google Test library
+    gtest_main
+    Eigen3::Eigen
+    freeimage
+    ${OpenCV_LIBS}
+)
 
 target_link_libraries(
     DepthImgPreprocessingTest # Out test
@@ -210,5 +210,7 @@ target_link_libraries(
 
 # Yes, we have tests!
 include(GoogleTest)
-gtest_discover_tests(DataPipelineTest)
+# gtest_discover_tests(DataPipelineTest)
+gtest_discover_tests(ReconstructTest)
+
 

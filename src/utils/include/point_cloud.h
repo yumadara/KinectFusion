@@ -2,7 +2,7 @@
 
 //#include "simple_mesh.h"
 #include "Eigen.h"
-
+#include "type_definitions.h"
 namespace kinect_fusion {
 
 class PointCloud {
@@ -36,7 +36,7 @@ public:
     //    }
     //}
 
-    PointCloud(std::shared_ptr<MatrixXf> depthMap, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const unsigned width, const unsigned height, unsigned downsampleFactor = 1, float maxDistance = 0.1f) {
+    PointCloud(Map2Df depthMap, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const unsigned width, const unsigned height, unsigned downsampleFactor = 1, float maxDistance = 0.1f) {
         // Get depth intrinsics.
         float fovX = depthIntrinsics(0, 0);
         float fovY = depthIntrinsics(1, 1);
@@ -57,9 +57,9 @@ public:
         for (int v = 0; v < height; ++v) {
             // For every pixel in a row.
             for (int u = 0; u < width; ++u) {
-                unsigned int idx = v * width + u; // linearized index
+            std:size_t idx = v * width + u; // linearized index
                 //auto depth = (*depthMap)[idx];
-                float depth = (*depthMap)(v, u);
+                float depth = (depthMap).get(idx);
                 if (depth == MINF) {
                     pointsTmp[idx] = Vector3f(MINF, MINF, MINF);
                 }
@@ -78,8 +78,8 @@ public:
             for (int u = 1; u < width - 1; ++u) {
                 unsigned int idx = v * width + u; // linearized index
 
-                const float du = 0.5f * ((*depthMap)(v,u+1)- (*depthMap)(v,u-1));
-                const float dv = 0.5f * ((*depthMap)(v+1,u) - (*depthMap)(v-1,u));
+                const float du = 0.5f * ((depthMap).get(v,u+1)- (depthMap).get(v,u-1));
+                const float dv = 0.5f * ((depthMap).get(v+1,u) - (depthMap).get(v-1,u));
                 if (!std::isfinite(du) || !std::isfinite(dv) || abs(du) > maxDistanceHalved || abs(dv) > maxDistanceHalved) {
                     normalsTmp[idx] = Vector3f(MINF, MINF, MINF);
                     continue;
@@ -118,67 +118,67 @@ public:
         }
     }
 
-    bool readFromFile(const std::string& filename) {
-        std::ifstream is(filename, std::ios::in | std::ios::binary);
-        if (!is.is_open()) {
-            std::cout << "ERROR: unable to read input file!" << std::endl;
-            return false;
-        }
+    // bool readFromFile(const std::string& filename) {
+    //     std::ifstream is(filename, std::ios::in | std::ios::binary);
+    //     if (!is.is_open()) {
+    //         std::cout << "ERROR: unable to read input file!" << std::endl;
+    //         return false;
+    //     }
 
-        char nBytes;
-        is.read(&nBytes, sizeof(char));
+    //     char nBytes;
+    //     is.read(&nBytes, sizeof(char));
 
-        unsigned int n;
-        is.read((char*)&n, sizeof(unsigned int));
+    //     unsigned int n;
+    //     is.read((char*)&n, sizeof(unsigned int));
 
-        if (nBytes == sizeof(float)) {
-            float* ps = new float[3 * n];
+    //     if (nBytes == sizeof(float)) {
+    //         float* ps = new float[3 * n];
 
-            is.read((char*)ps, 3 * sizeof(float) * n);
+    //         is.read((char*)ps, 3 * sizeof(float) * n);
 
-            for (unsigned int i = 0; i < n; i++) {
-                Eigen::Vector3f p(ps[3 * i + 0], ps[3 * i + 1], ps[3 * i + 2]);
-                m_points.push_back(p);
-            }
+    //         for (unsigned int i = 0; i < n; i++) {
+    //             Eigen::Vector3f p(ps[3 * i + 0], ps[3 * i + 1], ps[3 * i + 2]);
+    //             m_points.push_back(p);
+    //         }
 
-            is.read((char*)ps, 3 * sizeof(float) * n);
-            for (unsigned int i = 0; i < n; i++) {
-                Eigen::Vector3f p(ps[3 * i + 0], ps[3 * i + 1], ps[3 * i + 2]);
-                m_normals.push_back(p);
-            }
+    //         is.read((char*)ps, 3 * sizeof(float) * n);
+    //         for (unsigned int i = 0; i < n; i++) {
+    //             Eigen::Vector3f p(ps[3 * i + 0], ps[3 * i + 1], ps[3 * i + 2]);
+    //             m_normals.push_back(p);
+    //         }
 
-            delete[] ps;
-        }
-        else {
-            double* ps = new double[3 * n];
+    //         delete[] ps;
+    //     }
+    //     else {
+    //         double* ps = new double[3 * n];
 
-            is.read((char*)ps, 3 * sizeof(double) * n);
+    //         is.read((char*)ps, 3 * sizeof(double) * n);
 
-            for (unsigned int i = 0; i < n; i++) {
-                Eigen::Vector3f p((float)ps[3 * i + 0], (float)ps[3 * i + 1], (float)ps[3 * i + 2]);
-                m_points.push_back(p);
-            }
+    //         for (unsigned int i = 0; i < n; i++) {
+    //             Eigen::Vector3f p((float)ps[3 * i + 0], (float)ps[3 * i + 1], (float)ps[3 * i + 2]);
+    //             m_points.push_back(p);
+    //         }
 
-            is.read((char*)ps, 3 * sizeof(double) * n);
+    //         is.read((char*)ps, 3 * sizeof(double) * n);
 
-            for (unsigned int i = 0; i < n; i++) {
-                Eigen::Vector3f p((float)ps[3 * i + 0], (float)ps[3 * i + 1], (float)ps[3 * i + 2]);
-                m_normals.push_back(p);
-            }
+    //         for (unsigned int i = 0; i < n; i++) {
+    //             Eigen::Vector3f p((float)ps[3 * i + 0], (float)ps[3 * i + 1], (float)ps[3 * i + 2]);
+    //             m_normals.push_back(p);
+    //         }
 
-            delete[] ps;
-        }
+    //         delete[] ps;
+    //     }
 
 
-        //std::ofstream file("pointcloud.off");
-        //file << "OFF" << std::endl;
-        //file << m_points.size() << " 0 0" << std::endl;
-        //for(unsigned int i=0; i<m_points.size(); ++i)
-        //	file << m_points[i].x() << " " << m_points[i].y() << " " << m_points[i].z() << std::endl;
-        //file.close();
+    //     //std::ofstream file("pointcloud.off");
+    //     //file << "OFF" << std::endl;
+    //     //file << m_points.size() << " 0 0" << std::endl;
+    //     //for(unsigned int i=0; i<m_points.size(); ++i)
+    //     //	file << m_points[i].x() << " " << m_points[i].y() << " " << m_points[i].z() << std::endl;
+    //     //file.close();
 
-        return true;
-    }
+    //     return true;
+    // }
 
     std::vector<Vector3f>& getPoints() {
         return m_points;
@@ -216,4 +216,3 @@ private:
     std::vector<Vector3f> m_normals;
 };
 } // namespace kinect_fusion
- 
