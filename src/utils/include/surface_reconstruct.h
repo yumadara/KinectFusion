@@ -5,9 +5,14 @@
 #include"point_cloud.h"
 #include"Voxel.h"
 #include"virtual_sensor.h"
-    // some comments
-    // ?????
-   //????
+    //input float* depthMap = sensor.getDepth(); pixel coordinate x :(x,y) and corresponding global coordinate p_g :(x, y, z, 1)
+    //
+    //transform from current frame k to global frame : matrix4f
+    
+    //the pi function in equation (8)
+    //input:
+    //Matrix3f depthIntrinsics : a single constant camera calibration matrix K
+    //output :pixel_coordinate
     Vector2f cameraToScreen(const Vector3f& p_k, Matrix3f depthIntrinsics)
     {
         Vector3f q = depthIntrinsics*p_k;
@@ -25,7 +30,7 @@
 
     }
     
-    float SDF_truncation(const float defaut_dst, float& x, const float& mu)//quation (9)
+    float SDF_truncation(float& x, const float& mu)//quation (9)
     {   
         int sign = x/abs(x);
         if(x > -mu)
@@ -33,7 +38,7 @@
             return fmin(1, x/mu)*sign;//TODO:!
         }
         else
-            return defaut_dst;//TODO
+            return -100;//TODO: get default value from volum
     }
     Vector2i globalToScreen(const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p_g )//equation (8)
     {
@@ -57,13 +62,13 @@
 
     }
      //p: global point x,y,z
-    float SDF_k_i(const float defaut_dst, const float mu, float lamda, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p, const float depth_k_i)
+    float SDF_k_i(const float mu, float lamda, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p, const float depth_k_i)
     {
         Vector3f translation;
         translation << depthExtrinsics.topRightCorner(3,1);
         float sdf_k_i;
         float Eta = (translation - p).norm()/lamda - depth_k_i;
-        sdf_k_i = SDF_truncation(defaut_dst, Eta, mu);
+        sdf_k_i = SDF_truncation(Eta, mu);
         return sdf_k_i;//equation （6) for each point
     }
 
@@ -79,37 +84,37 @@
             //         std::cout << "BUG" << std::endl;
             Vector2i x = globalToScreen(depthIntrinsics, depthExtrinsics, vertex_k[i]);
             const float lamda = Lamda(depthIntrinsics, x);
-            unsigned int indx = x.x()*width + x.y();//TODO: why
+            unsigned int indx = x.x()*width+ x.y();
             if (indx<length){
                 float depth_k_i = depth_k[indx];
                 if(depth_k_i == MINF)
                     sdf_k[i] = defaut_dst; //defaut volum
                 else
-                    sdf_k[i] = SDF_k_i(defaut_dst, mu, lamda, depthIntrinsics, depthExtrinsics, vertex_k[i], depth_k_i);
+                    sdf_k[i] = SDF_k_i(mu, lamda, depthIntrinsics, depthExtrinsics, vertex_k[i], depth_k_i);
             }
             else
                 sdf_k[i] = defaut_dst;//defaut volum
         }
         return sdf_k;
     }
-    namespace kinect_fusion{
+namespace kinect_fusion {
     // Voxel volument(Distance=NULL, Weight=0)I need a function to initial Distance and Weight 
-    void update_volument(kinect_fusion::VirtualSensor& sensor, kinect_fusion::Voxel& volument)
+    void update_volument(kinect_fusion::VirtualSensor& sensor, Voxel& volument)
     {
         // Vector3i orig = volument.getOrig();
         const unsigned int k = 3;//TODO:??
         unsigned int i = 0;
         const float defaut_dst = volument.getDefaultDist();
         while (sensor.processNextFrame() && i <= k) {
-            float* depthMap_k_i = sensor.getDepth().data();
+            float* depthMap_k_i = sensor.getDepth().data();;
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
             const Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
-            const unsigned width = sensor.getDepthImageWidth();
-            const unsigned height = sensor.getDepthImageHeight();
+            const unsigned int width = sensor.getDepthImageWidth();
+            const unsigned int height = sensor.getDepthImageHeight();
             
-            PointCloud PointCloud_k_i{depthMap_k_i, depthIntrinsics, depthExtrinsics, width, height};
+            kinect_fusion::PointCloud PointCloud_k_i{sensor.getDepth(), sensor.getDepthIntrinsics(), sensor.getDepthExtrinsics(),  sensor.getDepthImageWidth(), sensor.getDepthImageHeight()};
             std::vector<Vector3f> vertex_k_i = PointCloud_k_i.getPoints();
-            const float mu = 0.1;//TODO
+            const float mu = 0.1;//
             
             std::vector<float> F_Rk_i = SDF_k(defaut_dst, width, height, mu, depthIntrinsics, depthExtrinsics, depthMap_k_i, vertex_k_i);
             for(unsigned int j=0; j<vertex_k_i.size(); j++)
@@ -118,7 +123,7 @@
                 volument.setWeight(vertex_k_i[j].x(), vertex_k_i[j].y(), vertex_k_i[j].z(), 1);
                 float F_k_i_j = volument.getDistance(vertex_k_i[j].x(), vertex_k_i[j].y(), vertex_k_i[j].z());
                 float new_dist;
-                if (F_k_i_j != defaut_dst)//TODO
+                if (F_k_i_j != defaut_dst)//TODO:get default value
                     new_dist = (F_k_i_j + F_Rk_i[j])/2;
                 else
                     new_dist = F_k_i_j;
@@ -131,5 +136,4 @@
         }
         
     }
-
-}
+ }

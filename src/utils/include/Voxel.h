@@ -23,14 +23,14 @@ public:
     numY = num_y;
     numZ = num_z;
     }
-    /*Voxel(int num_x, int num_y, int num_z,
+    Voxel(int num_x, int num_y, int num_z,
     int origin_x, int origin_y, int origin_z, float defaultDistance, int defaultWeight) {
     Distance.resize(num_x * num_y * num_z);
     Weight.resize( num_x * num_y * num_z);
     defaultDistance = defaultDistance;
     defaultWeight = defaultWeight;
-    std::fill_n(Distance, num_x * num_y * num_z, defaultDistance); 
-    std::fill_n(Weight,num_x * num_y * num_z , defaultWeight); 
+    std::fill_n(Distance.begin(), num_x * num_y * num_z, defaultDistance); 
+    std::fill_n(Weight.begin(), num_x * num_y * num_z, defaultWeight); 
 
     originX = origin_x;
     originY = origin_y;
@@ -38,7 +38,7 @@ public:
     numX = num_x;
     numY = num_y;
     numZ = num_z;
-    }*/
+    }
 
     
     Voxel() {
