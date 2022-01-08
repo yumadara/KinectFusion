@@ -115,11 +115,11 @@ add_executable(
     test/VoxelTest.cpp # Test file
     ${SOURCES}
 )
-#add_executable(
-#    CorrespondenceSearchTest # Test name
-#    test/projectiveCorrespondenceSearchTest.cpp # Test file
-#    ${SOURCES}
-#)
+add_executable(
+    CorrespondenceSearchTest # Test name
+    test/projectiveCorrespondenceSearchTest.cpp # Test file
+    ${SOURCES}
+)
 
 #add_executable(
 #    ReconstructTest
@@ -198,14 +198,14 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
-#target_link_libraries(
-#    CorrespondenceSearchTest
-#    gtest # Google Test library
-#    gtest_main
-#    freeimage
-#    Eigen3::Eigen
- #   ${OpenCV_LIBS}
-#)
+target_link_libraries(
+    CorrespondenceSearchTest
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+   ${OpenCV_LIBS}
+)
 
 
 # Yes, we have tests!

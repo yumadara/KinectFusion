@@ -2,7 +2,7 @@
 
 //#include "simple_mesh.h"
 #include "Eigen.h"
-
+#include "type_definitions.h"
 namespace kinect_fusion {
 
 class PointCloud {
@@ -36,7 +36,7 @@ public:
     //    }
     //}
 
-    PointCloud(std::shared_ptr<MatrixXf> depthMap, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const unsigned width, const unsigned height, unsigned downsampleFactor = 1, float maxDistance = 0.1f) {
+    PointCloud(Map2Df depthMap, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const unsigned width, const unsigned height, unsigned downsampleFactor = 1, float maxDistance = 0.1f) {
         // Get depth intrinsics.
         float fovX = depthIntrinsics(0, 0);
         float fovY = depthIntrinsics(1, 1);
@@ -57,9 +57,9 @@ public:
         for (int v = 0; v < height; ++v) {
             // For every pixel in a row.
             for (int u = 0; u < width; ++u) {
-                unsigned int idx = v * width + u; // linearized index
+            std:size_t idx = v * width + u; // linearized index
                 //auto depth = (*depthMap)[idx];
-                float depth = (*depthMap)(v, u);
+                float depth = (depthMap).get(idx);
                 if (depth == MINF) {
                     pointsTmp[idx] = Vector3f(MINF, MINF, MINF);
                 }
@@ -78,8 +78,8 @@ public:
             for (int u = 1; u < width - 1; ++u) {
                 unsigned int idx = v * width + u; // linearized index
 
-                const float du = 0.5f * ((*depthMap)(v,u+1)- (*depthMap)(v,u-1));
-                const float dv = 0.5f * ((*depthMap)(v+1,u) - (*depthMap)(v-1,u));
+                const float du = 0.5f * ((depthMap).get(v,u+1)- (depthMap).get(v,u-1));
+                const float dv = 0.5f * ((depthMap).get(v+1,u) - (depthMap).get(v-1,u));
                 if (!std::isfinite(du) || !std::isfinite(dv) || abs(du) > maxDistanceHalved || abs(dv) > maxDistanceHalved) {
                     normalsTmp[idx] = Vector3f(MINF, MINF, MINF);
                     continue;
