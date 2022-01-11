@@ -2,7 +2,7 @@
 
 #include <RayCasting.h>
 
-#include <camera.h>
+#include <Camera.h>
 #include <Voxel.h>
 
 namespace kinect_fusion {

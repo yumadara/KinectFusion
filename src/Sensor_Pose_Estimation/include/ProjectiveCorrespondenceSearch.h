@@ -2,7 +2,7 @@
 
 #include "Eigen.h"
 
-#include <surface.h>
+#include <Surface.h>
 #include <virtual_sensor.h>
 
 namespace kinect_fusion {
