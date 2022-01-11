@@ -66,14 +66,14 @@ namespace kinect_fusion {
         return sdf_k_i;
     }
     //
-    void update_volument(VirtualSensor& sensor, Voxel& volument)
+    void update_volument(VirtualSensor& sensor, Voxel& volument, const float defaut_dst )
     {
         // Vector3i orig = volument.getOrig();
-        std::cout<<"test====="<<std::endl;
-        const unsigned int k = 3;//TODO:??
-        unsigned int i = 0;
-        const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
-        while (sensor.processNextFrame() && i <= k) {
+        // std::cout<<"test====="<<std::endl;
+        // const unsigned int k = 3;//TODO:??
+        // unsigned int i = 0;
+        // const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
+        // while (sensor.processNextFrame() && i <= k) {
             Map2Df depthMap_k_i{sensor.getDepth()};
             //float* depthMap_k_i = sensor.getDepth().data();;
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
@@ -119,8 +119,8 @@ namespace kinect_fusion {
                 }
                
             }
-        i++;
-        }
+        // i++;
+        // }
         
     }
 

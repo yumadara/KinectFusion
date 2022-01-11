@@ -9,6 +9,12 @@ Voxel volum(100, 100, 100, 0, 0, 0, -100, 0);
 VirtualSensor sensor;
 std::string filenameIn{"../data/rgbd_dataset_freiburg1_xyz/"};
 sensor.init(filenameIn);
-update_volument(sensor, volum);
+const unsigned int k = 3;//TODO
+unsigned int i = 0;
+const float defaut_dst = volum.getDefaultDist();//TODO: get wrong intial value
+while (sensor.processNextFrame() && i <= k) {
+update_volument(sensor, volum, defaut_dst);
+i++;
+}
 }
 } // namespace kinect_fusion
