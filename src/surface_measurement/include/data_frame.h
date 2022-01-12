@@ -44,6 +44,12 @@ class FrameData {
             return m_surfaces[getIndex(level)];
         }
 
+        Eigen::Matrix3f& getCameraIntrinsics(Level level)
+        {
+            return m_cameraIntrinstics[getIndex(level)];
+        }
+
+
     private:
         /**
          * @brief Get index of m_filteredDepthMaps, m_normalMaps, or other maps in this class, from the level.

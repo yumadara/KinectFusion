@@ -25,7 +25,7 @@ class Surface {
          * @param height Height, or number of pixel rows in the maps 
          * @param width Width, or number of pixel columns in the maps
          */
-        Surface(std::size_t height, std::size_t width) :
+        Surface(std::size_t height, std::size_t width):
             vertexMap(height, width, Vector3f::Zero()),
             normalMap(height, width, Vector3f::Zero())
             {}

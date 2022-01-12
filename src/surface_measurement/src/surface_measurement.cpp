@@ -76,7 +76,7 @@ void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap)
             }
 
             float centerPixel = previousDepthMap.get(row, col);
-            float& newPixel = nextDepthMap.get(row / 2, col / 2);
+            float newPixel = nextDepthMap.get(int(row / 2), int(col / 2));
             newPixel = 0;
 
             for (int neighbourRow = topNeighbourRow; neighbourRow <= row + 1; neighbourRow++) {
