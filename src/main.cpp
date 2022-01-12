@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     Map2Df depth = sensor.getDepth();
     dataFrame.updateValues(depth);
 
-    Surface& previousSurface = dataFrame.getSurface();
+    
     MatrixXf& pose_estimation = MatrixXf::Identity();
     for (unsigned int i = 1; i < sensor.getCurrentFrameCnt(); i++) {
         sensor.processNextFrame();
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
         Map2Df depth = sensor.getDepth();
         dataFrame.updateValues(depth);
 
-        Surface& nextSurface = dataFrame.getSurface();
+        
 
         PoseEstimator pose_estimator(current_dataFrame, previous_dataFrame, pose_estimation);
         
@@ -36,7 +36,15 @@ int main(int argc, char *argv[]) {
         pose_estimation = pose_estimator.getCurrentTransformation();
 
         update_volument(sensor, volum, pose_estimation);
-
+        Camera camera(pose_estimation, sensor.getDepthIntrinsicsInverse(), //TODO 1. camera:change constructor 2. sensor.getDepthIntrinsicsInverse
+            sensor.getHeight(), sensor.getWidth(),
+            0, 0);
+        RayCasting cast(volum, camera);
+        cast.do_work();
+        Map2D depthMap = cast.getDepthMap();  //TODO cast.getDepthMap
+        
+        previous_dataFrame.updateValues(depthMap);
+        
 
     }
 }
