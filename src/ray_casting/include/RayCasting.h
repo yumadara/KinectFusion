@@ -30,7 +30,7 @@ class RayCasting {
         }
     }
     bool fill_pixel(int XInPixel, int YInPixel){
-        Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(XInPixel), 1.);
+        Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(YInPixel), 1.);
         float stepLength =  TSDF.truncateDistance;
         
         Ray ray = Ray(stepLength, this->minDistance, this->maxDistance, direction);
