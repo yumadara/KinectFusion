@@ -95,52 +95,6 @@ private:
 };
 
 
-/**
- * Optimization constraints.
- */
-class PointToPointConstraint {
-public:
-    PointToPointConstraint(const Vector3f& sourcePoint, const Vector3f& targetPoint, const float weight) :
-        m_sourcePoint{ sourcePoint },
-        m_targetPoint{ targetPoint },
-        m_weight{ weight }
-    { }
-
-    template <typename T>
-    bool operator()(const T* const pose, T* residuals) const {
-        // TODO: Implemented the point-to-point cost function.
-        // The resulting 3D residual should be stored in residuals array. To apply the pose 
-        // increment (pose parameters) to the source point, you can use the PoseIncrement
-        // class.
-        // Important: Ceres automatically squares the cost function.
-
-        PoseIncrement<T> PI(const_cast<T*> (pose));
-        T m_transformed_Point[3];
-        T m_source[3];
-        m_source[0] = T(m_sourcePoint[0]);
-        m_source[1] = T(m_sourcePoint[1]);
-        m_source[2] = T(m_sourcePoint[2]);
-
-        PI.apply(m_source, m_transformed_Point);
-        residuals[0] = T(m_weight * LAMBDA) * (m_transformed_Point[0] - T(m_targetPoint[0]));
-        residuals[1] = T(m_weight * LAMBDA) * (m_transformed_Point[1] - T(m_targetPoint[1]));
-        residuals[2] = T(m_weight * LAMBDA) * (m_transformed_Point[2] - T(m_targetPoint[2]));
-
-        return true;
-    }
-
-    static ceres::CostFunction* create(const Vector3f& sourcePoint, const Vector3f& targetPoint, const float weight) {
-        return new ceres::AutoDiffCostFunction<PointToPointConstraint, 3, 6>(
-            new PointToPointConstraint(sourcePoint, targetPoint, weight)
-            );
-    }
-
-protected:
-    const Vector3f m_sourcePoint;
-    const Vector3f m_targetPoint;
-    const float m_weight;
-    const float LAMBDA = 0.1f;
-};
 
 class PointToPlaneConstraint {
 public:

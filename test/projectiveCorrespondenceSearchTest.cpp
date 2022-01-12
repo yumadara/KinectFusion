@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include "../src/Sensor_Pose_Estimation/include/ProjectiveCorrespondenceSearch.h"
-#include "../src/utils/include/point_cloud.h"
+#include <virtual_sensor.h>
 
 namespace kinect_fusion {
 
 // Demonstrate some basic assertions.
-TEST(DepthImgPreprocessingTest, BasicAssertions) {
-	std::string filenameIn = std::string("../data/rgbd_dataset_freiburg1_xyz/");
+TEST(projectiveCorrespondenceSearchTest, BasicAssertions) {
+	std::string filenameIn = std::string("/mnt/d/Users/chiyu/1 semester/KinectFusion/data/rgbd_dataset_freiburg1_xyz/");
 
 	std::string filenameBaseOut = std::string("mesh_");
 
@@ -20,26 +20,35 @@ TEST(DepthImgPreprocessingTest, BasicAssertions) {
 
 	// We store a first frame as a reference frame. All next frames are tracked relatively to the first frame.
 	sensor.processNextFrame();
-	PointCloud target(sensor.getDepth(), sensor.getDepthIntrinsics(), sensor.getDepthExtrinsics(), sensor.getDepthImageWidth(), sensor.getDepthImageHeight());
 
+	Map2Df depths{sensor.getDepth()};
+	std::uint32_t width = sensor.getDepthImageWidth();
+	std::uint32_t height = sensor.getDepthImageHeight();
+	Eigen::Matrix3f cameraIntrinsics{ sensor.getDepthIntrinsics() };
+	std::cout << "frame k - 1 set up" << std::endl;
+	
 	int i = 0;
 	const int iMax = 1;
 	while (sensor.processNextFrame() && i <= 0) {
-		auto depthMap = sensor.getDepth();
-		Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
-		Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
-		PointCloud source(sensor.getDepth(), sensor.getDepthIntrinsics(),sensor.getDepthExtrinsics(), sensor.getDepthImageWidth(),sensor.getDepthImageHeight());
-
+		Map2Df depths{ sensor.getDepth() };
+		std::uint32_t width = sensor.getDepthImageWidth();
+		std::uint32_t height = sensor.getDepthImageHeight();
+		
+		Eigen::Matrix3f cameraIntrinsics{ sensor.getDepthIntrinsics()};
+		FrameData frame_data(cameraIntrinsics, height, width);
+		frame_data.updateValues(depths);
+		std::cout << "frame k set up" << std::endl;
 		Matrix4f previousTransformation = Matrix4f::Identity();
 		Matrix4f currentTransformation = Matrix4f::Identity();
-		
-		projectiveCorrespondence pc(target.getPoints(),
+		std::cout << "pc initial start";
+		projectiveCorrespondence pc(frame_data.getSurface().getVertexMap(),
 			previousTransformation,
-			currentTransformation,sensor);
+			currentTransformation,cameraIntrinsics);
+		std::cout << "pc initial end";
 		pc.matchPoint();
 		//std::vector<int> match = pc.getMatch();
 		std::cout << "matched point size" << pc.getMatch().size()<<std::endl;
-		std::cout << "target point size" << pc.getTargetPoint().size()<<std::endl;
+		//std::cout << "target point size" << pc.getTargetPoint().size()<<std::endl;
 		i++;
 	}
 }

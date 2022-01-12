@@ -1,41 +1,45 @@
 #include <math.h>
 
 #include "Eigen.h"
-
+#include <data_frame.h>
 #include <surface.h>
-#include <virtual_sensor.h>
+
 
 namespace kinect_fusion {
 
 class projectiveCorrespondence {
 public:
-	projectiveCorrespondence(const std::vector<Eigen::Vector3f>& targetPoints, 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="targetMap"> targetMap in camera space of frame k 
+	/// <param name="previousTransformation"></param> previous transformation also in camera space 
+	/// <param name="currentTransformation"></param> current transformation also in camera space
+	/// <param name="camera_intrinsics"></param> 
+	projectiveCorrespondence(const Map2DVector3f& targetMap,
 		const Eigen::MatrixXf& previousTransformation,
 		const Eigen::MatrixXf& currentTransformation,
-		const VirtualSensor virtualSensor)
+		const Eigen::Matrix3f& camera_intrinsics)
+		
 	{
-		m_targetPoints = targetPoints;
+		m_targetMap = targetMap;
 		//m_modelPoints = surfacePoints;
 		m_previousTransformation = previousTransformation;
 		m_currentTransformation = currentTransformation;
-		m_virtualSensor = virtualSensor;
+		m_cameraIntrinsics = camera_intrinsics;
 	}
 	int matchPoint()
 	{
 		// match target point with correspondence point
-		for (int i = 0; i != m_targetPoints.size(); i++)
+		for (int i = 0; i != m_targetMap.size(); i++)
 		{
 			// find correspondence point in m_modelpoints
-			if (m_targetPoints[i][0] != MINF && m_targetPoints[i][1] != MINF && m_targetPoints[i][2] != MINF)
+			if (m_targetMap.get(i)[0] != MINF && m_targetMap.get(i)[1] != MINF && m_targetMap.get(i)[2] != MINF)
 			{
-				int correspondenceIndexInSurface = findCorrespondence(m_targetPoints[i]);
+				int correspondenceIndexInSurface = findCorrespondence(m_targetMap.get(i));
 				if (correspondenceIndexInSurface != -1) // found correspondence
 				{
-					match.push_back(correspondenceIndexInSurface);
-				}
-				else // 
-				{
-					match.push_back(-1);
+					match.insert(std::pair<int, int>(i, correspondenceIndexInSurface));
 				}
 			}
 			
@@ -51,9 +55,9 @@ public:
 		point(2) = targetPoint[2];
 		//point(3) = 1;
 		Eigen::MatrixXf Transformation = m_previousTransformation.inverse()* m_currentTransformation;
-		Eigen::Matrix3f intrinsics = m_virtualSensor.getColorIntrinsics(); // should be k-1 th frame intrinsic
-		unsigned int depthHeight = m_virtualSensor.getDepthImageHeight();
-		unsigned int depthWidth = m_virtualSensor.getDepthImageWidth();
+		Eigen::Matrix3f intrinsics = m_cameraIntrinsics; // should be k-1 th frame intrinsic
+		unsigned int depthHeight = m_targetMap.getHeight();
+		unsigned int depthWidth = m_targetMap.getWidth();
 		
 		int imagePlaneCoordinateX = round(((intrinsics * (Transformation.block(0,0,3,3) * point + Transformation.block(0,3,3,1)))(0)));
 		int imagePlaneCoordinateY = round(((intrinsics * (Transformation.block(0, 0, 3, 3) * point + Transformation.block(0, 3, 3, 1))))(1));
@@ -63,23 +67,25 @@ public:
 		}
 		return imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX;
 	}
-	std::vector<int> getMatch()
+
+	std::map<int, int> getMatch()
 	{
 		return match;
 	}
 
-	std::vector<Eigen::Vector3f> getTargetPoint()
-	{
-		return m_targetPoints;
-	}
+
+	
+
 private:
-	std::vector<Eigen::Vector3f> m_targetPoints;
+	
 	//std::vector<Eigen::Vector3f> m_surfacePoints;
-	std::vector<int> match;
+	std::map<int, int> match;
 	Eigen::MatrixXf m_previousTransformation; //T_{g,k-1}
-	Eigen::MatrixXf m_currentTransformation; //T_{g,k}
-	Surface m_surface; // surface of last frame 
-	VirtualSensor m_virtualSensor;
+	Eigen::MatrixXf m_currentTransformation; //T_{g,k}, initial setting will be T_{g, k-1}
+	Map2DVector3f m_targetMap; // surface of k-th frame 
+	Eigen::MatrixXf m_cameraIntrinsics;
+	int m_height;
+	int m_width;
 };
 
 } // namespace kinect_fusion
