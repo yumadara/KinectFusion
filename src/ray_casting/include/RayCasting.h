@@ -2,8 +2,8 @@
 #include <Ray.h>
 #include <Voxel.h>
 
-#include <Camera.h>
-#include <Surface.h>
+#include <camera.h>
+#include <surface.h>
 
 namespace kinect_fusion {
 

@@ -2,6 +2,8 @@
 
 #include <surface_measurement_utils.h>
 
+#include <iostream>
+
 namespace kinect_fusion {
 
 FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t height, std::size_t width)
@@ -15,6 +17,7 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
 
             m_cameraIntrinstics[index] = computeLevelCameraIntrinstics(cameraIntrinstics, level);
 
+            m_filteredDepthMaps[index] = Map2Df(current_height, current_width);
             m_surfaces[index] = Surface(current_height, current_width);
         } 
     }

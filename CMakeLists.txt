@@ -51,6 +51,7 @@ include_directories(${SOURCE_DIR})
 include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
 include_directories(${SOURCE_DIR}/surface_measurement/include)
 include_directories(${SOURCE_DIR}/ray_casting/include)
+include_directories(${SOURCE_DIR}/surface_reconstruction/include)
 
 # Define our source files
 set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
@@ -124,6 +125,11 @@ add_executable(
 add_executable(
    ReconstructTest
    test/recon_test.cpp
+   ${SOURCES}
+)
+add_executable(
+   SurfaceMeasurementTest
+   test/surface_measurement_test.cpp
    ${SOURCES}
 )
 # enable_testing()
@@ -208,10 +214,20 @@ target_link_libraries(
    ${OpenCV_LIBS}
 )
 
+target_link_libraries(
+    SurfaceMeasurementTest
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+   ${OpenCV_LIBS}
+)
+
 
 # Yes, we have tests!
 include(GoogleTest)
 gtest_discover_tests(DataPipelineTest)
+gtest_discover_tests(SurfaceMeasurementTest)
 # gtest_discover_tests(ReconstructTest)
 
 
