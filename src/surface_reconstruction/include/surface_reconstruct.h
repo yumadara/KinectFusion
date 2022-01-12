@@ -74,7 +74,7 @@ namespace kinect_fusion {
         // std::cout<<"test====="<<std::endl;
         // const unsigned int k = 3;//TODO:??
         // unsigned int i = 0;
-        // const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
+            const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
         // while (sensor.processNextFrame() && i <= k) {
             Map2Df depthMap_k_i{sensor.getDepth()};
             //float* depthMap_k_i = sensor.getDepth().data();;
