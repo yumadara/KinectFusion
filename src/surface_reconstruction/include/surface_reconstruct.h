@@ -66,18 +66,21 @@ namespace kinect_fusion {
         return sdf_k_i;
     }
     //
-    void update_volument(VirtualSensor& sensor, Voxel& volument, const float defaut_dst )
+    //void update_volument(VirtualSensor& sensor, Voxel& volument, const float defaut_dst )
+    //{
+    void update_volument(VirtualSensor& sensor, Voxel& volument, const Matrix4f depthExtrinsics )
     {
         // Vector3i orig = volument.getOrig();
         // std::cout<<"test====="<<std::endl;
         // const unsigned int k = 3;//TODO:??
         // unsigned int i = 0;
-        // const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
+            const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
         // while (sensor.processNextFrame() && i <= k) {
             Map2Df depthMap_k_i{sensor.getDepth()};
             //float* depthMap_k_i = sensor.getDepth().data();;
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
-            const Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
+            //const Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
+            const Matrix4f depthExtrinsics = depthExtrinsics;
             const unsigned int width = sensor.getDepthImageWidth();
             const unsigned int height = sensor.getDepthImageHeight();
             const float mu = 10.0;//TODO: right? wirte a config file
