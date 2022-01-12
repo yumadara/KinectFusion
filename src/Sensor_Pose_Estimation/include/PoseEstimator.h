@@ -141,6 +141,12 @@ namespace kinect_fusion {
             }
         }
 
+        Eigen::MatrixXf getCurrentTransformation()
+        {
+            return m_currentTransformation;
+        }
+
+        
 	private:
         FrameData m_currentFrameData;
         FrameData m_lastFrameData;
