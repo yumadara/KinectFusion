@@ -2,6 +2,7 @@
 #include "utils/include/type_definitions.h"
 #include <PoseEstimator.h>
 #include <data_frame.h>
+#include"surface_reconstruct.h"
 namespace kinect_fusion {
 
 int main(int argc, char *argv[]) {
@@ -9,7 +10,7 @@ int main(int argc, char *argv[]) {
 
     VirtualSensor sensor;
     sensor.init(filenameIn)
-
+    Voxel volum(100, 100, 100, 0, 0, 0, -100, 0);
     FrameData previous_dataFrame{sensor.getDepthIntrinsics(), sensor.getHeight(), sensor.getWidth()};
 
     sensor.processNextFrame();
@@ -30,9 +31,13 @@ int main(int argc, char *argv[]) {
         
         for (Level level:  LEVELS)
         {
-            frame2frameEstimation(Eigen::MatrixXf inputTransformationMatrix, level);
+            frame2frameEstimation(pose_estimation, level);
         }
         pose_estimation = pose_estimator.getCurrentTransformation();
+
+        update_volument(sensor, volum, pose_estimation);
+
+
     }
 }
 } // namespace kinect_fusion
