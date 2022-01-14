@@ -49,6 +49,8 @@ class FrameData {
             return m_cameraIntrinstics[getIndex(level)];
         }
 
+        FrameData& operator=(const FrameData& rhs) { return *this; }
+
 
     private:
         /**
