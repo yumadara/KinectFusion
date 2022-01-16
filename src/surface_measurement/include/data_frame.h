@@ -10,6 +10,7 @@ constexpr float SIGMA{0.1};
 
 class FrameData {
     public:
+        FrameData() {};
         /**
          * @brief Construct a new Frame Data object
          * 

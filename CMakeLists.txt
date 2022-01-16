@@ -116,9 +116,11 @@ add_executable(
     test/VoxelTest.cpp # Test file
     ${SOURCES}
 )
+
+
 add_executable(
-    CorrespondenceSearchTest # Test name
-    test/projectiveCorrespondenceSearchTest.cpp # Test file
+    PoseEstimatorTest # Test name
+    test/PoseEstimatorTest.cpp # Test file
     ${SOURCES}
 )
 
@@ -195,6 +197,15 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
+target_link_libraries(
+
+    PoseEstimatorTest # Out test
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
+)
 
 target_link_libraries(
     VoxelTest # Out test
@@ -205,14 +216,7 @@ target_link_libraries(
     ${OpenCV_LIBS}
 )
 
-target_link_libraries(
-    CorrespondenceSearchTest
-    gtest # Google Test library
-    gtest_main
-    freeimage
-    Eigen3::Eigen
-   ${OpenCV_LIBS}
-)
+
 
 target_link_libraries(
     SurfaceMeasurementTest

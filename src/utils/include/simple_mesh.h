@@ -38,21 +38,17 @@ public:
 	SimpleMesh(VirtualSensor& sensor, const Matrix4f& cameraPose, float edgeThreshold = 0.01f) {
 		// Get ptr to the current depth frame.
 		// Depth is stored in row major (get dimensions via sensor.GetDepthImageWidth() / GetDepthImageHeight()).
-<<<<<<< HEAD
-		auto depthMap = sensor.getDepth();
+
+		Map2Df depthMap = sensor.getDepth();
 		// Get ptr to the current color frame.
 		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
-		auto colorMap = sensor.getColorRGBX();
-=======
-		float* depthMap = sensor.getDepth().data();
+		Map2Df colorMap = sensor.getColorRGBX();
+
+		//auto depthMap = sensor.getDepth().data();
 		// Get ptr to the current color frame.
 		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
-		BYTE* colorMap = sensor.getColorRGBX().data();
-<<<<<<< HEAD
->>>>>>> 8d95ff6... Almost finish data frame implementation (surface measurement)
-=======
->>>>>>> e8df95e20759c3de156e182b00c48a972bc37f56
->>>>>>> 8b3b20528207f1d76f0a1bafcc90c6aa59bbf235
+		//auto colorMap = sensor.getColorRGBX().data();
+
 
 		// Get depth intrinsics.
 		Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
@@ -74,7 +70,7 @@ public:
 			// For every pixel in a row.
 			for (unsigned int u = 0; u < sensor.getDepthImageWidth(); ++u) {
 				unsigned int idx = v*sensor.getDepthImageWidth() + u; // linearized index
-				auto depth = (*depthMap)[idx];
+				float depth = depthMap.get(idx);
 				if (depth == MINF) {
 					m_vertices[idx].position = Vector4f(MINF, MINF, MINF, MINF);
 					m_vertices[idx].color = Vector4uc(0, 0, 0, 0);
@@ -95,7 +91,7 @@ public:
 
 					// Write color to vertex.
 
-					//m_vertices[idx].color = Vector4uc((*colorMap)[4 * idxCol + 0], (*colorMap)[4 * idxCol + 1], (*colorMap)[4 * idxCol + 2], (*colorMap)[4 * idxCol + 3]);
+					m_vertices[idx].color = Vector4uc(colorMap.get(4 * idxCol + 0), colorMap.get(4 * idxCol + 1), colorMap.get(4 * idxCol + 2), colorMap.get(4 * idxCol + 3));
 				}
 			}
 		}

@@ -69,6 +69,10 @@ class Map2D {
             get(row, column) = value;
         }
 
+        inline void set(std::size_t index, const T& value) {
+            get(index) = value;
+        }
+
         /**
          * @brief Subscription operator. It does the same as get method.
          * 
