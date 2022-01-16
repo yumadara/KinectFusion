@@ -69,14 +69,7 @@ namespace kinect_fusion {
 
                     float cosin = (sourceNormal.x() * targetNormal.x() + sourceNormal.y() * targetNormal.y() + sourceNormal.z() * targetNormal.z()) / (sourceNormal.norm() * targetNormal.norm());
                     float dis = (sourceVertex - targetVertex).norm();
-                    if (cosin > epsilon_theta || dis > epsilon_d ) {
-                        //std::cout << "too far" << std::endl;
-                        num++;
-                        //std::cout << "match size" <<match.size()<< std::endl;
-                        //match.erase(it);
-                        //std::cout << "after erasing, match size" << match.size() << std::endl;
-                    }
-                    else
+                    if (cosin >= epsilon_theta && dis <= epsilon_d ) 
                     {
                         valid_num++;
                         Vector3f transformedSourceVertex = TransformVertex(sourceVertex, m_currentTransformation);
