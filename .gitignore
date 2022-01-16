@@ -9,3 +9,4 @@
 **/lib/opencv-master/**
 **/src/out
 **/.vscode
+**/*.off
