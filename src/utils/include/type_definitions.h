@@ -133,6 +133,9 @@ class Map2D {
         inline T* data() {
             return dataVector.data();
         }
+        inline const T* data() const {
+            return dataVector.data();
+        }
 
         /**
          * @brief Get size of the array.

@@ -13,8 +13,12 @@ const unsigned int k = 3;//TODO
 unsigned int i = 0;
 // const float defaut_dst = volum.getDefaultDist();//TODO: get wrong intial value
 while (sensor.processNextFrame() && i <= k) {
+<<<<<<< HEAD
 Matrix4f depthExtri = sensor.getDepthExtrinsics();
 update_volument(sensor, volum, depthExtri);
+=======
+// update_volument(sensor, volum, defaut_dst); // TODO: get it to compile
+>>>>>>> e4ee6281805ec98be5b84820876c7dfc03179dd5
 i++;
 }
 }

@@ -25,7 +25,7 @@ class FrameData {
          * 
          * @param depths Depths map from depth camera
          */
-        void updateValues(const Map2Df& depths);
+        void updateValues(Map2Df& depths);
 
         /**
          * @brief Get the surface with normal and vertex maps for the first level.
