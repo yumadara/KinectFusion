@@ -16,8 +16,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Our project name
 project(kinect_fusion_project) 
 
-# FInd important libraries
-#find_package(OpenCV REQUIRED)
+# Find important libraries
+find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 # Set variables here
@@ -123,8 +123,6 @@ add_executable(
     ${SOURCES}
 )
 
-
-
 add_executable(
    ReconstructTest
    test/recon_test.cpp
@@ -156,7 +154,6 @@ target_link_libraries(
     freeimage
     ${OpenCV_LIBS}
 )
-
 
 target_link_libraries(
     ReconstructTest # Our test
@@ -210,7 +207,6 @@ target_link_libraries(
     ${OpenCV_LIBS}
 )
 
-
 target_link_libraries(
     VoxelTest # Out test
     gtest # Google Test library
@@ -220,8 +216,6 @@ target_link_libraries(
     ${OpenCV_LIBS}
 )
 
-
-
 target_link_libraries(
     SurfaceMeasurementTest
     gtest # Google Test library
@@ -230,7 +224,6 @@ target_link_libraries(
     Eigen3::Eigen
    ${OpenCV_LIBS}
 )
-
 
 # Yes, we have tests!
 include(GoogleTest)
