@@ -24,11 +24,13 @@ void fillVertexMap(const Map2Df& depths, const Eigen::Matrix3f& depthIntrinsics,
                     std::size_t idx = depths.getIndex(row, col); // linearized index
                     float depth = depths.get(idx);
                     if (depth == MINF) {
-                        vertexMap.get(idx) = Vector3f(MINF, MINF, MINF);
+                        //vertexMap.get(idx) = Vector3f(MINF, MINF, MINF);
+                        vertexMap.set(idx, Vector3f(MINF, MINF, MINF));
                     }
                     else {
                         // Back-projection to camera space.
-                        vertexMap.get(idx) = Vector3f((col - cX) / fovX * depth, (row - cY) / fovY * depth, depth);
+                        //vertexMap.get(idx) = Vector3f((col - cX) / fovX * depth, (row - cY) / fovY * depth, depth);
+                        vertexMap.set(idx, Vector3f((col - cX) / fovX * depth, (row - cY) / fovY * depth, depth));
                     }
                 }
             }
@@ -76,7 +78,7 @@ void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap)
             }
 
             float centerPixel = previousDepthMap.get(row, col);
-            float newPixel = nextDepthMap.get(int(row / 2), int(col / 2));
+            float& newPixel = nextDepthMap.get(int(row / 2), int(col / 2));
             newPixel = 0;
 
             for (int neighbourRow = topNeighbourRow; neighbourRow <= row + 1; neighbourRow++) {

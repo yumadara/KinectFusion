@@ -79,6 +79,12 @@ add_executable(
 )
 
 add_executable(
+    PoseEstimatorTest # Test name
+    test/PoseEstimatorTest.cpp # Test file
+    ${SOURCES}
+)
+
+add_executable(
     DepthImgPreprocessingTest # Test name
     test/DepthImgPreprocessingTest.cpp # Test file
     ${SOURCES}
@@ -118,11 +124,6 @@ add_executable(
 )
 
 
-add_executable(
-    PoseEstimatorTest # Test name
-    test/PoseEstimatorTest.cpp # Test file
-    ${SOURCES}
-)
 
 add_executable(
    ReconstructTest
@@ -146,6 +147,17 @@ target_link_libraries(
     freeimage
     ${OpenCV_LIBS}
 )
+
+target_link_libraries(
+    PoseEstimatorTest # Our test
+    gtest # Google Test library
+    gtest_main
+    Eigen3::Eigen
+    freeimage
+    ${OpenCV_LIBS}
+)
+
+
 target_link_libraries(
     ReconstructTest # Our test
     gtest # Google Test library
@@ -197,15 +209,7 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
-target_link_libraries(
 
-    PoseEstimatorTest # Out test
-    gtest # Google Test library
-    gtest_main
-    freeimage
-    Eigen3::Eigen
-    ${OpenCV_LIBS}
-)
 
 target_link_libraries(
     VoxelTest # Out test
