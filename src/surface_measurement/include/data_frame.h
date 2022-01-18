@@ -2,7 +2,7 @@
 
 #include <Eigen.h>
 #include <iostream>
-#include <surface.h>
+#include <Surface.h>
 
 namespace kinect_fusion {
 

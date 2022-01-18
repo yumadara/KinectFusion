@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <surface.h>
+#include <Surface.h>
 
 namespace kinect_fusion {
 

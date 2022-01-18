@@ -11,9 +11,10 @@ std::string filenameIn{"../data/rgbd_dataset_freiburg1_xyz/"};
 sensor.init(filenameIn);
 const unsigned int k = 3;//TODO
 unsigned int i = 0;
-const float defaut_dst = volum.getDefaultDist();//TODO: get wrong intial value
+// const float defaut_dst = volum.getDefaultDist();//TODO: get wrong intial value
 while (sensor.processNextFrame() && i <= k) {
-update_volument(sensor, volum, defaut_dst);
+Matrix4f depthExtri = sensor.getDepthExtrinsics();
+update_volument(sensor, volum, depthExtri);
 i++;
 }
 }
