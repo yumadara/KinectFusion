@@ -48,6 +48,7 @@ public:
 			0.0f, 0.0f, 1.0f;
 
 		m_depthIntrinsics = m_colorIntrinsics;
+		m_depthIntrinsicsInverse = m_depthIntrinsics.inverse();
 
 		m_colorExtrinsics.setIdentity();
 		m_depthExtrinsics.setIdentity();
@@ -140,6 +141,10 @@ public:
 	// depth (ir) camera info
 	Eigen::Matrix3f getDepthIntrinsics() {
 		return m_depthIntrinsics;
+	}
+
+	Eigen::Matrix3f  getDepthIntrinsicsInverse() {
+		return m_depthIntrinsicsInverse;
 	}
 
 	Eigen::Matrix4f getDepthExtrinsics() {
@@ -240,6 +245,7 @@ private:
 
 	// depth (ir) camera info
 	Eigen::Matrix3f m_depthIntrinsics;
+	Eigen::Matrix3f m_depthIntrinsicsInverse;
 	Eigen::Matrix4f m_depthExtrinsics;
 	unsigned int m_depthImageWidth;
 	unsigned int m_depthImageHeight;
