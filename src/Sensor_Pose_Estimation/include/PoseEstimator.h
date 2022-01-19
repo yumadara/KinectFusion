@@ -1,6 +1,6 @@
 #include "ProjectiveCorrespondenceSearch.h"
-extern float epsilon_theta = 0.939;
-extern float epsilon_d = 0.001;
+extern float epsilon_theta = 0.996;
+extern float epsilon_d = 0.01;
 #include <virtual_sensor.h>
 #include <data_frame.h>
 #include <fstream>
@@ -76,6 +76,8 @@ namespace kinect_fusion {
         float average_dis = 0;
         float loss = 0;
 
+        int num_dis = 0;
+        
 
         //myfile.open("./test.txt");
         for (it = match.begin(); it != match.end(); it++) {
@@ -102,7 +104,7 @@ namespace kinect_fusion {
                 float cosin = (sourceNormal.x() * targetNormal.x() + sourceNormal.y() * targetNormal.y() + sourceNormal.z() * targetNormal.z()) / 
                     (sourceNormal.norm() * targetNormal.norm() + std::numeric_limits<float>::epsilon() );
                 float dis = (sourceVertex - targetVertex).norm();
-                
+                num_dis++;
                 average_dis += (targetVertex - sourceVertex).norm();
                 loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
 
@@ -123,8 +125,8 @@ namespace kinect_fusion {
         }
         std::cout << "valid num" << valid_num << std::endl;
 
-        std::cout << "  distance " << average_dis << std::endl;
-        std::cout << "  loss " << loss << std::endl;
+        std::cout << " Average distance " << average_dis/num_dis << std::endl;
+        std::cout << " Average loss " << loss / num_dis << std::endl;
 
         return result_map;
     }
@@ -257,6 +259,8 @@ namespace kinect_fusion {
                     tempInputTransformation = incremental * tempInputTransformation;
                     std::cout << "/nlevel "<< index  << "Iteration " << i << " Now tempInputTransformation " << tempInputTransformation << std::endl;
                 }
+
+               
             }
 
             return tempInputTransformation;
