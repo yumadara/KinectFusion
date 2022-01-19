@@ -10,3 +10,5 @@
 **/src/out
 **/.vscode
 **/*.off
+**/temp/*
+**/*checkpoint*
