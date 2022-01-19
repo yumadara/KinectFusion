@@ -110,6 +110,9 @@ Eigen::Matrix3f computeLevelCameraIntrinstics(const Eigen::Matrix3f& originalCam
         levelCameraIntrinstics(0, 0) *= scale; // focal_x
         levelCameraIntrinstics(1, 1) *= scale; // focal y
         levelCameraIntrinstics(0, 1) *= scale; // skew coefficient
+
+        levelCameraIntrinstics(0, 2) *= scale;
+        levelCameraIntrinstics(1, 2) *= scale;
         // Since first pixel is as it was at (0, 0), we do not need to change principal point!
 
         return levelCameraIntrinstics;

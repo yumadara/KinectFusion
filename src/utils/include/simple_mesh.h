@@ -91,7 +91,7 @@ public:
 
 					// Write color to vertex.
 
-					m_vertices[idx].color = Vector4uc(colorMap.get(4 * idxCol + 0), colorMap.get(4 * idxCol + 1), colorMap.get(4 * idxCol + 2), colorMap.get(4 * idxCol + 3);
+					m_vertices[idx].color = Vector4uc(colorMap.get(4 * idxCol + 0), colorMap.get(4 * idxCol + 1), colorMap.get(4 * idxCol + 2), colorMap.get(4 * idxCol + 3));
 				}
 			}
 		}

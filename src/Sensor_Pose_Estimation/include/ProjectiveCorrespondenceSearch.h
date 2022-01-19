@@ -15,7 +15,7 @@ public:
 	/// <param name="targetMap"> targetMap in camera space of frame k 
 	/// <param name="previousTransformation"></param> previous transformation also in camera space 
 	/// <param name="currentTransformation"></param> current transformation also in camera space
-	/// <param name="camera_intrinsics"></param> corressponding camera 
+	/// <param name="camera_intrinsics"></param> corressponding camera intrinsics
 	projectiveCorrespondence(const Map2DVector3f& targetVertexMap,
 		const Map2DVector3f& targetNormalMap,
 		const Eigen::MatrixXf& previousTransformation,
@@ -47,6 +47,7 @@ public:
 				int correspondenceIndexInSurface = findCorrespondence(m_targetVertexMap.get(i));
 				if (correspondenceIndexInSurface != -1) // found correspondence
 				{
+					
 					match.insert(std::pair<int, int>(i, correspondenceIndexInSurface));
 				}
 			}
@@ -66,9 +67,9 @@ public:
 		Eigen::Matrix3f intrinsics = m_cameraIntrinsics; // should be k-1 th frame intrinsic
 		unsigned int depthHeight = m_targetVertexMap.getHeight();
 		unsigned int depthWidth = m_targetVertexMap.getWidth();
-		
+		//std::cout << "depth height " << depthHeight << std::endl;
 		int imagePlaneCoordinateX = floor(((intrinsics * (Transformation.block(0,0,3,3) * point + Transformation.block(0,3,3,1)))(0)));
-		int imagePlaneCoordinateY = floor(((intrinsics * (Transformation.block(0, 0, 3, 3) * point + Transformation.block(0, 3, 3, 1))))(1));
+		int imagePlaneCoordinateY = floor(((intrinsics * (Transformation.block(0,0,3,3) * point + Transformation.block(0, 3, 3, 1))))(1));
 		if (imagePlaneCoordinateX > depthWidth || imagePlaneCoordinateY > depthHeight|| imagePlaneCoordinateX < 0 || imagePlaneCoordinateY<0)
 		{
 			return -1;
