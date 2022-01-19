@@ -40,6 +40,14 @@ void fillNormalMap(const Map2DVector3f& vertexMap, Map2DVector3f& normalMap);
 void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap);
 
 /**
+ * @brief Apply biliteral filter.
+ * 
+ * @param[in] unfilteredMap Input unfiltered map
+ * @param[out] filteredMap Output filtered map that should be filled
+ */
+void applyBiliteralFilter(Map2Df& unfilteredMap, Map2Df& filteredMap);
+
+/**
  * @brief Get the Camera Intrinstics for specific level (see surface measurement section in the paper for level definitions)
  * 
  * @param originalCameraIntrinstics Camera Intrinstics for first level, or real camera intrinstics

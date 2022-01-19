@@ -20,17 +20,17 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
 
             m_cameraIntrinstics[index] = computeLevelCameraIntrinstics(cameraIntrinstics, level);
 
-            m_filteredDepthMaps[ index] = Map2Df(current_height, current_width);
+            m_filteredDepthMaps[index] = Map2Df(current_height, current_width);
             m_surfaces[index] = Surface(current_height, current_width);
             
             std::cout << "surface height" << m_surfaces[index].getHeight() << std::endl;
         } 
     }
 
-    void FrameData::updateValues(const Map2Df& depths) {
+    void FrameData::updateValues(Map2Df& depths) {
         m_rowDepthMap = depths;
-
-        m_filteredDepthMaps[0] = depths;
+        
+        // applyBiliteralFilter(depths, m_filteredDepthMaps[0]); // Do not filter now
         for (std::size_t i = 0; i < NUMBER_OF_LEVELS - 1; i++) {
             subsample(m_filteredDepthMaps[i], m_filteredDepthMaps[i + 1]);
         }

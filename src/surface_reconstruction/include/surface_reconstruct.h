@@ -78,9 +78,9 @@ namespace kinect_fusion {
         // while (sensor.processNextFrame() && i <= k) {
             Map2Df depthMap_k_i{sensor.getDepth()};
             //float* depthMap_k_i = sensor.getDepth().data();;
-            const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
+            // const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
             //const Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
-            const Matrix4f depthExtrinsics = depthExtrinsics;
+            // const Matrix4f depthExtrinsics = depthExtrinsics;
             const unsigned int width = sensor.getDepthImageWidth();
             const unsigned int height = sensor.getDepthImageHeight();
             const float mu = 10.0;//TODO: right? wirte a config file

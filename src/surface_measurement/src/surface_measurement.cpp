@@ -1,13 +1,20 @@
 #include <surface_measurement_utils.h>
 
+#include <opencv2/imgproc.hpp>
+
 namespace kinect_fusion {
+
+/**
+ * @brief Sigma value for bilateral filter
+ */
+constexpr float SIGMA = 0.1f / 3.0f;
 
 /**
  * @brief Max distance, or 3 sigmas. For subsampling, when averaging the block of pixels,
  * if value of neighbor pixel is MAX_DISTANCE greater/smaller than the value of center pixel,
  * it is not used for averaging. 
  */
-constexpr float MAX_DISTANCE = 0.1f;
+constexpr float MAX_DISTANCE = SIGMA * 3.0f;
 
 void fillVertexMap(const Map2Df& depths, const Eigen::Matrix3f& depthIntrinsics, Map2DVector3f& vertexMap) {
     // Get depth intrinsics.
@@ -94,7 +101,16 @@ void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap)
             }
         }
     }
+}
 
+void applyBiliteralFilter(Map2Df& unfilteredMap, Map2Df& filteredMap) {
+    const cv::Mat cvUnfilteredMap(unfilteredMap.getHeight(), unfilteredMap.getWidth(), CV_32F, 
+                reinterpret_cast<void*>(unfilteredMap.data()));
+    cv::Mat cvFilteredMap(filteredMap.getHeight(), filteredMap.getWidth(), CV_32F, 
+                reinterpret_cast<void*>(filteredMap.data()));
+
+    constexpr int computeDFromSigma{-1};
+    cv::bilateralFilter(cvUnfilteredMap, cvFilteredMap, computeDFromSigma, SIGMA, SIGMA);
 }
 
 Eigen::Matrix3f computeLevelCameraIntrinstics(const Eigen::Matrix3f& originalCameraIntrinstics, Level level) 
