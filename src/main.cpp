@@ -36,12 +36,12 @@ int main(int argc, char *argv[]) {
         pose_estimation = pose_estimator.getCurrentTransformation();
 
         update_volument(sensor, volum, pose_estimation);
-        Camera camera(pose_estimation, sensor.getDepthIntrinsicsInverse(), //TODO 1. camera:change constructor 2. sensor.getDepthIntrinsicsInverse
+        Camera camera(pose_estimation, sensor.getDepthIntrinsicsInverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
             sensor.getHeight(), sensor.getWidth(),
             0, 0);
         RayCasting cast(volum, camera);
         cast.do_work();
-        Map2D depthMap = cast.getDepthMap();  //TODO cast.getDepthMap
+        Map2Df depthMap = cast.getDepthMap();  //TODO cast.getDepthMap
         
         previous_dataFrame.updateValues(depthMap);
         
