@@ -51,11 +51,13 @@ class RayCasting {
             }
             if (currF<=0 && lastF>=0){
                 Vector3f vertexCamera = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF);
-                Vector3f normalWorld = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
+                //Vector3f normalWorld = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
                 //Vector3f vertexCamera = camera.worldToCameraVector(vertexWorld);
-                Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
-                surface.setNormal(XInPixel, YInPixel, normalCamera);
-                surface.setVertex(XInPixel, YInPixel, vertexCamera);
+                //Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
+                //surface.setNormal(XInPixel, YInPixel, normalCamera);
+                
+                depthMap.set(row, col, vertexCamera.coeff(2))
+                // surface.setVertex(XInPixel, YInPixel, vertexCamera);
                 return true;
             }
             
@@ -65,8 +67,8 @@ class RayCasting {
         }
 
     }
-    Surface& getSurface() {
-        return surface;
+    Map2Df& getDepthMap() {
+        return depthMap;
     }
     Camera& getCamera() {
         return camera;
@@ -76,6 +78,7 @@ class RayCasting {
     Voxel TSDF;
     
     Camera camera;
+    Map2Df depthMap;
     Surface surface;
     float minDistance;
     float maxDistance;
