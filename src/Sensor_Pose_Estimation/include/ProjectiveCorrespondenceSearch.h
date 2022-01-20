@@ -42,39 +42,54 @@ public:
 				vertex[0] != MINF && vertex[1] != MINF && vertex[2] != MINF &&
 				normal[0] != MINF && normal[1]!=MINF && normal[2] != MINF)
 			{
-				//std::cout << "target point  " << m_targetVertexMap.get(i) << std::endl;
+				//std::cout << "input target point  " << m_targetVertexMap.get(i) << std::endl;
 				//std::cout << "target normal  " << m_targetNormalMap.get(i) << std::endl;
+				//std::cout << "target index " << i << std::endl;
 				int correspondenceIndexInSurface = findCorrespondence(m_targetVertexMap.get(i));
 				if (correspondenceIndexInSurface != -1) // found correspondence
 				{
-					
+
+					//assert(i == correspondenceIndexInSurface);
 					match.insert(std::pair<int, int>(i, correspondenceIndexInSurface));
+					
 				}
 			}
 			
 		}
 		return 1;
 	}
-
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="targetPoint" Target point is kth frame vertex in camera space
+	/// <returns></returns>
 	int findCorrespondence(const Eigen::Vector3f& targetPoint)
 	{
-		Eigen::Vector3f point;
-		point(0) = targetPoint[0];
-		point(1) = targetPoint[1];
-		point(2) = targetPoint[2];
+
 		//point(3) = 1;
 		Eigen::MatrixXf Transformation = m_previousTransformation.inverse()* m_currentTransformation;
 		Eigen::Matrix3f intrinsics = m_cameraIntrinsics; // should be k-1 th frame intrinsic
 		unsigned int depthHeight = m_targetVertexMap.getHeight();
 		unsigned int depthWidth = m_targetVertexMap.getWidth();
-		//std::cout << "depth height " << depthHeight << std::endl;
-		int imagePlaneCoordinateX = floor(((intrinsics * (Transformation.block(0,0,3,3) * point + Transformation.block(0,3,3,1)))(0)));
-		int imagePlaneCoordinateY = floor(((intrinsics * (Transformation.block(0,0,3,3) * point + Transformation.block(0, 3, 3, 1))))(1));
+		//std::cout << "intrinsics " << intrinsics << std::endl;
+		//std::cout << "target point" << targetPoint << std::endl;
+		//std::cout << "transformation " << Transformation << std::endl;
+		//std::cout << "result is " << intrinsics * (Transformation.block(0, 0, 3, 3) * targetPoint + Transformation.block(0, 3, 3, 1)) << std::endl;
+		Vector3f point = (Transformation.block(0, 0, 3, 3) * targetPoint + Transformation.block(0, 3, 3, 1));// k -1 frame 
+			//Vector3f image_plane_point = intrinsics*point;
+			//std::cout << "image plane point " << image_plane_point << std::endl;
+		//std::cout << "source point" << point << std::endl;
+		float imagePlaneCoordinateX = (intrinsics(0, 0) * point.x() / point.z() + intrinsics(0, 2));
+		float imagePlaneCoordinateY = (intrinsics(1, 1) * point.y() / point.z() + intrinsics(1, 2));
+		//std::cout << "image X " << imagePlaneCoordinateX << std::endl;
+		//std::cout << "image Y " << imagePlaneCoordinateY << std::endl;
+
 		if (imagePlaneCoordinateX > depthWidth || imagePlaneCoordinateY > depthHeight|| imagePlaneCoordinateX < 0 || imagePlaneCoordinateY<0)
 		{
 			return -1;
 		}
-		return imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX;
+		//std::cout << "source index " << imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX << std::endl;
+		return round(imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX);
 	}
 
 	std::map<int, int> getMatch()

@@ -21,11 +21,11 @@ namespace kinect_fusion {
 		MatrixXf previousTransformation = Matrix4f::Identity();
 		MatrixXf currentTransformation = Matrix4f::Identity();
 
-		std::stringstream ss_first;
-		ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
-		std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
-		SimpleMesh lastDepthMesh{ sensor, previousTransformation, 0.1f };
-		lastDepthMesh.writeMesh(ss_first.str());
+		//std::stringstream ss_first;
+		//ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
+		//std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
+		//SimpleMesh lastDepthMesh{ sensor, previousTransformation, 0.1f };
+		//lastDepthMesh.writeMesh(ss_first.str());
 
 		Map2Df firstframe_depths{ sensor.getDepth() };
 		std::uint32_t width = sensor.getDepthImageWidth();
@@ -36,7 +36,7 @@ namespace kinect_fusion {
 		//first_frame_data.printDataFrame();
 		sensor.processNextFrame();
 
-		Map2Df secondframe_depths{ sensor.getDepth() };
+		Map2Df secondframe_depths{ sensor.getDepth()};
 		Eigen::Matrix3f secondframe_cameraIntrinsics{ sensor.getDepthIntrinsics() };
 		FrameData second_frame_data(secondframe_cameraIntrinsics, height, width);
 		second_frame_data.updateValues(secondframe_depths);
@@ -54,11 +54,11 @@ namespace kinect_fusion {
 		SimpleMesh currentDepthMesh{ sensor, currentTransformation, 0.1f };
 		currentDepthMesh.writeMesh(ss.str());
 
-		std::stringstream ss_current_frame_not_transformed;
-		ss_current_frame_not_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off";
-		std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
-		SimpleMesh currentDepthMeshNotTransformed{ sensor,previousTransformation , 0.1f };
-		currentDepthMeshNotTransformed.writeMesh(ss_current_frame_not_transformed.str());
+		//std::stringstream ss_current_frame_not_transformed;
+		//ss_current_frame_not_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off";
+		//std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
+		//SimpleMesh currentDepthMeshNotTransformed{ sensor,previousTransformation , 0.1f };
+		//currentDepthMeshNotTransformed.writeMesh(ss_current_frame_not_transformed.str());
 
 }
 } // namespace kinect_fusion

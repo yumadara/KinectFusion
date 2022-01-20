@@ -11,7 +11,7 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
         for (Level level : LEVELS) {
             
             std::size_t index = getIndex(level);
-            std::cout << "index " << index << std::endl;
+            std::cout << "Level index: " << index << std::endl;
 
             std::size_t scale = std::pow(2U, index);
 
@@ -23,7 +23,7 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
             m_filteredDepthMaps[index] = Map2Df(current_height, current_width);
             m_surfaces[index] = Surface(current_height, current_width);
             
-            std::cout << "surface height" << m_surfaces[index].getHeight() << std::endl;
+            std::cout << "Surface height: " << m_surfaces[index].getHeight() << std::endl;
         } 
     }
 
@@ -31,6 +31,7 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
         m_rowDepthMap = depths;
         
         // applyBiliteralFilter(depths, m_filteredDepthMaps[0]); // Do not filter now
+        m_filteredDepthMaps[0] = depths;
         for (std::size_t i = 0; i < NUMBER_OF_LEVELS - 1; i++) {
             subsample(m_filteredDepthMaps[i], m_filteredDepthMaps[i + 1]);
         }

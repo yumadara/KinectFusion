@@ -65,6 +65,20 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # Link libraries here
 link_directories(${FreeImage_LIBRARY_DIR})
 
+# Add executables
+add_executable(
+    SurfaceMeasurementApp # Name
+    ${SOURCE_DIR}/executables/surface_measurement_app.cpp # File
+    ${SOURCES}
+)
+
+target_link_libraries(
+    SurfaceMeasurementApp
+    freeimage
+    Eigen3::Eigen
+   ${OpenCV_LIBS}
+)
+
 # Add google test library for unit tests
 add_subdirectory(${LIBRARY_DIR}/googletest)
 

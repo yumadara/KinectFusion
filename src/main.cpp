@@ -3,6 +3,7 @@
 #include <PoseEstimator.h>
 #include <data_frame.h>
 #include"surface_reconstruct.h"
+
 namespace kinect_fusion {
 
 int main(int argc, char *argv[]) {
