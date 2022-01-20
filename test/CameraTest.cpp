@@ -9,7 +9,7 @@ namespace kinect_fusion {
 /// @brief Basic test to check that data pipeline works
 TEST(CameraTest, CheckCameraConstruction) {
     
-    Matrix4f pose = MatrixXf::Identity();
+    Matrix4f pose = Matrix4f::Identity();
     Matrix3f inverseCalibrationMatrix = Matrix3f::Identity();
     int pictureHeightInPixel = 100;
     int pictureWidthInPixel = 100;
@@ -22,7 +22,7 @@ TEST(CameraTest, CheckCameraConstruction) {
 
 
 TEST(CameraTest, CheckCameraToWorld) {
-	Matrix4f pose = MatrixXf::Identity();
+	Matrix4f pose = Matrix4f::Identity();
     Matrix3f inverseCalibrationMatrix = Matrix3f::Identity();
     int pictureHeightInPixel = 100;
     int pictureWidthInPixel = 100;

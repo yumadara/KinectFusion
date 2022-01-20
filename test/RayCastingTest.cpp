@@ -66,7 +66,7 @@ TEST(RayCastingTest, CheckFill_Pixel) {
     RayCasting rayCastingRayCasting(TSDF, camera);
     rayCastingRayCasting.fill_pixel(0, 0);
     Map2Df depthMap = rayCastingRayCasting.getDepthMap();
-    EXPECT_NEAR(depthMap.get(0,0), 480.,0.0001);
+    EXPECT_NEAR(depthMap.get(0+camera.originXInPixel,0+camera.originYInPixel), 480.,0.0001);
     
 }
 

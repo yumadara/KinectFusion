@@ -18,14 +18,16 @@ class RayCasting {
         this->camera = camera;
         this->TSDF = TSDF;
         Surface surface(camera.getHeight(), camera.getWidth());
+        Map2Df depthMap = Map2Df(camera.getHeight(), camera.getWidth(),MINF);
         this->surface = surface;
+        this->depthMap = depthMap;
         this->minDistance = 400.;
         this->maxDistance = 8000.;
     }
     void do_work(){
         for (int j = 0;j< this->surface.getHeight();j++){
             for (int i = 0; i< this->surface.getWidth(); i++){
-                fill_pixel(i,j);
+                fill_pixel(i-camera.originXInPixel,j-camera.originYInPixel);
             }
         }
     }
@@ -56,7 +58,7 @@ class RayCasting {
                 //Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
                 //surface.setNormal(XInPixel, YInPixel, normalCamera);
                 
-                depthMap.set(row, col, vertexCamera.coeff(2))
+                depthMap.set(XInPixel+camera.originXInPixel, YInPixel+camera.originYInPixel, vertexCamera.coeff(2));
                 // surface.setVertex(XInPixel, YInPixel, vertexCamera);
                 return true;
             }
