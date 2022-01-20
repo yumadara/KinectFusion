@@ -5,6 +5,19 @@
 
 namespace kinect_fusion {
 
+TEST(SurfaceMeasurementTest, Assumptions) {
+    // Please do not change these values
+    EXPECT_EQ(FIRST_LEVEL, 0U);
+    EXPECT_EQ(SECOND_LEVEL, 1U);
+    EXPECT_EQ(THIRD_LEVEL, 2U);
+
+    EXPECT_EQ(LEVELS[0], 0U);
+    EXPECT_EQ(LEVELS[1], 1U);
+    EXPECT_EQ(LEVELS[2], 2U);
+
+    EXPECT_EQ(NUMBER_OF_LEVELS, 3U);
+}
+
 TEST(SurfaceMeasurementTest, MainTest) {
     Eigen::Matrix3f cameraIntrinstics{Eigen::Matrix3f::Zero()};
 
@@ -22,7 +35,6 @@ TEST(SurfaceMeasurementTest, MainTest) {
     EXPECT_NEAR(frameData.getSurface().getNormalMap().get(0, 0)(0), 0.0, 1e-6);
     EXPECT_NEAR(frameData.getSurface().getVertexMap().get(0, 0)(0), -2, 1e-6);
 }
-
 
 TEST(SurfaceMeasurementTest, SubsampleTest) {
     Map2Df depth{4, 4};
@@ -69,6 +81,31 @@ TEST(SurfaceMeasurementTest, SubsampleInvalidDepths) {
 
     EXPECT_EQ(subsampledDepth.get(0), MINF);
     EXPECT_EQ(subsampledDepth.get(1), MINF);
+}
+
+TEST(SurfaceMeasurementTest, CameraCalculcation) {
+    Eigen::Matrix3f cameraIntrinstics{Eigen::Matrix3f::Zero()};
+
+    cameraIntrinstics(0, 0) = 1.0f;
+    cameraIntrinstics(0, 1) = 2.0f;
+    cameraIntrinstics(1, 1) = 4.0f;
+    cameraIntrinstics(0, 2) = 5.0f;
+    cameraIntrinstics(1, 2) = 6.0f;
+    cameraIntrinstics(2, 2) = 1.0f;
+
+    Eigen::Matrix3f first_level_intrinstics = computeLevelCameraIntrinstics(cameraIntrinstics, FIRST_LEVEL);
+    Eigen::Matrix3f second_level_intrinstics = computeLevelCameraIntrinstics(cameraIntrinstics, SECOND_LEVEL);
+    Eigen::Matrix3f third_level_intrinstics = computeLevelCameraIntrinstics(cameraIntrinstics, THIRD_LEVEL);
+
+    EXPECT_EQ(first_level_intrinstics, cameraIntrinstics);
+
+    Eigen::Matrix3f expected_second_level = cameraIntrinstics * 0.5;
+    expected_second_level(2, 2) = 1.0f;
+    EXPECT_EQ(second_level_intrinstics, expected_second_level);
+
+    Eigen::Matrix3f expected_third_level = cameraIntrinstics * 0.25;
+    expected_third_level(2, 2) = 1.0f;
+    EXPECT_EQ(third_level_intrinstics, expected_third_level);
 }
 
 } // namespace kinect_fusion
