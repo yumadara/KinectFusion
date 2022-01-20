@@ -1,5 +1,5 @@
 #include "ProjectiveCorrespondenceSearch.h"
-extern float epsilon_theta = 0.939;
+extern float epsilon_theta = 0.996;
 extern float epsilon_d = 0.01;
 #include <virtual_sensor.h>
 #include <data_frame.h>
@@ -15,14 +15,12 @@ namespace kinect_fusion {
             
             m_currentFrameData = currentFrameData;
             m_lastFrameData = lastFrameData;
-
-
 			m_lastTransformation = lastTransformation;
             m_currentTransformation = currentTransformation;
             //std::cout << "current frame data second level in constructor" << currentFrameData.getSurface(kinect_fusion::Level::Second).getVertexMap().size() << std::endl;
             //std::cout << "current frame data second level in constructor" << m_currentFrameData.getSurface(kinect_fusion::Level::Second).getVertexMap().size() << std::endl;
 		}
-        Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
+        /*Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
         {
             return Transformation.block(0, 0, 3, 3) * vertex + Transformation.block(0,3,3,1);
 
@@ -50,7 +48,39 @@ namespace kinect_fusion {
                 result.set(i, Transformation.block(0, 0, 3, 3) * normalMap.get(i)) ;
             }
             return result;
+        }*/
+
+
+        Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
+        {
+            return Transformation.block(0, 0, 3, 3).inverse() * vertex - Transformation.block(0, 0, 3, 3).inverse() * Transformation.block(0,3,3,1);
+
         }
+        Vector3f TransformNormal(Vector3f normal, Eigen::MatrixXf Transformation)
+        {
+            return Transformation.block(0,0,3,3).inverse()* normal;
+        }
+
+        Map2DVector3f TransformVertexMap(Map2DVector3f& vertexMap, Eigen::MatrixXf Transformation)
+        {
+            Map2DVector3f result = vertexMap;
+            for (int i = 0; i != vertexMap.size(); i++)
+            {
+                result.set(i,Transformation.block(0, 0, 3, 3).inverse() * vertexMap.get(i) - Transformation.block(0, 0, 3, 3).inverse() * Transformation.block(0, 3, 3, 1));
+            }
+            return result;
+        }
+
+        Map2DVector3f TransformNormalMap(Map2DVector3f& normalMap, Eigen::MatrixXf Transformation)
+        {
+            Map2DVector3f result = normalMap;
+            for (int i = 0; i != normalMap.size(); i++)
+            {
+                result.set(i, Transformation.block(0, 0, 3, 3).inverse() * normalMap.get(i)) ;
+            }
+            return result;
+        }
+
 
         /// <summary>
         /// 
@@ -59,14 +89,14 @@ namespace kinect_fusion {
         /// <param name="targetNormals" is transformed to global frame, which is R^{z}_{g,k}*Nk(u)
         /// <param name="sourceVertices" is transformed to global frame, which is V^{g}_{k-1}
         /// <param name="targetVertices" is transformed to global frame, which is T^{z}_{g,k}*Vk(u)
-        /// <param name="matches"></param>
+        /// <param name="matches"></param which is from index target to source
     std::map<int, int> pruneCorrespondences(const Map2DVector3f& sourceNormals,
         const Map2DVector3f& targetNormals,
         const Map2DVector3f& sourceVertices,
         const Map2DVector3f& targetVertices,
         std::map<int, int>& match) {
         //std::cout << "in prunecorrespondences " << match.size() << std::endl;
-        std::map<int, int> result_map;
+        std::map<int, int> result_map; // maps from source index to target index
         
         int valid_num = 0;
         std::map<int, int>::iterator it;
@@ -103,9 +133,6 @@ namespace kinect_fusion {
                 float cosin = (sourceNormal.x() * targetNormal.x() + sourceNormal.y() * targetNormal.y() + sourceNormal.z() * targetNormal.z()) / 
                     (sourceNormal.norm() * targetNormal.norm() + std::numeric_limits<float>::epsilon() );
                 float dis = (sourceVertex - targetVertex).norm();
-                
-
-
 
                 if (cosin >= epsilon_theta && dis <= epsilon_d)
                 {
@@ -114,10 +141,30 @@ namespace kinect_fusion {
                     valid_num++;
                     //std::cout << "after pruning, index target " << index_target << std::endl;
                     //std::cout << "after pruning, source target " << index_source << std::endl;
-                    result_map.insert(std::pair<int, int>(index_target, index_source));
-                    num_dis++;
+                    //result_map.insert(std::pair<int, int>(index_target, index_source));
+                    
                     //average_dis += (targetVertex - sourceVertex).norm();
                     loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
+                    if (result_map.find(index_source) == result_map.end())
+                    {
+                        //valid_num++;
+                        result_map.insert(std::pair<int, int>(index_source, index_target));
+                        //loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
+                    }
+                       
+                    else
+                    {
+                        int index_target_ = result_map[index_source]; // previous matching
+                        Vector3f targetVertex_ = targetVertices[index_target_];
+                        if (abs((targetVertex - sourceVertex).transpose() * sourceNormal) <
+                            abs((targetVertex_ - sourceVertex).transpose() * sourceNormal))
+                        {
+                            // if true, previous matching is worse, update
+                            result_map[index_source] = index_target;
+                        }
+                    }
+
+
                 }
                
             }
@@ -126,7 +173,7 @@ namespace kinect_fusion {
         std::cout << "valid num" << valid_num << std::endl;
 
         //std::cout << " Average distance " << average_dis/num_dis << std::endl;
-        std::cout << " Average loss " << loss / num_dis << std::endl;
+        std::cout << " Average loss " << loss / valid_num << std::endl;
 
         return result_map;
     }
@@ -151,8 +198,8 @@ namespace kinect_fusion {
             std::map<int, int>::iterator it;
             
             for (it = match.begin(); it != match.end(); it++) {
-                int index_target = it->first;
-                int index_source = it->second;
+                int index_target = it->second;
+                int index_source = it->first;
                 
                 //std::cout << "index_target while calculate " << index_target << std::endl;
                 //std::cout << "index_source while calculate " << index_source << std::endl;
@@ -263,14 +310,11 @@ namespace kinect_fusion {
             int index = m_currentFrameData.getIndex(level); // index = 0, 1, 2
             std::cout << "INEDX" << index << std::endl;
             //std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
-            Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface( index).getNormalMap();
-            Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(index).getVertexMap();
+            Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface( index).getNormalMap();// camera space
+            Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(index).getVertexMap();//camera space
 
-            Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface( index).getNormalMap();
-            Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface( index).getVertexMap();
-
-            //std::cout << "height of image" << m_currentFrameData.getSurface(2-index).getHeight() << std::endl;
-
+            Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface( index).getNormalMap();//camera space
+            Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface( index).getVertexMap();//camera space
 
             for (int i = 0; i != iteration_num_with_level[Level::Third]; i++)
             {
@@ -280,11 +324,11 @@ namespace kinect_fusion {
                 std::map<int, int> match = pc.getMatch();
                 std::cout << "correspondence mapping " << match.size() << std::endl;
 
-                Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);
-                Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);
+                Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);// world space
+                Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);//world space
 
-                Map2DVector3f currentFrameNormal_transformed = this->TransformNormalMap(currentFrameNormal, tempInputTransformation);
-                Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);
+                Map2DVector3f currentFrameNormal_transformed = this->TransformNormalMap(currentFrameNormal, tempInputTransformation);//world space
+                Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);//world space
 
                 std::map<int, int> new_match = this->pruneCorrespondences(lastFrameNormal_transformed, currentFrameNormal_transformed, lastFrameVertex_transformed, currentVertex_transformed, match);
                 std::cout << "after pruning the new match" << new_match.size() << std::endl;

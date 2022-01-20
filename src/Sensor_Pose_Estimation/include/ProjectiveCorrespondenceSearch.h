@@ -76,6 +76,7 @@ public:
 		//std::cout << "previous transformation " << m_previousTransformation << std::endl;
 		//std::cout << "current transformation " << m_currentTransformation << std::endl;
 		//std::cout << "result is " << intrinsics * (Transformation.block(0, 0, 3, 3) * targetPoint + Transformation.block(0, 3, 3, 1)) << std::endl;
+
 		Vector3f point = (Transformation.block(0, 0, 3, 3) * targetPoint + Transformation.block(0, 3, 3, 1));// k -1 frame 
 			//Vector3f image_plane_point = intrinsics*point;
 			//std::cout << "image plane point " << image_plane_point << std::endl;
