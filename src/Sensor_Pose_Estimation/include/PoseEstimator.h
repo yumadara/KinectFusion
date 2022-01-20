@@ -1,5 +1,5 @@
 #include "ProjectiveCorrespondenceSearch.h"
-extern float epsilon_theta = 0.996;
+extern float epsilon_theta = 0.939;
 extern float epsilon_d = 0.01;
 #include <virtual_sensor.h>
 #include <data_frame.h>
@@ -29,7 +29,7 @@ namespace kinect_fusion {
         }
         Vector3f TransformNormal(Vector3f normal, Eigen::MatrixXf Transformation)
         {
-            return Transformation.block(0,0,3,3)* normal + Transformation.block(0,3,3,1);
+            return Transformation.block(0,0,3,3)* normal;
         }
 
         Map2DVector3f TransformVertexMap(Map2DVector3f& vertexMap, Eigen::MatrixXf Transformation)
@@ -47,7 +47,7 @@ namespace kinect_fusion {
             Map2DVector3f result = normalMap;
             for (int i = 0; i != normalMap.size(); i++)
             {
-                result.set(i, Transformation.block(0, 0, 3, 3) * normalMap.get(i) + Transformation.block(0, 3, 3, 1));
+                result.set(i, Transformation.block(0, 0, 3, 3) * normalMap.get(i)) ;
             }
             return result;
         }
@@ -71,7 +71,6 @@ namespace kinect_fusion {
         int valid_num = 0;
         std::map<int, int>::iterator it;
 
-        std::ofstream myfile;
 
         float average_dis = 0;
         float loss = 0;
@@ -104,9 +103,7 @@ namespace kinect_fusion {
                 float cosin = (sourceNormal.x() * targetNormal.x() + sourceNormal.y() * targetNormal.y() + sourceNormal.z() * targetNormal.z()) / 
                     (sourceNormal.norm() * targetNormal.norm() + std::numeric_limits<float>::epsilon() );
                 float dis = (sourceVertex - targetVertex).norm();
-                num_dis++;
-                average_dis += (targetVertex - sourceVertex).norm();
-                loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
+                
 
 
 
@@ -118,6 +115,9 @@ namespace kinect_fusion {
                     //std::cout << "after pruning, index target " << index_target << std::endl;
                     //std::cout << "after pruning, source target " << index_source << std::endl;
                     result_map.insert(std::pair<int, int>(index_target, index_source));
+                    num_dis++;
+                    //average_dis += (targetVertex - sourceVertex).norm();
+                    loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
                 }
                
             }
@@ -125,7 +125,7 @@ namespace kinect_fusion {
         }
         std::cout << "valid num" << valid_num << std::endl;
 
-        std::cout << " Average distance " << average_dis/num_dis << std::endl;
+        //std::cout << " Average distance " << average_dis/num_dis << std::endl;
         std::cout << " Average loss " << loss / num_dis << std::endl;
 
         return result_map;
@@ -223,44 +223,76 @@ namespace kinect_fusion {
         Eigen::MatrixXf frame2frameEstimation(Eigen::MatrixXf& inputTransformationMatrix)
         {
             Eigen::MatrixXf tempInputTransformation = inputTransformationMatrix;
-            for (Level level : LEVELS)
+            //for (Level level : LEVELS)
+            //{
+
+            //    int index = m_currentFrameData.getIndex(level); // index = 0, 1, 2
+            //    std::cout << "INEDX" << index << std::endl;
+            //    std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
+            //    Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface(2 - index).getNormalMap();
+            //    Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(2 - index).getVertexMap();
+
+            //    Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface(2 - index).getNormalMap();
+            //    Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface(2 - index).getVertexMap();
+
+            //    for (int i = 0; i != iteration_num_with_level[level]; i++)
+            //    {
+            //        //std::cout << "now we are at iteration " << i << std::endl;
+            //        //std::cout << "temp Input Transformation " << tempInputTransformation << std::endl;
+            //        projectiveCorrespondence pc(currentFrameVertex, currentFrameNormal, inputTransformationMatrix, tempInputTransformation, m_lastFrameData.getCameraIntrinsics(2 - index));
+            //        pc.matchPoint();
+            //        std::map<int, int> match = pc.getMatch();
+            //        std::cout << "correspondence mapping " << match.size() << std::endl;
+
+            //        Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);
+            //        Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);
+
+            //        Map2DVector3f currentFrameNormal_transformed = this->TransformNormalMap(currentFrameNormal, tempInputTransformation);
+            //        Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);
+
+            //        std::map<int, int> new_match = this->pruneCorrespondences(lastFrameNormal_transformed, currentFrameNormal_transformed, lastFrameVertex_transformed, currentVertex_transformed, match);
+            //        std::cout << "after pruning the new match" << new_match.size() << std::endl;
+            //        Matrix4f incremental = calculateIncremental(currentVertex_transformed, lastFrameVertex_transformed, lastFrameNormal_transformed, new_match);
+
+            //        tempInputTransformation = incremental * tempInputTransformation;
+            //        std::cout << "/nlevel " << index << "Iteration " << i << " Now tempInputTransformation " << tempInputTransformation << std::endl;
+            //    }
+            //}
+
+            Level level = Level::First;
+            int index = m_currentFrameData.getIndex(level); // index = 0, 1, 2
+            std::cout << "INEDX" << index << std::endl;
+            //std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
+            Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface( index).getNormalMap();
+            Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(index).getVertexMap();
+
+            Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface( index).getNormalMap();
+            Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface( index).getVertexMap();
+
+            //std::cout << "height of image" << m_currentFrameData.getSurface(2-index).getHeight() << std::endl;
+
+
+            for (int i = 0; i != iteration_num_with_level[Level::Third]; i++)
             {
+                //std::cout << "now we are at iteration " << i << std::endl;
+                projectiveCorrespondence pc(currentFrameVertex, currentFrameNormal, inputTransformationMatrix, tempInputTransformation, m_lastFrameData.getCameraIntrinsics(index));
+                pc.matchPoint();
+                std::map<int, int> match = pc.getMatch();
+                std::cout << "correspondence mapping " << match.size() << std::endl;
 
-                int index = m_currentFrameData.getIndex(level); // index = 0, 1, 2
-                std::cout << "INEDX" << index << std::endl;
-                std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
-                Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface(2-index).getNormalMap();
-                Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(2-index).getVertexMap();
+                Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);
+                Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);
 
-                Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface(2-index).getNormalMap();
-                Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface(2-index).getVertexMap();
+                Map2DVector3f currentFrameNormal_transformed = this->TransformNormalMap(currentFrameNormal, tempInputTransformation);
+                Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);
 
-                //std::cout << "height of image" << m_currentFrameData.getSurface(2-index).getHeight() << std::endl;
+                std::map<int, int> new_match = this->pruneCorrespondences(lastFrameNormal_transformed, currentFrameNormal_transformed, lastFrameVertex_transformed, currentVertex_transformed, match);
+                std::cout << "after pruning the new match" << new_match.size() << std::endl;
+                Matrix4f incremental = calculateIncremental(currentVertex_transformed, lastFrameVertex_transformed, lastFrameNormal_transformed, new_match);
 
-
-                for (int i = 0; i != iteration_num_with_level[level]; i++)
-                {
-                    //std::cout << "now we are at iteration " << i << std::endl;
-                    projectiveCorrespondence pc(currentFrameVertex, currentFrameNormal, inputTransformationMatrix, tempInputTransformation, m_lastFrameData.getCameraIntrinsics(2-index));
-                    pc.matchPoint();
-                    std::map<int, int> match = pc.getMatch();
-                    std::cout << "correspondence mapping " << match.size() << std::endl;
-
-                    Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);
-                    Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);
-
-                    Map2DVector3f currentFrameNormal_transformed = this->TransformNormalMap(currentFrameNormal, tempInputTransformation);
-                    Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);
-
-                    std::map<int, int> new_match = this->pruneCorrespondences(lastFrameNormal_transformed, currentFrameNormal_transformed, lastFrameVertex_transformed, currentVertex_transformed, match);
-                    std::cout << "after pruning the new match" << new_match.size() << std::endl;
-                    Matrix4f incremental = calculateIncremental(currentVertex_transformed, lastFrameVertex_transformed, lastFrameNormal_transformed, new_match);
-                    
-                    tempInputTransformation = incremental * tempInputTransformation;
-                    std::cout << "/nlevel "<< index  << "Iteration " << i << " Now tempInputTransformation " << tempInputTransformation << std::endl;
-                }
-
-               
+                tempInputTransformation = incremental * tempInputTransformation;
+                std::cout << "level " << index << "Iteration " << i << " Now tempInputTransformation " << std::endl;
+                std::cout << tempInputTransformation << std::endl;
             }
 
             return tempInputTransformation;
