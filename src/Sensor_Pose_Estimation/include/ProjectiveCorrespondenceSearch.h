@@ -15,7 +15,7 @@ public:
 	/// <param name="targetMap"> targetMap in camera space of frame k 
 	/// <param name="previousTransformation"></param> previous transformation also in camera space 
 	/// <param name="currentTransformation"></param> current transformation also in camera space
-	/// <param name="camera_intrinsics"></param> corressponding camera intrinsics
+	/// <param name="camera_intrinsics"></param> corressponding camera intrinsics ( k -1 th frame intrinsics )
 	projectiveCorrespondence(const Map2DVector3f& targetVertexMap,
 		const Map2DVector3f& targetNormalMap,
 		const Eigen::MatrixXf& previousTransformation,
@@ -29,6 +29,10 @@ public:
 		m_currentTransformation = currentTransformation;
 		m_cameraIntrinsics = camera_intrinsics;
 	}
+	/// <summary>
+	/// Get the index match of correspondence search
+	/// </summary>
+	/// <returns match mapping from index_target to index_source
 	int matchPoint()
 	{
 		// match target point with correspondence point
@@ -62,7 +66,7 @@ public:
 	/// 
 	/// </summary>
 	/// <param name="targetPoint" Target point is kth frame vertex in camera space
-	/// <returns></returns>
+	/// <returns index of source point ( k-1 frame) which corresponds target (k frame)
 	int findCorrespondence(const Eigen::Vector3f& targetPoint)
 	{
 

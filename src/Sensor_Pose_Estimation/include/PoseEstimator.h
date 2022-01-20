@@ -20,7 +20,7 @@ namespace kinect_fusion {
             //std::cout << "current frame data second level in constructor" << currentFrameData.getSurface(kinect_fusion::Level::Second).getVertexMap().size() << std::endl;
             //std::cout << "current frame data second level in constructor" << m_currentFrameData.getSurface(kinect_fusion::Level::Second).getVertexMap().size() << std::endl;
 		}
-        /*Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
+        Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
         {
             return Transformation.block(0, 0, 3, 3) * vertex + Transformation.block(0,3,3,1);
 
@@ -48,37 +48,6 @@ namespace kinect_fusion {
                 result.set(i, Transformation.block(0, 0, 3, 3) * normalMap.get(i)) ;
             }
             return result;
-        }*/
-
-
-        Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
-        {
-            return Transformation.block(0, 0, 3, 3).inverse() * vertex - Transformation.block(0, 0, 3, 3).inverse() * Transformation.block(0,3,3,1);
-
-        }
-        Vector3f TransformNormal(Vector3f normal, Eigen::MatrixXf Transformation)
-        {
-            return Transformation.block(0,0,3,3).inverse()* normal;
-        }
-
-        Map2DVector3f TransformVertexMap(Map2DVector3f& vertexMap, Eigen::MatrixXf Transformation)
-        {
-            Map2DVector3f result = vertexMap;
-            for (int i = 0; i != vertexMap.size(); i++)
-            {
-                result.set(i,Transformation.block(0, 0, 3, 3).inverse() * vertexMap.get(i) - Transformation.block(0, 0, 3, 3).inverse() * Transformation.block(0, 3, 3, 1));
-            }
-            return result;
-        }
-
-        Map2DVector3f TransformNormalMap(Map2DVector3f& normalMap, Eigen::MatrixXf Transformation)
-        {
-            Map2DVector3f result = normalMap;
-            for (int i = 0; i != normalMap.size(); i++)
-            {
-                result.set(i, Transformation.block(0, 0, 3, 3).inverse() * normalMap.get(i)) ;
-            }
-            return result;
         }
 
 
@@ -89,7 +58,7 @@ namespace kinect_fusion {
         /// <param name="targetNormals" is transformed to global frame, which is R^{z}_{g,k}*Nk(u)
         /// <param name="sourceVertices" is transformed to global frame, which is V^{g}_{k-1}
         /// <param name="targetVertices" is transformed to global frame, which is T^{z}_{g,k}*Vk(u)
-        /// <param name="matches"></param which is from index target to source
+        /// <param name="matches"></param which is from source_index to target_index
     std::map<int, int> pruneCorrespondences(const Map2DVector3f& sourceNormals,
         const Map2DVector3f& targetNormals,
         const Map2DVector3f& sourceVertices,
@@ -186,7 +155,7 @@ namespace kinect_fusion {
         /// <param name="sourceVertices" is transformed to global frame, which is V^{g}_{k-1}
         /// <param name="targetVertices" is transformed to global frame, which is T^{z}_{g,k}*Vk(u)
         /// match is correspondence match after pruning
-        /// <returns></returns>
+        /// <returns incremental matrix between iterations
         Matrix4f calculateIncremental(const Map2DVector3f& targetVertex,
             const Map2DVector3f& sourceVertex,
             const Map2DVector3f& sourceNormals,
