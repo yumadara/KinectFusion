@@ -29,7 +29,7 @@ namespace kinect_fusion {
         }
         Vector3f TransformNormal(Vector3f normal, Eigen::MatrixXf Transformation)
         {
-            return Transformation.block(0,0,3,3)* normal + Transformation.block(0,3,3,1);
+            return Transformation.block(0,0,3,3)* normal;
         }
 
         Map2DVector3f TransformVertexMap(Map2DVector3f& vertexMap, Eigen::MatrixXf Transformation)
@@ -47,7 +47,7 @@ namespace kinect_fusion {
             Map2DVector3f result = normalMap;
             for (int i = 0; i != normalMap.size(); i++)
             {
-                result.set(i, Transformation.block(0, 0, 3, 3) * normalMap.get(i) + Transformation.block(0, 3, 3, 1));
+                result.set(i, Transformation.block(0, 0, 3, 3) * normalMap.get(i)) ;
             }
             return result;
         }
