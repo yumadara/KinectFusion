@@ -68,7 +68,7 @@ link_directories(${FreeImage_LIBRARY_DIR})
 # Add executables
 add_executable(
     SurfaceMeasurementApp # Name
-    ${SOURCE_DIR}/executables/surface_measurement_app.cpp # File
+    ${CMAKE_CURRENT_SOURCE_DIR}/executables/surface_measurement_app.cpp # File
     ${SOURCES}
 )
 

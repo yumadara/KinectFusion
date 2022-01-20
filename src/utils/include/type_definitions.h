@@ -109,26 +109,34 @@ class Map2D {
 
         /**
          * @brief Get number of rows, or height of 2D map.
-         * 
-         * @return std::size_t Number of rows, or height.
          */
         inline std::size_t getHeight() const {
             return m_height;
         }
 
         /**
+         * @brief Get number of rows, or height.
+         */
+        inline std::size_t getNumberOfRows() const {
+            return getHeight();
+        }
+
+        /**
          * @brief Get number of columns, or width of 2D map.
-         * 
-         * @return std::size_t Number of columns, or width.
          */
         inline std::size_t getWidth() const {
             return m_width;
         }
 
         /**
+         * @brief Get number of rows, or height.
+         */
+        inline std::size_t getNumberOfColumns() const {
+            return getWidth();
+        }
+
+        /**
          * @brief Get underlying array as pointer.
-         * 
-         * @return T* Underlying array as pointer.
          */
         inline T* data() {
             return dataVector.data();
@@ -139,10 +147,8 @@ class Map2D {
 
         /**
          * @brief Get size of the array.
-         * 
-         * @return std::size_t Size
          */
-        inline std::size_t size() {
+        inline std::size_t size() const {
             return dataVector.size();
         }
 
@@ -158,26 +164,24 @@ typedef Map2D<float> Map2Df;
 /// 2D Map for Eigen float vectors
 typedef Map2D<Eigen::Vector3f> Map2DVector3f;
 
+/// Type of level
+typedef std::size_t Level;
 
 /**
- * @brief Levels.
- */
-enum class Level : std::size_t {
-    First = 1U,
-    Second = 2U,
-    Third = 3U
-};
-
-/**
- * @brief Number of levels.
+ * @brief Number of levels;
  */
 constexpr std::size_t NUMBER_OF_LEVELS = 3;
 
 /**
- * @brief All levels (1, 2, 3).
+ * @brief Levels by name
+ */
+constexpr Level FIRST_LEVEL{0U}, SECOND_LEVEL{1U}, THIRD_LEVEL{2U};
+
+/**
+ * @brief Arrays containing 3 levels;
  */
 constexpr Level LEVELS[NUMBER_OF_LEVELS] {
-    Level::First, Level::Second, Level::Third
+    FIRST_LEVEL, SECOND_LEVEL, THIRD_LEVEL
 };
 
 } // namespace kinect_fusion

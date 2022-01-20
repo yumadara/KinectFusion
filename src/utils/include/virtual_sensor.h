@@ -112,12 +112,12 @@ public:
 	}
 
 	// get current color data
-	Map2Df getColorRGBX() {
+	Map2Df& getColorRGBX() {
 		return m_colorFrame;
 	}
 
 	// get current depth data
-	Map2Df getDepth() {
+	Map2Df& getDepth() {
 		return m_depthFrame;
 	}
 

@@ -5,6 +5,8 @@
 #include "virtual_sensor.h"
 #include "Eigen.h"
 
+#include <type_definitions.h>
+
 namespace kinect_fusion {
 
 struct Vertex {
@@ -104,6 +106,86 @@ public:
 				unsigned int i1 = (i + 1)*sensor.getDepthImageWidth() + j;
 				unsigned int i2 = i*sensor.getDepthImageWidth() + j + 1;
 				unsigned int i3 = (i + 1)*sensor.getDepthImageWidth() + j + 1;
+
+				bool valid0 = m_vertices[i0].position.allFinite();
+				bool valid1 = m_vertices[i1].position.allFinite();
+				bool valid2 = m_vertices[i2].position.allFinite();
+				bool valid3 = m_vertices[i3].position.allFinite();
+
+				if (valid0 && valid1 && valid2) {
+					float d0 = (m_vertices[i0].position - m_vertices[i1].position).norm();
+					float d1 = (m_vertices[i0].position - m_vertices[i2].position).norm();
+					float d2 = (m_vertices[i1].position - m_vertices[i2].position).norm();
+					if (edgeThreshold > d0 && edgeThreshold > d1 && edgeThreshold > d2)
+						addFace(i0, i1, i2);
+				}
+				if (valid1 && valid2 && valid3) {
+					float d0 = (m_vertices[i3].position - m_vertices[i1].position).norm();
+					float d1 = (m_vertices[i3].position - m_vertices[i2].position).norm();
+					float d2 = (m_vertices[i1].position - m_vertices[i2].position).norm();
+					if (edgeThreshold > d0 && edgeThreshold > d1 && edgeThreshold > d2)
+						addFace(i1, i3, i2);
+				}
+			}
+		}
+	}
+
+		/**
+	 * Constructs a mesh from the current color and depth image.
+	 */
+	SimpleMesh(Map2DVector3f& vertexMap, const Matrix4f& cameraPose = Matrix4f::Identity(), float edgeThreshold = 0.01f) {
+		// Get ptr to the current color frame.
+		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
+		// Map2Df colorMap = sensor.getColorRGBX();
+
+		//auto depthMap = sensor.getDepth().data();
+		// Get ptr to the current color frame.
+		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
+		//auto colorMap = sensor.getColorRGBX().data()
+
+
+		// Compute inverse camera pose (mapping from camera CS to world CS).
+		Matrix4f cameraPoseInverse = cameraPose.inverse();
+
+		// Compute vertices with back-projection.
+		m_vertices.resize(vertexMap.size());
+		for (unsigned int v = 0; v < vertexMap.getHeight(); ++v) {
+			for (unsigned int u = 0; u < vertexMap.getWidth(); ++u) {
+				std::size_t index = vertexMap.getIndex(v, u);
+				if (!vertexMap.get(index).allFinite()) {
+					m_vertices[index].position = Vector4f(MINF, MINF, MINF, MINF);
+					m_vertices[index].color = Vector4uc(0, 0, 0, 0);
+				}
+				else {
+					// Back-projection and tranformation to world space.
+					m_vertices[index].position = cameraPoseInverse * Vector4f(vertexMap.get(index)(0),
+								vertexMap.get(index)(1), vertexMap.get(index)(2), 1.0f);
+
+					// // Project position to color map.
+					// Vector3f proj = sensor.getColorIntrinsics() * (sensor.getColorExtrinsics() * cameraPose * m_vertices[idx].position).block<3, 1>(0, 0);
+					// proj /= proj.z(); // dehomogenization
+					// unsigned int uCol = (unsigned int)std::floor(proj.x());
+					// unsigned int vCol = (unsigned int)std::floor(proj.y());
+					// if (uCol >= sensor.getColorImageWidth()) uCol = sensor.getColorImageWidth() - 1;
+					// if (vCol >= sensor.getColorImageHeight()) vCol = sensor.getColorImageHeight() - 1;
+					// unsigned int idxCol = vCol*sensor.getColorImageWidth() + uCol; // linearized index color
+					// 																//unsigned int idxCol = idx; // linearized index color
+
+					// Write color to vertex.
+
+					m_vertices[index].color = Vector4uc(128, 128, 128, 128);
+				}
+			}
+		}
+
+		// Compute triangles (faces).
+		m_triangles.reserve((vertexMap.getHeight() - 1) * (vertexMap.getWidth() - 1) * 2);
+		for (unsigned int i = 0; i < vertexMap.getHeight() - 1; i++) {
+			for (unsigned int j = 0; j < vertexMap.getWidth() - 1; j++) {
+				unsigned int i0 = i*vertexMap.getWidth() + j;
+				unsigned int i1 = (i + 1)*vertexMap.getWidth() + j;
+				unsigned int i2 = i*vertexMap.getWidth() + j + 1;
+				unsigned int i3 = (i + 1)*vertexMap.getWidth() + j + 1;
 
 				bool valid0 = m_vertices[i0].position.allFinite();
 				bool valid1 = m_vertices[i1].position.allFinite();

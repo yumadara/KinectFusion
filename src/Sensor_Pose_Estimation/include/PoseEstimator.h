@@ -3,8 +3,9 @@ extern float epsilon_theta = 0.996;
 extern float epsilon_d = 0.01;
 #include <virtual_sensor.h>
 #include <data_frame.h>
+#include <type_definitions.h>
 #include <fstream>
-extern std::map<kinect_fusion::Level, int> iteration_num_with_level = { {kinect_fusion::Level::First, 4}, {kinect_fusion::Level::Second,5}, {kinect_fusion::Level::Third,10} };
+extern std::map<kinect_fusion::Level, int> iteration_num_with_level = { {kinect_fusion::FIRST_LEVEL, 4}, {kinect_fusion::SECOND_LEVEL,5}, {kinect_fusion::THIRD_LEVEL,10} };
 
 namespace kinect_fusion {
 
@@ -17,8 +18,8 @@ namespace kinect_fusion {
             m_lastFrameData = lastFrameData;
 			m_lastTransformation = lastTransformation;
             m_currentTransformation = currentTransformation;
-            //std::cout << "current frame data second level in constructor" << currentFrameData.getSurface(kinect_fusion::Level::Second).getVertexMap().size() << std::endl;
-            //std::cout << "current frame data second level in constructor" << m_currentFrameData.getSurface(kinect_fusion::Level::Second).getVertexMap().size() << std::endl;
+            //std::cout << "current frame data second level in constructor" << currentFrameData.getSurface(kinect_fusion::SECOND_LEVEL).getVertexMap().size() << std::endl;
+            //std::cout << "current frame data second level in constructor" << m_currentFrameData.getSurface(kinect_fusion::SECOND_LEVEL).getVertexMap().size() << std::endl;
 		}
         Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
         {
@@ -245,7 +246,7 @@ namespace kinect_fusion {
             //for (Level level : LEVELS)
             //{
 
-            //    int index = m_currentFrameData.getIndex(level); // index = 0, 1, 2
+            //    int index = level; // index = 0, 1, 2
             //    std::cout << "INEDX" << index << std::endl;
             //    std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
             //    Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface(2 - index).getNormalMap();
@@ -278,8 +279,8 @@ namespace kinect_fusion {
             //    }
             //}
 
-            Level level = Level::First;
-            int index = m_currentFrameData.getIndex(level); // index = 0, 1, 2
+            Level level = FIRST_LEVEL;
+            int index = level; // index = 0, 1, 2
             std::cout << "LEVEL INDEX" << index << std::endl;
             //std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
             Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface( index).getNormalMap();// camera space
@@ -288,7 +289,7 @@ namespace kinect_fusion {
             Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface( index).getNormalMap();//camera space
             Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface( index).getVertexMap();//camera space
 
-            for (int i = 0; i != iteration_num_with_level[Level::Third]; i++)
+            for (int i = 0; i != iteration_num_with_level[THIRD_LEVEL]; i++)
             {
                 std::cout << std::endl;
                 std::cout << std::endl;
