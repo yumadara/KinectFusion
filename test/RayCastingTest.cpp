@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <RayCasting.h>
-
+#include <type_definitions.h>
 #include <Camera.h>
 #include <Voxel.h>
 
@@ -65,13 +65,9 @@ TEST(RayCastingTest, CheckFill_Pixel) {
     
     RayCasting rayCastingRayCasting(TSDF, camera);
     rayCastingRayCasting.fill_pixel(0, 0);
-    Surface surface = rayCastingRayCasting.getSurface();
-    EXPECT_NEAR(surface.getVertex(0,0)(0), 0.,0.0001);
-    EXPECT_NEAR(surface.getVertex(0,0)(1), 0.,0.0001);
-    EXPECT_NEAR(surface.getVertex(0,0)(2), 480.,0.0001);
-    EXPECT_NEAR(surface.getNormal(0,0)(0), 0.,0.0001);
-    EXPECT_NEAR(surface.getNormal(0,0)(1), 0.,0.0001);
-    EXPECT_NEAR(surface.getNormal(0,0)(2), -1.,0.0001);
+    Map2Df depthMap = rayCastingRayCasting.getDepthMap();
+    EXPECT_NEAR(depthMap.get(0,0), 480.,0.0001);
+    
 }
 
 } // namespace kinect_fusion

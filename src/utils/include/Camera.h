@@ -8,9 +8,12 @@ namespace kinect_fusion {
 
 class Camera {
     public:
-    Camera(Vector3f translation, Matrix3f rotation, Matrix3f inverseCalibrationMatrix,
+    Camera(MatrixXf poseEstimation, Matrix3f inverseCalibrationMatrix,
     int pictureHeightInPixel, int pictureWidthInPixel,
     int originXInPixel, int originYInPixel){
+        Vector3f translation = poseEstimation.block(0,3,3,1);
+        Matrix3f rotation = poseEstimation.block(0,0,3,3);
+
         init(translation,rotation, inverseCalibrationMatrix,
         pictureHeightInPixel, pictureWidthInPixel,
         originXInPixel, originYInPixel);

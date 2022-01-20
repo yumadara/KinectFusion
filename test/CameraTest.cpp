@@ -8,28 +8,27 @@ namespace kinect_fusion {
 
 /// @brief Basic test to check that data pipeline works
 TEST(CameraTest, CheckCameraConstruction) {
-    Vector3f translation = Vector3f(0.,0.,0.);
-    Matrix3f rotation = Matrix3f::Identity();
+    
+    Matrix4f pose = MatrixXf::Identity();
     Matrix3f inverseCalibrationMatrix = Matrix3f::Identity();
     int pictureHeightInPixel = 100;
     int pictureWidthInPixel = 100;
     int originXInPixel = 0;
     int originYInPixel = 0;
-	Camera camera(translation,rotation, inverseCalibrationMatrix,
+	Camera camera(pose, inverseCalibrationMatrix,
     pictureHeightInPixel, pictureWidthInPixel,
     originXInPixel, originYInPixel);
 }
 
 
 TEST(CameraTest, CheckCameraToWorld) {
-	Vector3f translation = Vector3f(0.,0.,0.);
-    Matrix3f rotation = Matrix3f::Identity();
+	Matrix4f pose = MatrixXf::Identity();
     Matrix3f inverseCalibrationMatrix = Matrix3f::Identity();
     int pictureHeightInPixel = 100;
     int pictureWidthInPixel = 100;
     int originXInPixel = 0;
     int originYInPixel = 0;
-	Camera camera(translation,rotation, inverseCalibrationMatrix,
+	Camera camera(pose, inverseCalibrationMatrix,
     pictureHeightInPixel, pictureWidthInPixel,
     originXInPixel, originYInPixel);
     Vector3f cameraFrame = Vector3f(1.,0.,0.);
