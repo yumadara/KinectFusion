@@ -20,7 +20,8 @@ namespace kinect_fusion {
 
 		MatrixXf previousTransformation = Matrix4f::Identity();
 		MatrixXf currentTransformation = Matrix4f::Identity();
-
+		currentTransformation(0, 3) = 0.001;
+		//currentTransformation(2, 3) = 0.0005;
 		//std::stringstream ss_first;
 		//ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
 		//std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
@@ -44,7 +45,7 @@ namespace kinect_fusion {
 
 		PoseEstimator pose_estimator(second_frame_data, first_frame_data, previousTransformation, currentTransformation);
 		//std::cout << "current transformation" <<pose_estimator.getCurrentTransformation()<<std::endl;
-		std::cout << "second frame data second level vertex map size" << second_frame_data.getSurface(kinect_fusion::Level::Third).getVertexMap().size() << std::endl;
+		//std::cout << "second frame data second level vertex map size" << second_frame_data.getSurface(kinect_fusion::Level::Third).getVertexMap().size() << std::endl;
 		currentTransformation = pose_estimator.frame2frameEstimation(previousTransformation);
 		std::cout << "Final Transformation" << currentTransformation << std::endl;
 
