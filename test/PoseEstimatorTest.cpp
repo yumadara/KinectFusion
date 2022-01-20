@@ -47,7 +47,8 @@ namespace kinect_fusion {
 		//std::cout << "current transformation" <<pose_estimator.getCurrentTransformation()<<std::endl;
 		//std::cout << "second frame data second level vertex map size" << second_frame_data.getSurface(kinect_fusion::Level::Third).getVertexMap().size() << std::endl;
 		currentTransformation = pose_estimator.frame2frameEstimation(previousTransformation);
-		std::cout << "Final Transformation" << currentTransformation << std::endl;
+		std::cout << "Final Transformation " << std::endl;
+		std::cout << currentTransformation << std::endl;
 
 		std::stringstream ss;
 		ss << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
