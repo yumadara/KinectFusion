@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         Map2Df& depths{sensor.getDepth()};
         dataFrame.updateValues(depths);
 
-        std::ofstream depthsFile{std::string("./executables/temp/depths_csv/frame_") + std::to_string(i) + std::string(".csv")};
+        std::ofstream depthsFile{std::string("./executables/generated_data/depths_csv/frame_") + std::to_string(i) + std::string(".csv")};
         std::size_t last_column = depths.getNumberOfColumns() - 1;
         for (std::size_t row = 0; row < depths.getNumberOfRows(); row++) {
             for (std::size_t col = 0; col < last_column; col++) {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
             depthsFile << depths.get(row, last_column) << "\n";
         }
 
-        std::ofstream filteredDepthsFile{std::string("./executables/temp/depths_csv/filtered_frame_") + std::to_string(i) + std::string(".csv")};
+        std::ofstream filteredDepthsFile{std::string("./executables/generated_data/depths_csv/filtered_frame_") + std::to_string(i) + std::string(".csv")};
         last_column = depths.getNumberOfColumns() - 1;
         for (std::size_t row = 0; row < depths.getNumberOfRows(); row++) {
             for (std::size_t col = 0; col < last_column; col++) {
@@ -38,17 +38,17 @@ int main(int argc, char *argv[]) {
             filteredDepthsFile << dataFrame.getFilteredDepths().get(row, last_column) << "\n";
         }
 
-        std::string unfilteredMeshFile{std::string("./executables/temp/meshes/unfiltered_frame_") + std::to_string(i) + std::string(".off")};
+        std::string unfilteredMeshFile{std::string("./executables/generated_data/meshes/unfiltered_frame_") + std::to_string(i) + std::string(".off")};
         SimpleMesh unfilteredMesh{sensor, Matrix4f::Identity(), 0.1f};
 		unfilteredMesh.writeMesh(unfilteredMeshFile);
         
         for (std::size_t level = 0; level < NUMBER_OF_LEVELS; level++) {
-            std::string meshFileName{std::string("./executables/temp/meshes/frame_") + std::to_string(i) + std::string("_level_") + std::to_string(level) + std::string(".off")};
+            std::string meshFileName{std::string("./executables/generated_data/meshes/frame_") + std::to_string(i) + std::string("_level_") + std::to_string(level) + std::string(".off")};
 		    SimpleMesh depthMesh{dataFrame.getSurface(level).getVertexMap(), Matrix4f::Identity(), 0.1f};
 		    depthMesh.writeMesh(meshFileName);
 
-            std::ofstream vertexFile{std::string("./executables/temp/vertices_csv/frame_") + std::to_string(i) + std::string("_level_") + std::to_string(level) + std::string(".csv")};
-            std::ofstream normalFile{std::string("./executables/temp/normals_csv/frame_") + std::to_string(i) + std::string("_level_") + std::to_string(level) + std::string(".csv")};
+            std::ofstream vertexFile{std::string("./executables/generated_data/vertices_csv/frame_") + std::to_string(i) + std::string("_level_") + std::to_string(level) + std::string(".csv")};
+            std::ofstream normalFile{std::string("./executables/generated_data/normals_csv/frame_") + std::to_string(i) + std::string("_level_") + std::to_string(level) + std::string(".csv")};
 
             Map2DVector3f& normal_map{dataFrame.getSurface(level).getNormalMap()};
             Map2DVector3f& vertex_map{dataFrame.getSurface(level).getVertexMap()};

@@ -1,0 +1,12 @@
+conda create -n kinect_fusion python=3.6
+conda activate kinect_fusion
+conda install -c open3d-admin -c conda-forge open3d
+conda install jupyter
+pip install --upgrade jupyter_client
+pip install pptk
+conda install mayavi
+conda install importlib_metadata
+conda install importlib_resources
+conda install -c anaconda pyqt
+conda install -c dsdale24 pyqt5
+pip install PyQt5==5.10.1
