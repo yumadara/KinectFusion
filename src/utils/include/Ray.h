@@ -34,6 +34,9 @@ class Ray {
     bool isInBound(){
         return this->currLocation.norm()<=this->maxDistance;
     }
+    void setstepLength(float stepLength){
+        this->stepLength = stepLength;
+    }
 
     private:
     float stepLength;

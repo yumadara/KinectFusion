@@ -87,12 +87,11 @@ public:
     }
     int ordFromCont(float ordCont){
         
-        float k  = ordCont/minimumResolution;
-        int r = std::floor(ordCont/minimumResolution);
-        return r;
+        
+        return std::floor(ordCont/minimumResolution);
     }
-    float ContFromOrd(int ord){
-        return ord*minimumResolution;
+    Vector3f ContFromOrd(Vector3i ord){
+        return (ord-Vector3i(originX, originY, originZ)).cast<float>()*minimumResolution;
     }
     float getDistance(float ordXf, float ordYf, float ordZf){
         int ordX = ordFromCont(ordXf);
@@ -150,7 +149,7 @@ public:
         if (! isInBoundInt(ordX, ordY, ordZ)){
             return false;
         }
-        Distance[(ordX + originX) + (ordY + originY) * numX + (ordZ + originZ) * numX * numY] = truncate(newDistance);
+        Distance[(ordX + originX) + (ordY + originY) * numX + (ordZ + originZ) * numX * numY] = newDistance;
         return true;
     }
     bool setWeight(float ordXf, float ordYf, float ordZf, float newWeight){
@@ -164,7 +163,7 @@ public:
         return true;
     }
     bool isKnown(float distanceValue){
-        return distanceValue> -truncateDistance && distanceValue<= truncateDistance;
+        return distanceValue> -1 ;
     }
     float truncate(float distance){
         if (isKnown(distance)){
@@ -185,7 +184,7 @@ public:
 
     float defaultDistance = -100.;
     float defaultWeight = -1.;
-    float truncateDistance = 30.;
+    float truncateDistance = 200.;
     float minimumResolution = 5.;
     int originX;
     int originY;

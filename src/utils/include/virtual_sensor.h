@@ -120,6 +120,9 @@ public:
 	Map2Df getDepth() {
 		return m_depthFrame;
 	}
+	void setDepth(Map2Df m_depthFrame){
+		this->m_depthFrame = m_depthFrame;
+	}
 
 	// color camera info
 	Eigen::Matrix3f getColorIntrinsics() {
@@ -167,6 +170,14 @@ public:
 	Eigen::Matrix4f getTrajectory() {
 		return m_currentTrajectory;
 	}
+	float get_tan_y_z(){
+		return float(m_depthIntrinsics.coeff(1,2))/float(m_depthIntrinsics.coeff(1,1));
+	}
+	
+	float get_tan_x_z(){
+		return float(m_depthIntrinsics.coeff(0,2))/float(m_depthIntrinsics.coeff(1,1));
+	}
+	
 
 private:
 	bool readFileList(const std::string& filename, std::vector<std::string>& result, std::vector<double>& timestamps) {
