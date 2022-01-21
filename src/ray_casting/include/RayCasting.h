@@ -4,6 +4,7 @@
 
 #include <Camera.h>
 #include <Surface.h>
+#include <algorithm>
 
 namespace kinect_fusion {
 
@@ -21,20 +22,20 @@ class RayCasting {
         Map2Df depthMap = Map2Df(camera.getHeight(), camera.getWidth(),MINF);
         this->surface = surface;
         this->depthMap = depthMap;
-        this->minDistance = 400.;
+        this->minDistance = 200.;
         this->maxDistance = 8000.;
     }
     void do_work(){
         for (int j = 0;j< this->surface.getHeight();j++){
             for (int i = 0; i< this->surface.getWidth(); i++){
-                fill_pixel(i-camera.originXInPixel,j-camera.originYInPixel);
+                fill_pixel(i,j);
             }
         }
     }
     bool fill_pixel(int XInPixel, int YInPixel){
         Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(YInPixel), 1.);
-        float stepLength =  TSDF.truncateDistance;
-        
+        float stepLength =  TSDF.truncateDistance/2.;
+        std::cout<<"pixel corrd: "<<XInPixel<<","<<YInPixel<<std::endl;
         Ray ray = Ray(stepLength, this->minDistance, this->maxDistance, direction);
         float currF = TSDF.defaultDistance;
         float lastF = TSDF.defaultDistance;
@@ -48,22 +49,33 @@ class RayCasting {
             }
             lastF = currF;
             currF = TSDF.getDistance(currLocationWorld(0), currLocationWorld(1), currLocationWorld(2));
+            
+            std::cout<<"distance from camera: "<<currLocationCamera.norm()<<std::endl;
+            std::cout<<"currF: "<<currF<<std::endl;
             if (currF>=0 && lastF<=0 &&  TSDF.isKnown(lastF)){
                 return false;
             }
-            if (currF<=0 && lastF>=0){
-                Vector3f vertexCamera = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF);
+            if (lastF>=0 && !TSDF.isKnown(currF)){
+                return false;
+            }
+            if (currF<=0 && lastF>=0 && TSDF.isKnown(currF)){
+                std::cout<<"RAYHITS,currF: "<<currF<<" lastF:"<<lastF<<std::endl;
+                Vector3f vertexCamera = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF+0.001);
                 //Vector3f normalWorld = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
                 //Vector3f vertexCamera = camera.worldToCameraVector(vertexWorld);
                 //Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
                 //surface.setNormal(XInPixel, YInPixel, normalCamera);
                 
-                depthMap.set(XInPixel+camera.originXInPixel, YInPixel+camera.originYInPixel, vertexCamera.coeff(2));
+                depthMap.set( YInPixel+camera.originYInPixel,XInPixel+camera.originXInPixel, vertexCamera.coeff(2)/1000.);
                 // surface.setVertex(XInPixel, YInPixel, vertexCamera);
                 return true;
             }
             
             else{
+                if (currF >0 && currF<1){
+                    ray.setstepLength(std::max(30.,TSDF.truncateDistance/2. * currF));
+                }
+                
                 ray.step();
             }       
         }

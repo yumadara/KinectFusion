@@ -3,6 +3,9 @@
 #include"Voxel.h"
 #include"virtual_sensor.h"
 #include"type_definitions.h"
+#include <chrono>
+#include <cassert>
+
 namespace kinect_fusion {
     //camera coordinate -> pixel coordinate
     Vector2f cameraToScreen(const Vector3f& p_k, Matrix3f depthIntrinsics)
@@ -24,20 +27,23 @@ namespace kinect_fusion {
     //quation (9)
     float SDF_truncation(float& x, const float& mu, const float& default_sdf)
     {   
-        int sign = x/abs(x);
+        int sign = x>0? 1:-1;
         if(x > -mu)
         {
-            return fmin(1, x/mu)*sign;
+            return fmin(1, abs(x/mu))*sign;
         }
         else
             return default_sdf;
     }
     //equation (8)
-    Vector2i globalToScreen(const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p_g )
+    Vector2i globalToScreen(const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p_g ,float x_z_limit, float y_z_limit)
     {
         Matrix4f depthExtrinsicsInv = depthExtrinsics.inverse();
         Vector4f p = homogenisation(p_g);
         Vector4f p_k = depthExtrinsicsInv*p;
+        if (p_k.z()<0){
+            return Vector2i(MINF,MINF);
+        }
         Vector3f p_p;
         p_p << p_k.x(), p_k.y(), p_k.z();
         p_p = depthIntrinsics*p_p;
@@ -61,7 +67,7 @@ namespace kinect_fusion {
         Vector3f translation;
         translation << depthExtrinsics.topRightCorner(3,1);
         float sdf_k_i;
-        float Eta = (translation - p).norm()/lamda - depth_k_i;
+        float Eta =depth_k_i*1000 - (translation*1000 - p).norm()/lamda ;//change of unit from m to mm
         sdf_k_i = SDF_truncation(Eta, mu, default_sdf);
         return sdf_k_i;
     }
@@ -76,6 +82,8 @@ namespace kinect_fusion {
         // unsigned int i = 0;
             const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
         // while (sensor.processNextFrame() && i <= k) {
+            float y_z_limit = sensor.get_tan_y_z();
+            float x_z_limit = sensor.get_tan_x_z();
             Map2Df depthMap_k_i{sensor.getDepth()};
             //float* depthMap_k_i = sensor.getDepth().data();;
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
@@ -83,40 +91,62 @@ namespace kinect_fusion {
             // const Matrix4f depthExtrinsics = depthExtrinsics;
             const unsigned int width = sensor.getDepthImageWidth();
             const unsigned int height = sensor.getDepthImageHeight();
-            const float mu = 10.0;//TODO: right? wirte a config file
+            const float mu = volument.truncateDistance;//TODO: right? wirte a config file
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             for (int voxel_xi=0; voxel_xi<volument.numX; voxel_xi++)
+            // for (int voxel_xi=75; voxel_xi<125; voxel_xi++)
             {
+                end = std::chrono::steady_clock::now();
+                std::cout<<"x:"<<voxel_xi<<std::endl;
+                std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+                begin = end;
                 for(int voxel_yi=0; voxel_yi<volument.numY; voxel_yi++)
+                // for(int voxel_yi=75; voxel_yi<125; voxel_yi++)
                 {
+                   
                     for(int voxel_zi=0; voxel_zi<volument.numZ; voxel_zi++)
                     {
-                        float p_x =  volument.ContFromOrd(voxel_xi);
-                        float p_y =  volument.ContFromOrd(voxel_yi);
-                        float p_z =  volument.ContFromOrd(voxel_zi);
-                        Vector3f p_g(p_x, p_y, p_z);
-                        Vector2i x = globalToScreen(depthIntrinsics, depthExtrinsics, p_g);
-                        if(x.x()>height || x.y()>width || x.x()<0 || x.y()<0)
+                        Vector3f p_g = volument.ContFromOrd(Vector3i(voxel_xi, voxel_yi, voxel_zi));
+                        
+                        
+                        
+                        
+                        
+                        
+                        Vector2i x = globalToScreen(depthIntrinsics, depthExtrinsics, p_g, x_z_limit, y_z_limit);
+                        if(x.x()>width || x.y()>height || x.x()<0 || x.y()<0)
                         {
                             continue;
                         }
-                        float depth_k_i = depthMap_k_i.get(x.x(), x.y());
+                        
+                        float depth_k_i = depthMap_k_i.get( x.y(), x.x());
+                        if (!(depth_k_i>0)){
+                            continue;
+                        }
                         const float lamda = Lamda(depthIntrinsics, x);
                         float SDF_k_i_n = SDF_k_i(mu, lamda, depthIntrinsics, depthExtrinsics, p_g, depth_k_i, defaut_dst);
-                        float F_k_i_j = volument.getDistance(p_x, p_y, p_z);
+                        float F_k_i_j = volument.getDistance(p_g.x(), p_g.y(), p_g.z());
                         float new_dist;
-                        if (F_k_i_j != defaut_dst and SDF_k_i_n!=defaut_dst)
+                        if (F_k_i_j !=defaut_dst && SDF_k_i_n!=defaut_dst)
                         {
                             new_dist = (F_k_i_j + SDF_k_i_n)/2;
-                            volument.setDistance(p_x, p_y, p_z, new_dist);
+                            volument.setDistance(p_g.x(), p_g.y(), p_g.z(), new_dist);
                         }    
                         else if (SDF_k_i_n!=defaut_dst)
                         {
                             new_dist = SDF_k_i_n;
-                            volument.setDistance(p_x, p_y, p_z, new_dist);
+                            if (new_dist<0 && new_dist>-1){
+                                std::cout<<"GOTBACK, "<<new_dist<<std::endl;
+                            }
+                            else{
+                                std::cout<<"GOTFRONT, "<<new_dist<<std::endl;
+                            }
+                            volument.setDistance(p_g.x(), p_g.y(), p_g.z(), new_dist);
+                            assert (volument.getDistance(p_g.x(), p_g.y(), p_g.z()) == new_dist);
                         }
                             
-                        else
-                            ;
+                        
 
                     }
                 }
