@@ -45,25 +45,18 @@ public:
 		// Get ptr to the current color frame.
 		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
 		Map2Df colorMap = sensor.getColorRGBX();
-
-		//auto depthMap = sensor.getDepth().data();
-		// Get ptr to the current color frame.
-		// Color is stored as RGBX in row major (4 byte values per pixel, get dimensions via sensor.GetColorImageWidth() / GetColorImageHeight()).
-		//auto colorMap = sensor.getColorRGBX().data();
-
-
 		// Get depth intrinsics.
 		Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
 		float fovX = depthIntrinsics(0, 0);
 		float fovY = depthIntrinsics(1, 1);
 		float cX = depthIntrinsics(0, 2);
 		float cY = depthIntrinsics(1, 2);
-
+		Matrix4f depthExtrinsicsInv = sensor.getDepthExtrinsics();
 		// Compute inverse depth extrinsics.
-		Matrix4f depthExtrinsicsInv = sensor.getDepthExtrinsics().inverse();
+		//Matrix4f depthExtrinsicsInv = sensor.getDepthExtrinsics().inverse();
 
 		// Compute inverse camera pose (mapping from camera CS to world CS).
-		Matrix4f cameraPoseInverse = cameraPose.inverse();
+		//Matrix4f cameraPoseInverse = cameraPose.inverse();
 
 		// Compute vertices with back-projection.
 		m_vertices.resize(sensor.getDepthImageWidth() * sensor.getDepthImageHeight());
@@ -79,21 +72,21 @@ public:
 				}
 				else {
 					// Back-projection and tranformation to world space.
-					m_vertices[idx].position = cameraPoseInverse * depthExtrinsicsInv * Vector4f((u - cX) / fovX * depth, (v - cY) / fovY * depth, depth, 1.0f);
-
+					//m_vertices[idx].position = cameraPoseInverse * depthExtrinsicsInv * Vector4f((u - cX) / fovX * depth, (v - cY) / fovY * depth, depth, 1.0f);
+					m_vertices[idx].position = cameraPose * Vector4f((u - cX) / fovX * depth, (v - cY) / fovY * depth, depth, 1.0f);
 					// Project position to color map.
-					Vector3f proj = sensor.getColorIntrinsics() * (sensor.getColorExtrinsics() * cameraPose * m_vertices[idx].position).block<3, 1>(0, 0);
-					proj /= proj.z(); // dehomogenization
-					unsigned int uCol = (unsigned int)std::floor(proj.x());
-					unsigned int vCol = (unsigned int)std::floor(proj.y());
-					if (uCol >= sensor.getColorImageWidth()) uCol = sensor.getColorImageWidth() - 1;
-					if (vCol >= sensor.getColorImageHeight()) vCol = sensor.getColorImageHeight() - 1;
-					unsigned int idxCol = vCol*sensor.getColorImageWidth() + uCol; // linearized index color
-																					//unsigned int idxCol = idx; // linearized index color
+					//Vector3f proj = sensor.getColorIntrinsics() * (sensor.getColorExtrinsics() * cameraPose * m_vertices[idx].position).block<3, 1>(0, 0);
+					//proj /= proj.z(); // dehomogenization
+					//unsigned int uCol = (unsigned int)std::floor(proj.x());
+					//unsigned int vCol = (unsigned int)std::floor(proj.y());
+					//if (uCol >= sensor.getColorImageWidth()) uCol = sensor.getColorImageWidth() - 1;
+					//if (vCol >= sensor.getColorImageHeight()) vCol = sensor.getColorImageHeight() - 1;
+					//unsigned int idxCol = vCol*sensor.getColorImageWidth() + uCol; // linearized index color
+					//																//unsigned int idxCol = idx; // linearized index color
 
 					// Write color to vertex.
 
-					m_vertices[idx].color = Vector4uc(colorMap.get(4 * idxCol + 0), colorMap.get(4 * idxCol + 1), colorMap.get(4 * idxCol + 2), colorMap.get(4 * idxCol + 3));
+					m_vertices[idx].color = Vector4uc(colorMap.get(4 * idx + 0), colorMap.get(4 * idx + 1), colorMap.get(4 * idx + 2), colorMap.get(4 * idx + 3));
 				}
 			}
 		}

@@ -5,19 +5,21 @@ extern float epsilon_d = 0.01;
 #include <data_frame.h>
 #include <type_definitions.h>
 #include <fstream>
+#include <simple_mesh.h>
 extern std::map<kinect_fusion::Level, int> iteration_num_with_level = { {kinect_fusion::FIRST_LEVEL, 4}, {kinect_fusion::SECOND_LEVEL,5}, {kinect_fusion::THIRD_LEVEL,10} };
 
 namespace kinect_fusion {
 
 	class PoseEstimator {
 	public:
-		PoseEstimator(FrameData& currentFrameData, FrameData& lastFrameData, Eigen::MatrixXf& lastTransformation , Eigen::MatrixXf& currentTransformation)
+		PoseEstimator(FrameData& currentFrameData, FrameData& lastFrameData, Eigen::MatrixXf& lastTransformation , Eigen::MatrixXf& currentTransformation, VirtualSensor& sensor)
 		{
             
             m_currentFrameData = currentFrameData;
             m_lastFrameData = lastFrameData;
 			m_lastTransformation = lastTransformation;
             m_currentTransformation = currentTransformation;
+            m_sensor = sensor;
             //std::cout << "current frame data second level in constructor" << currentFrameData.getSurface(kinect_fusion::SECOND_LEVEL).getVertexMap().size() << std::endl;
             //std::cout << "current frame data second level in constructor" << m_currentFrameData.getSurface(kinect_fusion::SECOND_LEVEL).getVertexMap().size() << std::endl;
 		}
@@ -75,7 +77,7 @@ namespace kinect_fusion {
         float average_dis = 0;
         float loss = 0;
 
-        int num_dis = 0;
+        int num_pair = 0;
         
 
         //myfile.open("./test.txt");
@@ -108,7 +110,7 @@ namespace kinect_fusion {
                 {
                     //std::cout << "cosin " << cosin << std::endl;
                     //std::cout << "dis" << dis << std::endl;
-                    
+                    valid_num++;
                     //std::cout << "after pruning, index target " << index_target << std::endl;
                     //std::cout << "after pruning, source target " << index_source << std::endl;
                     //result_map.insert(std::pair<int, int>(index_target, index_source));
@@ -117,7 +119,7 @@ namespace kinect_fusion {
                     //loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
                     if (result_map.find(index_source) == result_map.end())
                     {
-                        valid_num++;
+                        num_pair++;
                         result_map.insert(std::pair<int, int>(index_source, index_target));
                         loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
                     }
@@ -142,10 +144,10 @@ namespace kinect_fusion {
             }
             
         }
-        std::cout << "After pruning, valid correspondences in total " << valid_num << std::endl;
-
+        std::cout << "After pruning, valid correspondences in total " << num_pair << std::endl;
+        std::cout << "Without bijective projection, valid correspondence number will be in " << valid_num << std::endl;
         //std::cout << " Average distance " << average_dis/num_dis << std::endl;
-        std::cout << "Average loss for each valid correspondence " << loss / valid_num << std::endl;
+        std::cout << "Average loss for each valid correspondence " << loss / num_pair << std::endl;
 
         return result_map;
     }
@@ -313,6 +315,12 @@ namespace kinect_fusion {
                 tempInputTransformation = incremental * tempInputTransformation;
                 std::cout << "Level " << index << " Iteration " << i << " after this iteration, currently estimated pose is " << std::endl;
                 std::cout << tempInputTransformation << std::endl;
+
+                std::stringstream ss;
+                std::string filenameBaseOut = std::string("mesh_");
+                ss << filenameBaseOut << m_sensor.getCurrentFrameCnt() << "_Iteration_" << i << ".off";  
+                SimpleMesh currentDepthMesh{ m_sensor, tempInputTransformation, 0.1f };
+                currentDepthMesh.writeMesh(ss.str());
             }
 
             return tempInputTransformation;
@@ -330,5 +338,6 @@ namespace kinect_fusion {
 		
 		Eigen::MatrixXf m_lastTransformation; // k-1 frame pose estimation
         Eigen::MatrixXf m_currentTransformation;
+        VirtualSensor m_sensor;
     };
 }
