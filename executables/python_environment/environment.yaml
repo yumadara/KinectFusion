@@ -1,0 +1,13 @@
+name: kinect_fusion
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.6
+  - open3d
+  - jupyter
+  - mayavi
+  - importlib_metadata
+  - importlib_resources
+  - pyqt
+prefix: /Users/russii/opt/anaconda3/envs/kinect_fusion
