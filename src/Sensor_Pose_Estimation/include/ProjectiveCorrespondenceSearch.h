@@ -85,8 +85,8 @@ public:
 			//Vector3f image_plane_point = intrinsics*point;
 			//std::cout << "image plane point " << image_plane_point << std::endl;
 		//std::cout << "source point" << point << std::endl;
-		float imagePlaneCoordinateX = (intrinsics(0, 0) * point.x() / point.z() + intrinsics(0, 2));
-		float imagePlaneCoordinateY = (intrinsics(1, 1) * point.y() / point.z() + intrinsics(1, 2));
+		int imagePlaneCoordinateX = round(intrinsics(0, 0) * point.x() / point.z() + intrinsics(0, 2) );
+		int imagePlaneCoordinateY = round(intrinsics(1, 1) * point.y() / point.z() + intrinsics(1, 2) );
 		//std::cout << "image X " << imagePlaneCoordinateX << std::endl;
 		//std::cout << "image Y " << imagePlaneCoordinateY << std::endl;
 
@@ -95,7 +95,7 @@ public:
 			return -1;
 		}
 		//std::cout << "source index " << imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX << std::endl;
-		return round(imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX);
+		return imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX;
 	}
 
 	std::map<int, int> getMatch()
