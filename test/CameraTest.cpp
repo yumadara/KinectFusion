@@ -10,12 +10,12 @@ namespace kinect_fusion {
 TEST(CameraTest, CheckCameraConstruction) {
     
     Matrix4f pose = Matrix4f::Identity();
-    Matrix3f inverseCalibrationMatrix = Matrix3f::Identity();
+    Matrix3f CalibrationMatrix = Matrix3f::Identity();
     int pictureHeightInPixel = 100;
     int pictureWidthInPixel = 100;
     int originXInPixel = 0;
     int originYInPixel = 0;
-	Camera camera(pose, inverseCalibrationMatrix,
+	Camera camera(pose, CalibrationMatrix,
     pictureHeightInPixel, pictureWidthInPixel,
     originXInPixel, originYInPixel);
 }
@@ -23,12 +23,12 @@ TEST(CameraTest, CheckCameraConstruction) {
 
 TEST(CameraTest, CheckCameraToWorld) {
 	Matrix4f pose = Matrix4f::Identity();
-    Matrix3f inverseCalibrationMatrix = Matrix3f::Identity();
+    Matrix3f CalibrationMatrix = Matrix3f::Identity();
     int pictureHeightInPixel = 100;
     int pictureWidthInPixel = 100;
     int originXInPixel = 0;
     int originYInPixel = 0;
-	Camera camera(pose, inverseCalibrationMatrix,
+	Camera camera(pose, CalibrationMatrix,
     pictureHeightInPixel, pictureWidthInPixel,
     originXInPixel, originYInPixel);
     Vector3f cameraFrame = Vector3f(1.,0.,0.);
