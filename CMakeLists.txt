@@ -66,14 +66,27 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 link_directories(${FreeImage_LIBRARY_DIR})
 
 # Add executables
+#add_executable(
+ #   SurfaceMeasurementApp # Name
+ #   ${CMAKE_CURRENT_SOURCE_DIR}/executables/surface_measurement_app.cpp # File
+ #   ${SOURCE}
+#)
+
+#target_link_libraries(
+#    SurfaceMeasurementApp
+#    freeimage
+#    Eigen3::Eigen
+#   ${OpenCV_LIBS}
+#)
+
 add_executable(
-    SurfaceMeasurementApp # Name
-    ${CMAKE_CURRENT_SOURCE_DIR}/executables/surface_measurement_app.cpp # File
+    KinectFusionApp # Name
+    ${SOURCE_DIR}/main.cpp # File
     ${SOURCES}
 )
 
 target_link_libraries(
-    SurfaceMeasurementApp
+    KinectFusionApp
     freeimage
     Eigen3::Eigen
    ${OpenCV_LIBS}
@@ -147,6 +160,7 @@ add_executable(
    test/surface_measurement_test.cpp
    ${SOURCES}
 )
+
 # enable_testing()
 
 

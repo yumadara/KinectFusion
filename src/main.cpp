@@ -1,52 +1,50 @@
 #include <virtual_sensor.h>
 #include "utils/include/type_definitions.h"
-#include <PoseEstimator.h>
+#include "Sensor_Pose_Estimation/include/PoseEstimator.h"
 #include <data_frame.h>
 #include"surface_reconstruct.h"
+#include <RayCasting.h>
+#include <Camera.h>
 
-namespace kinect_fusion {
+using namespace kinect_fusion;
 
 int main(int argc, char *argv[]) {
-    std::string filenameIn{"../data/rgbd_dataset_freiburg1_xyz/"};
+    std::string filenameIn{ "/mnt/d/Users/chiyu/1 semester/KinectFusion/data/rgbd_dataset_freiburg1_xyz/" };
 
     VirtualSensor sensor;
-    sensor.init(filenameIn)
+    sensor.init(filenameIn);
     Voxel volum(100, 100, 100, 0, 0, 0, -100, 0);
-    FrameData previous_dataFrame{sensor.getDepthIntrinsics(), sensor.getHeight(), sensor.getWidth()};
+    FrameData previous_dataFrame{sensor.getDepthIntrinsics(), sensor.getDepthImageHeight(), sensor.getDepthImageWidth() };
 
     sensor.processNextFrame();
     Map2Df depth = sensor.getDepth();
-    dataFrame.updateValues(depth);
+    previous_dataFrame.updateValues(depth);
 
     
-    MatrixXf& pose_estimation = MatrixXf::Identity();
-    for (unsigned int i = 1; i < sensor.getCurrentFrameCnt(); i++) {
+    MatrixXf previousTransformation = Matrix4f::Identity();
+    MatrixXf currentTransformation = Matrix4f::Identity();
+
+    for (unsigned int i = 1; i < 3; i++) {
+        //currentTransformation = 
         sensor.processNextFrame();
-        FrameData current_dataFrame{ sensor.getDepthIntrinsics(), sensor.getHeight(), sensor.getWidth() };
+        FrameData current_dataFrame{ sensor.getDepthIntrinsics(), sensor.getDepthImageHeight(), sensor.getDepthImageWidth() };
         Map2Df depth = sensor.getDepth();
-        dataFrame.updateValues(depth);
+        current_dataFrame.updateValues(depth);
 
-        
+        PoseEstimator pose_estimator(current_dataFrame, previous_dataFrame, previousTransformation, currentTransformation, sensor);
 
-        PoseEstimator pose_estimator(current_dataFrame, previous_dataFrame, pose_estimation);
-        
-        for (Level level:  LEVELS)
-        {
-            frame2frameEstimation(pose_estimation, level);
-        }
-        pose_estimation = pose_estimator.getCurrentTransformation();
+        currentTransformation = pose_estimator.frame2frameEstimation(previousTransformation);
 
-        update_volument(sensor, volum, pose_estimation);
-        Camera camera(pose_estimation, sensor.getDepthIntrinsicsInverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
-            sensor.getHeight(), sensor.getWidth(),
+        update_volument(sensor, volum, currentTransformation);
+        Camera camera(currentTransformation, sensor.getDepthIntrinsicsInverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
+            sensor.getDepthImageHeight(), sensor.getDepthImageWidth(),
             0, 0);
         RayCasting cast(volum, camera);
         cast.do_work();
         Map2Df depthMap = cast.getDepthMap();  //TODO cast.getDepthMap
-        
         previous_dataFrame.updateValues(depthMap);
-        
+        previousTransformation = currentTransformation;
 
     }
 }
-} // namespace kinect_fusion
+ // namespace kinect_fusion

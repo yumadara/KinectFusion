@@ -36,7 +36,8 @@ class Camera {
     void init(Vector3f translation, Matrix3f rotation, Matrix3f inverseCalibrationMatrix,
         int pictureHeightInPixel, int pictureWidthInPixel,
         int originXInPixel, int originYInPixel) {
-        assert (rotationIsValid(rotation));
+        assert (abs(rotation.determinant()-1) <0.01 );
+        
         this->rotation = rotation;
         this->translation = translation;
         this->inverseCalibrationMatrix = inverseCalibrationMatrix;
