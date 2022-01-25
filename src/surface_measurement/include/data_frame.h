@@ -70,18 +70,18 @@ class FrameData {
         /**
          * @brief Filtered depth maps.
          */
-        Map2Df m_filteredDepthMaps[NUMBER_OF_LEVELS];
+        std::array<Map2Df, NUMBER_OF_LEVELS> m_filteredDepthMaps;
 
         /**
          * @brief Vertex and normal maps for different levels (i.e. V matrices).
          */
-        Surface m_surfaces[NUMBER_OF_LEVELS];
+        std::array<Surface, NUMBER_OF_LEVELS> m_surfaces;
         
         /**
          * @brief Camera instrinstics for different levels, i.e. K.
          * 
          * @note Since the images on different levels have different resolutions, camera instrinstics change accordingly.
          */
-        Eigen::Matrix3f m_cameraIntrinstics[NUMBER_OF_LEVELS];          
+        std::array<Eigen::Matrix3f, NUMBER_OF_LEVELS> m_cameraIntrinstics;    
 };
 } // namespace kinect_fusion
