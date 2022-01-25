@@ -137,10 +137,10 @@ namespace kinect_fusion {
                         {
                             new_dist = SDF_k_i_n;
                             if (new_dist<0 && new_dist>-1){
-                                std::cout<<"GOTBACK, "<<new_dist<<std::endl;
+                                //std::cout<<"GOTBACK, "<<new_dist<<std::endl;
                             }
                             else{
-                                std::cout<<"GOTFRONT, "<<new_dist<<std::endl;
+                                //std::cout<<"GOTFRONT, "<<new_dist<<std::endl;
                             }
                             volument.setDistance(p_g.x(), p_g.y(), p_g.z(), new_dist);
                             assert (volument.getDistance(p_g.x(), p_g.y(), p_g.z()) == new_dist);

@@ -43,7 +43,12 @@ int main(int argc, char *argv[]) {
         cast.do_work();
         Map2Df depthMap = cast.getDepthMap();  //TODO cast.getDepthMap
         previous_dataFrame.updateValues(depthMap);
+
+        std::string meshFileName{ std::string("./mesh/") + std::to_string(i) + std::string("_frame_") +  std::string(".off") };
+        SimpleMesh depthMesh{ previous_dataFrame.getSurface().getVertexMap(), currentTransformation, 0.1f };
+        depthMesh.writeMesh(meshFileName);
         previousTransformation = currentTransformation;
+
 
     }
 }
