@@ -33,7 +33,13 @@ class RayCasting {
         }
     }
     bool fill_pixel(int XInPixel, int YInPixel){
-        Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(YInPixel), 1.);
+        Matrix3f depthIntrinsics = camera.CalibrationMatrix;
+        float fovX = depthIntrinsics(0, 0);
+        float fovY = depthIntrinsics(1, 1);
+        float cX = depthIntrinsics(0, 2);
+        float cY = depthIntrinsics(1, 2);
+        Vector3f direction  = Vector3f((XInPixel - cX) / fovX , (YInPixel - cY) / fovY , 1.);
+        // Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(YInPixel), 1.);
         float stepLength =  TSDF.truncateDistance/2.;
         std::cout<<"pixel corrd: "<<XInPixel<<","<<YInPixel<<std::endl;
         Ray ray = Ray(stepLength, this->minDistance, this->maxDistance, direction);
