@@ -98,8 +98,8 @@ namespace kinect_fusion {
             // for (int voxel_xi=75; voxel_xi<125; voxel_xi++)
             {
                 end = std::chrono::steady_clock::now();
-                std::cout<<"x:"<<voxel_xi<<std::endl;
-                std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+                //std::cout<<"x:"<<voxel_xi<<std::endl;
+                //std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
                 begin = end;
                 for(int voxel_yi=0; voxel_yi<volument.numY; voxel_yi++)
                 // for(int voxel_yi=75; voxel_yi<125; voxel_yi++)
@@ -108,11 +108,6 @@ namespace kinect_fusion {
                     for(int voxel_zi=0; voxel_zi<volument.numZ; voxel_zi++)
                     {
                         Vector3f p_g = volument.ContFromOrd(Vector3i(voxel_xi, voxel_yi, voxel_zi));
-                        
-                        
-                        
-                        
-                        
                         
                         Vector2i x = globalToScreen(depthIntrinsics, depthExtrinsics, p_g, x_z_limit, y_z_limit);
                         if(x.x()>width || x.y()>height || x.x()<0 || x.y()<0)
