@@ -18,9 +18,9 @@ TEST(RayCastingTest, CheckCastingConstruction) {
 TEST(RayCastingTest, CheckFill_Pixel) {
 	Camera camera;
     Voxel TSDF(100,100,200,50,50,0);
-    for (int i =80;i<90;i++){
+    for (int i =20;i<56;i++){
         float loc = 5.* i;
-        float distance = TSDF.truncateDistance;
+        float distance = 1;
         TSDF.setDistance(0,0,loc, distance);
         TSDF.setDistance(-1,0,loc, distance);
         TSDF.setDistance(6,0,loc, distance);
@@ -34,9 +34,9 @@ TEST(RayCastingTest, CheckFill_Pixel) {
         
 
     }
-    for (int i =90;i<=96;i++){
+    for (int i =56;i<=96;i++){
         float loc = 5.* i;
-        float distance = TSDF.truncateDistance-(i-90)*5.;
+        float distance = (TSDF.truncateDistance-(i-56)*5.)/ TSDF.truncateDistance;
         TSDF.setDistance(0,0,loc, distance);
         TSDF.setDistance(-1,0,loc, distance);
         TSDF.setDistance(6,0,loc, distance);
@@ -48,9 +48,9 @@ TEST(RayCastingTest, CheckFill_Pixel) {
         TSDF.setDistance(6,-1,loc, distance);
         
     }
-    for (int i =97;i<=103;i++){
+    for (int i =97;i<=137;i++){
         float loc = 5.* i;
-        float distance = -(i-96)*5.;
+        float distance = (-(i-96)*5./TSDF.truncateDistance);
         TSDF.setDistance(0,0,loc, distance);
         TSDF.setDistance(-1,0,loc, distance);
         TSDF.setDistance(6,0,loc, distance);
@@ -64,9 +64,9 @@ TEST(RayCastingTest, CheckFill_Pixel) {
     }
     
     RayCasting rayCastingRayCasting(TSDF, camera);
-    rayCastingRayCasting.fill_pixel(0, 0);
+    rayCastingRayCasting.fill_pixel(0+ camera.originXInPixel, 0+ camera.originYInPixel);
     Map2Df depthMap = rayCastingRayCasting.getDepthMap();
-    EXPECT_NEAR(depthMap.get(0+camera.originXInPixel,0+camera.originYInPixel), 480.,0.0001);
+    EXPECT_NEAR(depthMap.get(0+ camera.originYInPixel,0+ camera.originXInPixel)*1000, 480.,1.);
     
 }
 

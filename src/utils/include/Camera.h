@@ -8,43 +8,43 @@ namespace kinect_fusion {
 
 class Camera {
     public:
-    Camera(MatrixXf poseEstimation, Matrix3f inverseCalibrationMatrix,
+    Camera(MatrixXf poseEstimation, Matrix3f CalibrationMatrix,
     int pictureHeightInPixel, int pictureWidthInPixel,
     int originXInPixel, int originYInPixel){
         Vector3f translation = poseEstimation.block(0,3,3,1);
         Matrix3f rotation = poseEstimation.block(0,0,3,3);
 
-        init(translation,rotation, inverseCalibrationMatrix,
+        init(translation,rotation, CalibrationMatrix,
         pictureHeightInPixel, pictureWidthInPixel,
-        originXInPixel, originYInPixel);
+        CalibrationMatrix(0, 2), CalibrationMatrix(1, 2));
     }
 
     Camera(){
         Vector3f translation = Vector3f(0.,0.,0.);
         Matrix3f rotation = Matrix3f::Identity();
-        Matrix3f inverseCalibrationMatrix = Matrix3f::Identity();
+        Matrix3f CalibrationMatrix = Matrix3f::Identity();
         std::size_t pictureHeightInPixel = 100;
         std::size_t pictureWidthInPixel = 100;
         std::size_t originXInPixel = 0;
         std::size_t originYInPixel = 0;
 
-        init(translation,rotation, inverseCalibrationMatrix,
+        init(translation,rotation, CalibrationMatrix,
         pictureHeightInPixel, pictureWidthInPixel,
         originXInPixel, originYInPixel);
         
     }
-    void init(Vector3f translation, Matrix3f rotation, Matrix3f inverseCalibrationMatrix,
+    void init(Vector3f translation, Matrix3f rotation, Matrix3f CalibrationMatrix,
         int pictureHeightInPixel, int pictureWidthInPixel,
         int originXInPixel, int originYInPixel) {
         assert (abs(rotation.determinant()-1) <0.01 );
         
         this->rotation = rotation;
         this->translation = translation;
-        this->inverseCalibrationMatrix = inverseCalibrationMatrix;
+        this->CalibrationMatrix = CalibrationMatrix;
         this->pictureHeightInPixel = pictureHeightInPixel;
         this->pictureWidthInPixel = pictureWidthInPixel;
-        this->originXInPixel = originXInPixel;
-        this->originYInPixel = originYInPixel;
+        this->originXInPixel = CalibrationMatrix(0, 2);
+        this->originYInPixel = CalibrationMatrix(1, 2);
     }
     bool rotationIsValid(Matrix3f rotation){
         return (rotation * rotation.transpose() - Matrix3f::Identity()).isZero();
@@ -83,7 +83,7 @@ class Camera {
     std::size_t pictureWidthInPixel;
     std::size_t originXInPixel;
     std::size_t originYInPixel;
-    Matrix3f inverseCalibrationMatrix;
+    Matrix3f CalibrationMatrix;
     private:
     Vector3f translation;
     Matrix3f rotation;

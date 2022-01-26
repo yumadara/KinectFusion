@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
     VirtualSensor sensor;
     sensor.init(filenameIn);
-    Voxel volum(100, 100, 100, 0, 0, 0, -100, 0);
+    Voxel volum(200, 200, 300, 100, 100, 0, -100, 0);
     FrameData previous_dataFrame{sensor.getDepthIntrinsics(), sensor.getDepthImageHeight(), sensor.getDepthImageWidth() };
 
     sensor.processNextFrame();
