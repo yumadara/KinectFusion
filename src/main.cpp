@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
         currentTransformation = pose_estimator.frame2frameEstimation(previousTransformation);
 
         update_volument(sensor, volum, currentTransformation);
-        Camera camera(currentTransformation, sensor.getDepthIntrinsicsInverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
+        Camera camera(currentTransformation, sensor.getDepthIntrinsics(), //TODO 2. sensor.getDepthIntrinsicsInverse
             sensor.getDepthImageHeight(), sensor.getDepthImageWidth(),
             0, 0);
         RayCasting cast(volum, camera);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
         SimpleMesh depthMesh{ previous_dataFrame.getSurface().getVertexMap(), currentTransformation, 0.1f };
         depthMesh.writeMesh(meshFileName);
         previousTransformation = currentTransformation;
-
+        std::cout << "Mesh written " << std::endl;
 
     }
 }
