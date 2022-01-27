@@ -55,6 +55,7 @@ namespace kinect_fusion {
     float Lamda(const Matrix3f& depthIntrinsics, const Vector2i& pixel_coord)
     {
         Matrix3f K_Inv = depthIntrinsics.inverse();
+        //Matrix3f K_Inv = depthIntrinsics;
         Vector3f homo_pixel_coord = homogenisation(pixel_coord.cast<float>());
         Vector3f temp = K_Inv*homo_pixel_coord;
         float lamda = temp.norm();

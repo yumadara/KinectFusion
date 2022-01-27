@@ -42,7 +42,7 @@ class RayCasting {
         Vector3f direction  = Vector3f((XInPixel - cX) / fovX , (YInPixel - cY) / fovY , 1.);
         // Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(YInPixel), 1.);
         float stepLength =  TSDF.truncateDistance/2.;
-        std::cout<<"pixel corrd: "<<XInPixel<<","<<YInPixel<<std::endl;
+        //std::cout<<"pixel corrd: "<<XInPixel<<","<<YInPixel<<std::endl;
         Ray ray = Ray(stepLength, this->minDistance, this->maxDistance, direction);
         float currF = TSDF.defaultDistance;
         float lastF = TSDF.defaultDistance;
@@ -57,8 +57,8 @@ class RayCasting {
             lastF = currF;
             currF = TSDF.getDistance(currLocationWorld(0), currLocationWorld(1), currLocationWorld(2));
             
-            std::cout<<"distance from camera: "<<currLocationCamera.norm()<<std::endl;
-            std::cout<<"currF: "<<currF<<std::endl;
+            //std::cout<<"distance from camera: "<<currLocationCamera.norm()<<std::endl;
+            //std::cout<<"currF: "<<currF<<std::endl;
             if (currF>=0 && lastF<=0 &&  TSDF.isKnown(lastF)){
                 return false;
             }
@@ -66,7 +66,7 @@ class RayCasting {
                 return false;
             }
             if (currF<=0 && lastF>=0 && TSDF.isKnown(currF)){
-                std::cout<<"RAYHITS,currF: "<<currF<<" lastF:"<<lastF<<std::endl;
+                //std::cout<<"RAYHITS,currF: "<<currF<<" lastF:"<<lastF<<std::endl;
                 Vector3f vertexCamera = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF+0.001);
                 //Vector3f normalWorld = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
                 //Vector3f vertexCamera = camera.worldToCameraVector(vertexWorld);
@@ -74,7 +74,8 @@ class RayCasting {
                 //surface.setNormal(XInPixel, YInPixel, normalCamera);
                 
                 depthMap.set( YInPixel,XInPixel, vertexCamera.coeff(2)/1000.);
-                std::cout<<"new depth:"<<depthMap.get(YInPixel,XInPixel);
+                //depthMap.set(XInPixel, YInPixel, vertexCamera.coeff(2) / 1000.);
+                //std::cout<<"new depth:"<<depthMap.get(YInPixel,XInPixel);
                 // surface.setVertex(XInPixel, YInPixel, vertexCamera);
                 return true;
             }

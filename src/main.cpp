@@ -10,7 +10,7 @@ using namespace kinect_fusion;
 
 int main(int argc, char *argv[]) {
     std::string filenameIn{ "/mnt/d/Users/chiyu/1 semester/KinectFusion/data/rgbd_dataset_freiburg1_xyz/" };
-
+    std::string filenameBaseOut = std::string("./mesh/mesh_");
     VirtualSensor sensor;
     sensor.init(filenameIn);
     Voxel volum(200, 200, 300, 100, 100, 0, -100, 0);
@@ -24,34 +24,45 @@ int main(int argc, char *argv[]) {
     MatrixXf currentTransformation = Matrix4f::Identity();
     update_volument(sensor, volum, previousTransformation);
 
-    std::string frameZero{ std::string("./mesh/""frame_0_not_transformed") + std::string(".off") };
-    SimpleMesh meshZero{ previous_dataFrame.getSurface().getVertexMap(), previousTransformation, 0.1f };
-    meshZero.writeMesh(frameZero);
+    //std::string frameZero{ std::string("./mesh/""frame_0_not_transformed") + std::string(".off") };
+    //SimpleMesh meshZero{ previous_dataFrame.getSurface().getVertexMap(), previousTransformation, 0.1f };
+    //meshZero.writeMesh(frameZero);
     
+    std::stringstream ss_first;
+    ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
+    std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
+    SimpleMesh lastDepthMesh{ sensor, previousTransformation, 0.1f };
+    lastDepthMesh.writeMesh(ss_first.str());
 
-    for (unsigned int i = 1; i < 3; i++) {
+    for (unsigned int i = 1; i < 5; i++) {
         //currentTransformation = 
+        std::cout << "Now we are at frame " << i << std::endl;
         sensor.processNextFrame();
         FrameData current_dataFrame{ sensor.getDepthIntrinsics(), sensor.getDepthImageHeight(), sensor.getDepthImageWidth() };
         Map2Df depth = sensor.getDepth();
         current_dataFrame.updateValues(depth);
 
+        std::stringstream ss_current_frame_not_transformed;
+        ss_current_frame_not_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off";
+        std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
+        SimpleMesh currentDepthMeshNotTransformed{ sensor,previousTransformation , 0.1f };
+        currentDepthMeshNotTransformed.writeMesh(ss_current_frame_not_transformed.str());
 
-        std::string meshFileNameNotTransformed{ std::string("./mesh/") + std::to_string(i) + std::string("_frame_not_transformed") + std::string(".off") };
-        SimpleMesh depthMeshNotTransformed{ current_dataFrame.getSurface().getVertexMap(), previousTransformation, 0.1f };
-        depthMeshNotTransformed.writeMesh(meshFileNameNotTransformed);
 
+        assert(previousTransformation(2, 3) == currentTransformation(2, 3));
         PoseEstimator pose_estimator(current_dataFrame, previous_dataFrame, previousTransformation, currentTransformation, sensor);
 
         currentTransformation = pose_estimator.frame2frameEstimation(previousTransformation);
 
-        std::string meshFileNameTransformed{ std::string("./mesh/") + std::to_string(i) + std::string("_frame_transformed") + std::string(".off") };
-        SimpleMesh depthMeshTransformed{ current_dataFrame.getSurface().getVertexMap(), currentTransformation, 0.1f };
-        depthMeshTransformed.writeMesh(meshFileNameTransformed);
+        std::stringstream ss_current_frame_transformed;
+        ss_current_frame_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_transformed.off";
+        //std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
+        SimpleMesh currentDepthMeshTransformed{ sensor, currentTransformation, 0.1f };
+        currentDepthMeshTransformed.writeMesh(ss_current_frame_transformed.str());
 
         update_volument(sensor, volum, currentTransformation);
 
-        Camera camera(currentTransformation, sensor.getDepthIntrinsics(), //TODO 2. sensor.getDepthIntrinsicsInverse
+        Camera camera(currentTransformation, sensor.getDepthIntrinsicsInverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
             sensor.getDepthImageHeight(), sensor.getDepthImageWidth(),
             0, 0);
         RayCasting cast(volum, camera);
@@ -59,9 +70,12 @@ int main(int argc, char *argv[]) {
         Map2Df depthMap = cast.getDepthMap();  //TODO cast.getDepthMap
         previous_dataFrame.updateValues(depthMap);
 
-        std::string meshFileName{ std::string("./mesh/") + std::to_string(i) + std::string("_frame_transformed_updated") +  std::string(".off") };
-        SimpleMesh depthMesh{ previous_dataFrame.getSurface().getVertexMap(), currentTransformation, 0.1f };
-        depthMesh.writeMesh(meshFileName);
+        std::stringstream ss_current_frame_transformed_updated;
+        ss_current_frame_transformed_updated << filenameBaseOut << sensor.getCurrentFrameCnt() << "_transformed_updated.off";
+        //std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
+        SimpleMesh currentDepthMeshTransformedUpdated{ sensor, currentTransformation, 0.1f };
+        currentDepthMeshTransformedUpdated.writeMesh(ss_current_frame_transformed_updated.str());
+
         previousTransformation = currentTransformation;
         std::cout << "Mesh written " << std::endl;
 

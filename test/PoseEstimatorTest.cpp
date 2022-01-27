@@ -13,7 +13,7 @@ namespace kinect_fusion {
 			//return -1;
 		}
 		// We store a first frame as a reference frame. All next frames are tracked relatively to the first frame.
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			sensor.processNextFrame();
 		}
@@ -21,11 +21,11 @@ namespace kinect_fusion {
 		MatrixXf previousTransformation = Matrix4f::Identity();
 		MatrixXf currentTransformation = Matrix4f::Identity();
 		
-		//std::stringstream ss_first;
-		//ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
-		//std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
-		//SimpleMesh lastDepthMesh{ sensor, previousTransformation, 0.1f };
-		//lastDepthMesh.writeMesh(ss_first.str());
+		std::stringstream ss_first;
+		ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
+		std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
+		SimpleMesh lastDepthMesh{ sensor, previousTransformation, 0.1f };
+		lastDepthMesh.writeMesh(ss_first.str());
 
 		Map2Df firstframe_depths{ sensor.getDepth() };
 		std::uint32_t width = sensor.getDepthImageWidth();
@@ -56,11 +56,11 @@ namespace kinect_fusion {
 		currentDepthMeshTransformed.writeMesh(ss_current_frame_transformed.str());
 		
 
-		//std::stringstream ss_current_frame_not_transformed;
-		//ss_current_frame_not_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off";
-		//std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
-		//SimpleMesh currentDepthMeshNotTransformed{ sensor,previousTransformation , 0.1f };
-		//currentDepthMeshNotTransformed.writeMesh(ss_current_frame_not_transformed.str());
+		std::stringstream ss_current_frame_not_transformed;
+		ss_current_frame_not_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off";
+		std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
+		SimpleMesh currentDepthMeshNotTransformed{ sensor,previousTransformation , 0.1f };
+		currentDepthMeshNotTransformed.writeMesh(ss_current_frame_not_transformed.str());
 
 }
 } // namespace kinect_fusion
