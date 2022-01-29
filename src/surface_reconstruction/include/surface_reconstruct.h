@@ -24,15 +24,17 @@ namespace kinect_fusion {
         return homo_coord;
 
     }
-    //quation (9)
+    //quation (9)  modified
     float SDF_truncation(float& x, const float& mu, const float& default_sdf)
     {   
         int sign = x>0? 1:-1;
-        if(x > -mu)
+        if (x > -mu)
         {
-            return fmin(1, abs(x/mu))*sign;
+            //return fmin(1, abs(x / mu)) * sign;
+            return fmin(1, x / mu) * sign;
         }
         else
+            //return default_sdf;
             return default_sdf;
     }
     //equation (8)
@@ -41,6 +43,7 @@ namespace kinect_fusion {
         Matrix4f depthExtrinsicsInv = depthExtrinsics.inverse();
         Vector4f p = homogenisation(p_g);
         Vector4f p_k = depthExtrinsicsInv*p;
+        //Vector4f p_k = depthExtrinsics * p;
         if (p_k.z()<0){
             return Vector2i(MINF,MINF);
         }
@@ -48,7 +51,7 @@ namespace kinect_fusion {
         p_p << p_k.x(), p_k.y(), p_k.z();
         p_p = depthIntrinsics*p_p;
         Vector2i pixel_coord;
-        pixel_coord << floor(p_p.x()/p_p.z()), floor(p_p.y()/p_p.z());
+        pixel_coord << round(p_p.x()/p_p.z()), round(p_p.y()/p_p.z());
         return pixel_coord;
     }
     //equation (7)
@@ -62,13 +65,14 @@ namespace kinect_fusion {
         return lamda;
 
     }
-    //equation （6) for each point
+    //equation （6) for each point (modified)
     float SDF_k_i(const float mu, float lamda, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p, const float depth_k_i, const float& default_sdf)
     {
         Vector3f translation;
         translation << depthExtrinsics.topRightCorner(3,1);
         float sdf_k_i;
-        float Eta =depth_k_i*1000 - (translation*1000 - p).norm()/lamda ;//change of unit from m to mm
+        //float Eta =depth_k_i*1000 - (translation*1000 - p).norm()/lamda ;//change of unit from m to mm
+        float Eta =    (translation - p).norm() / lamda - depth_k_i;
         sdf_k_i = SDF_truncation(Eta, mu, default_sdf);
         return sdf_k_i;
     }

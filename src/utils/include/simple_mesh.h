@@ -138,8 +138,8 @@ public:
 
 
 		// Compute inverse camera pose (mapping from camera CS to world CS).
-		Matrix4f cameraPoseInverse = cameraPose.inverse();
-
+		//Matrix4f cameraPoseInverse = cameraPose.inverse();
+		Matrix4f cameraPoseInverse = cameraPose;
 		// Compute vertices with back-projection.
 		m_vertices.resize(vertexMap.size());
 		for (unsigned int v = 0; v < vertexMap.getHeight(); ++v) {
