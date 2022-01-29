@@ -59,10 +59,14 @@ int main(int argc, char *argv[]) {
         //std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
         SimpleMesh currentDepthMeshTransformed{ sensor, currentTransformation, 0.1f };
         currentDepthMeshTransformed.writeMesh(ss_current_frame_transformed.str());
+        MatrixXf currentTransformationMM = currentTransformation;
+        for (int index = 0;index <3;index ++){
+            currentTransformationMM(index, 2) = currentTransformationMM(index, 2) * 1000.;
+        }
+        
+        update_volument(sensor, volum, currentTransformationMM);
 
-        update_volument(sensor, volum, currentTransformation);
-
-        Camera camera(currentTransformation, sensor.getDepthIntrinsicsInverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
+        Camera camera(currentTransformationMM, sensor.getDepthIntrinsicsInverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
             sensor.getDepthImageHeight(), sensor.getDepthImageWidth(),
             0, 0);
         RayCasting cast(volum, camera);
