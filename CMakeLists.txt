@@ -151,6 +151,11 @@ add_executable(
 )
 
 add_executable(
+    RayCastingRecTest # Test name
+    test/surfacereconstruction_raycastingTest.cpp # Test file
+    ${SOURCES}
+) 
+add_executable(
    ReconstructTest
    test/recon_test.cpp
    ${SOURCES}
@@ -246,6 +251,14 @@ target_link_libraries(
 
 target_link_libraries(
     SurfaceMeasurementTest
+    gtest # Google Test library
+    gtest_main
+    freeimage
+    Eigen3::Eigen
+   ${OpenCV_LIBS}
+)
+target_link_libraries(
+    RayCastingRecTest
     gtest # Google Test library
     gtest_main
     freeimage
