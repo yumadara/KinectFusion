@@ -281,7 +281,7 @@ namespace kinect_fusion {
             //    }
             //}
 
-            Level level = THIRD_LEVEL;
+            Level level = FIRST_LEVEL;
             int index = level; // index = 0, 1, 2
             std::cout << "LEVEL INDEX" << index << std::endl;
             std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
@@ -291,7 +291,7 @@ namespace kinect_fusion {
             Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface( index).getNormalMap();//camera space
             Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface( index).getVertexMap();//camera space
 
-            for (int i = 0; i != iteration_num_with_level[THIRD_LEVEL]; i++)
+            for (int i = 0; i != iteration_num_with_level[level]; i++)
             {
                 std::cout << std::endl;
                 std::cout << std::endl;

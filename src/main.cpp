@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
     MatrixXf previousTransformation = Matrix4f::Identity();
     MatrixXf currentTransformation = Matrix4f::Identity();
-    update_volument(sensor, volum, previousTransformation.inverse());
+    update_volument(sensor, volum, previousTransformation);
 
     /*std::string frameZero{ std::string("./mesh/""frame_0_not_transformed") + std::string(".off") };
     SimpleMesh meshZero{ previous_dataFrame.getSurface().getVertexMap(), previousTransformation, 0.1f };
@@ -41,28 +41,40 @@ int main(int argc, char *argv[]) {
         FrameData current_dataFrame{ sensor.getDepthIntrinsics(), sensor.getDepthImageHeight(), sensor.getDepthImageWidth() };
         Map2Df depth = sensor.getDepth();
         current_dataFrame.updateValues(depth);
-
+        current_dataFrame = previous_dataFrame;
+        //current_dataFrame = previous_dataFrame;
         //std::stringstream ss_current_frame_not_transformed;
         //ss_current_frame_not_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off";
         //std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
         //SimpleMesh currentDepthMeshNotTransformed{ sensor,previousTransformation , 0.1f };
         //currentDepthMeshNotTransformed.writeMesh(ss_current_frame_not_transformed.str());
 
+        for (int i = 0; i != current_dataFrame.getSurface().getVertexMap().size(); i++)
+        {
+            std::cout << "before volume update, now index " << i << " current data frame " << current_dataFrame.getSurface().getVertexMap().get(i) << " previous data frame " << previous_dataFrame.getSurface().getVertexMap().get(i) << std::endl;
+            assert(current_dataFrame.getSurface().getVertexMap().get(i) ==
+                previous_dataFrame.getSurface().getVertexMap().get(i));
+        }
 
         assert(previousTransformation(2, 3) == currentTransformation(2, 3));
-        PoseEstimator pose_estimator(current_dataFrame, previous_dataFrame, previousTransformation, currentTransformation, sensor);
+        PoseEstimator pose_estimator(previous_dataFrame, previous_dataFrame, previousTransformation, currentTransformation, sensor);
 
         currentTransformation = pose_estimator.frame2frameEstimation(previousTransformation);
 
-        //std::stringstream ss_current_frame_transformed;
+       // std::stringstream ss_current_frame_transformed;
         //ss_current_frame_transformed << filenameBaseOut << sensor.getCurrentFrameCnt() << "_transformed.off";
-        ////std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
-        //SimpleMesh currentDepthMeshTransformed{ sensor, currentTransformation, 0.1f };
-        //currentDepthMeshTransformed.writeMesh(ss_current_frame_transformed.str());
+        //std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
+       // SimpleMesh currentDepthMeshTransformed{ sensor, currentTransformation, 0.1f };
+       // currentDepthMeshTransformed.writeMesh(ss_current_frame_transformed.str());
+        MatrixXf currentTransformationMM = currentTransformation;
+        for (int index = 0;index <3;index ++){
+            currentTransformationMM(index, 2) = currentTransformationMM(index, 2) * 1000.;
+        }
+        
+        update_volument(sensor, volum, currentTransformationMM);
 
-        update_volument(sensor, volum, currentTransformation.inverse());
+        Camera camera(currentTransformationMM, sensor.getDepthIntrinsics().inverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
 
-        Camera camera(currentTransformation, sensor.getDepthIntrinsics(), //TODO 2. sensor.getDepthIntrinsicsInverse
             sensor.getDepthImageHeight(), sensor.getDepthImageWidth(),
             0, 0);
         RayCasting cast(volum, camera);
@@ -70,6 +82,14 @@ int main(int argc, char *argv[]) {
         Map2Df depthMap = cast.getDepthMap();  //TODO cast.getDepthMap
         previous_dataFrame.updateValues(depthMap);
 
+        
+
+        for (int i = 0; i != current_dataFrame.getSurface().getVertexMap().size(); i++)
+        {
+            std::cout << "after volume update, now index " << i << " current data frame " << current_dataFrame.getSurface().getVertexMap().get(i) << " previous data frame " << previous_dataFrame.getSurface().getVertexMap().get(i) << std::endl;
+            assert(current_dataFrame.getSurface().getVertexMap().get(i) ==
+                previous_dataFrame.getSurface().getVertexMap().get(i));
+        }
         
 
 
@@ -88,7 +108,7 @@ int main(int argc, char *argv[]) {
             meshK.writeMesh(frameK);
         }
         
-
+        //previous_dataFrame = current_dataFrame;
         previousTransformation = currentTransformation;
         std::cout << "Mesh written " << std::endl;
 
