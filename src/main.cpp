@@ -27,12 +27,12 @@ int main(int argc, char *argv[]) {
     /*std::string frameZero{ std::string("./mesh/""frame_0_not_transformed") + std::string(".off") };
     SimpleMesh meshZero{ previous_dataFrame.getSurface().getVertexMap(), previousTransformation, 0.1f };
     meshZero.writeMesh(frameZero);*/
-    //
-    //std::stringstream ss_first;
-    //ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
-    //std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
-    //SimpleMesh lastDepthMesh{ sensor, previousTransformation, 0.1f };
-    //lastDepthMesh.writeMesh(ss_first.str());
+    
+    /*std::stringstream ss_first;
+    ss_first << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off";
+    std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << ".off" << std::endl;
+    SimpleMesh lastDepthMesh{ sensor, previousTransformation, 0.1f };
+    lastDepthMesh.writeMesh(ss_first.str());*/
 
     for (unsigned int i = 1; i < 798; i++) {
         //currentTransformation = 
@@ -49,12 +49,12 @@ int main(int argc, char *argv[]) {
         //SimpleMesh currentDepthMeshNotTransformed{ sensor,previousTransformation , 0.1f };
         //currentDepthMeshNotTransformed.writeMesh(ss_current_frame_not_transformed.str());
 
-        for (int i = 0; i != current_dataFrame.getSurface().getVertexMap().size(); i++)
+        /*for (int i = 0; i != current_dataFrame.getSurface().getVertexMap().size(); i++)
         {
             std::cout << "before volume update, now index " << i << " current data frame " << current_dataFrame.getSurface().getVertexMap().get(i) << " previous data frame " << previous_dataFrame.getSurface().getVertexMap().get(i) << std::endl;
             assert(current_dataFrame.getSurface().getVertexMap().get(i) ==
                 previous_dataFrame.getSurface().getVertexMap().get(i));
-        }
+        }*/
 
         assert(previousTransformation(2, 3) == currentTransformation(2, 3));
         PoseEstimator pose_estimator(previous_dataFrame, previous_dataFrame, previousTransformation, currentTransformation, sensor);
@@ -66,14 +66,11 @@ int main(int argc, char *argv[]) {
         //std::cout << filenameBaseOut << sensor.getCurrentFrameCnt() << "_not_transformed.off" << std::endl;
        // SimpleMesh currentDepthMeshTransformed{ sensor, currentTransformation, 0.1f };
        // currentDepthMeshTransformed.writeMesh(ss_current_frame_transformed.str());
-        MatrixXf currentTransformationMM = currentTransformation;
-        for (int index = 0;index <3;index ++){
-            currentTransformationMM(index, 2) = currentTransformationMM(index, 2) * 1000.;
-        }
         
-        update_volument(sensor, volum, currentTransformationMM);
+        
+        update_volument(sensor, volum, currentTransformation);
 
-        Camera camera(currentTransformationMM, sensor.getDepthIntrinsics().inverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
+        Camera camera(currentTransformation, sensor.getDepthIntrinsics().inverse(), //TODO 2. sensor.getDepthIntrinsicsInverse
 
             sensor.getDepthImageHeight(), sensor.getDepthImageWidth(),
             0, 0);
@@ -84,12 +81,12 @@ int main(int argc, char *argv[]) {
 
         
 
-        for (int i = 0; i != current_dataFrame.getSurface().getVertexMap().size(); i++)
-        {
-            std::cout << "after volume update, now index " << i << " current data frame " << current_dataFrame.getSurface().getVertexMap().get(i) << " previous data frame " << previous_dataFrame.getSurface().getVertexMap().get(i) << std::endl;
-            assert(current_dataFrame.getSurface().getVertexMap().get(i) ==
-                previous_dataFrame.getSurface().getVertexMap().get(i));
-        }
+        //for (int i = 0; i != current_dataFrame.getSurface().getVertexMap().size(); i++)
+        //{
+        //    std::cout << "after volume update, now index " << i << " previous data frame " << previous_dataFrame.getSurface().getVertexMap().get(i) << std::endl;
+        //    /*assert(current_dataFrame.getSurface().getVertexMap().get(i) ==
+        //        previous_dataFrame.getSurface().getVertexMap().get(i));*/
+        //}
         
 
 

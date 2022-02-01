@@ -19,8 +19,10 @@ namespace kinect_fusion {
     // FrameData previous_dataFrame{sensor.getDepthIntrinsics(), sensor.getHeight(), sensor.getWidth()};
 
     sensor.processNextFrame();
-    // Map2Df depth = sensor.getDepth();
-    // dataFrame.updateValues(depth);
+    update_volument(sensor, volum, Matrix4f::Identity());
+
+    Map2Df depth_zero = sensor.getDepth();
+    //dataFrame.updateValues(depth);
 
     
     // MatrixXf& pose_estimation = MatrixXf::Identity();

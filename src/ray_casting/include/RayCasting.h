@@ -22,8 +22,8 @@ class RayCasting {
         Map2Df depthMap = Map2Df(camera.getHeight(), camera.getWidth(),MINF);
         this->surface = surface;
         this->depthMap = depthMap;
-        this->minDistance = 200.;
-        this->maxDistance = 8000.;
+        this->minDistance = 200. ;
+        this->maxDistance = 800. ;
     }
     void do_work(){
         for (int j = 0;j< this->surface.getHeight();j++){
@@ -73,7 +73,7 @@ class RayCasting {
                 //Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
                 //surface.setNormal(XInPixel, YInPixel, normalCamera);
                 
-                depthMap.set( YInPixel,XInPixel, vertexCamera.coeff(2)/1000.);
+                depthMap.set( YInPixel,XInPixel, vertexCamera.coeff(2) );
                 //depthMap.set(XInPixel, YInPixel, vertexCamera.coeff(2) / 1000.);
                 //std::cout<<"new depth:"<<depthMap.get(YInPixel,XInPixel);
                 // surface.setVertex(XInPixel, YInPixel, vertexCamera);
@@ -82,7 +82,7 @@ class RayCasting {
             
             else{
                 if (currF >0 && currF<1){
-                    ray.setstepLength(std::max(30.,TSDF.truncateDistance/2. * currF));
+                    ray.setstepLength(std::max(30. ,TSDF.truncateDistance/2. * currF));
                 }
                 
                 ray.step();

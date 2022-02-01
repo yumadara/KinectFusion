@@ -183,7 +183,8 @@ public:
 
 
     float defaultDistance = -100.;
-    float defaultWeight = -1.;
+    //float defaultWeight = -1.;
+    float defaultWeight = 0.;
     float truncateDistance = 200.;
     float minimumResolution = 5.;
     int originX;

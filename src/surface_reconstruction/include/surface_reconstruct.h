@@ -40,8 +40,10 @@ namespace kinect_fusion {
     //equation (8)
     Vector2i globalToScreen(const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p_g ,float x_z_limit, float y_z_limit)
     {
+        Vector3f p_g_scaled;
+        p_g_scaled << p_g.x() / 1000., p_g.y() / 1000., p_g.z() / 1000.;
         Matrix4f depthExtrinsicsInv = depthExtrinsics.inverse();
-        Vector4f p = homogenisation(p_g);
+        Vector4f p = homogenisation(p_g_scaled);
         Vector4f p_k = depthExtrinsicsInv*p;
         //Vector4f p_k = depthExtrinsics * p;
         if (p_k.z()<0){
@@ -87,9 +89,21 @@ namespace kinect_fusion {
         // unsigned int i = 0;
             const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
         // while (sensor.processNextFrame() && i <= k) {
+            int num = 0;
+            int num_same_voxel = 0;
             float y_z_limit = sensor.get_tan_y_z();
             float x_z_limit = sensor.get_tan_x_z();
             Map2Df depthMap_k_i{sensor.getDepth()};
+            int num_index = 0;
+            for (int index = 0; index != depthMap_k_i.size(); index++)
+            {
+                if (depthMap_k_i.get(index) != MINF)
+                {
+                    //std::cout << "test" << depthMap_k_i.get(index) << std::endl;
+                    num_index++;
+                }
+            }
+
             //float* depthMap_k_i = sensor.getDepth().data();;
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
             //const Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
@@ -112,7 +126,7 @@ namespace kinect_fusion {
                    
                     for(int voxel_zi=0; voxel_zi<volument.numZ; voxel_zi++)
                     {
-                        Vector3f p_g = volument.ContFromOrd(Vector3i(voxel_xi, voxel_yi, voxel_zi));
+                        Vector3f p_g = volument.ContFromOrd(Vector3i(voxel_xi, voxel_yi, voxel_zi)) * 0.001;
                         
                         Vector2i x = globalToScreen(depthIntrinsics, depthExtrinsics, p_g, x_z_limit, y_z_limit);
                         if(x.x()>width || x.y()>height || x.x()<0 || x.y()<0)
@@ -125,23 +139,33 @@ namespace kinect_fusion {
                             continue;
                         }
                         const float lamda = Lamda(depthIntrinsics, x);
-                        float SDF_k_i_n = SDF_k_i(mu, lamda, depthIntrinsics, depthExtrinsics, p_g, depth_k_i, defaut_dst);
+                        float SDF_k_i_n = SDF_k_i(mu / 1000, lamda, depthIntrinsics, depthExtrinsics, p_g, depth_k_i, defaut_dst/1000);
+                        SDF_k_i_n = SDF_k_i_n * 1000;
+                        p_g = p_g * 1000;
                         float F_k_i_j = volument.getDistance(p_g.x(), p_g.y(), p_g.z());
                         float new_dist;
+                        
                         if (F_k_i_j !=defaut_dst && SDF_k_i_n!=defaut_dst)
                         {
                             new_dist = (F_k_i_j + SDF_k_i_n)/2;
                             volument.setDistance(p_g.x(), p_g.y(), p_g.z(), new_dist);
+                            num_same_voxel++;
+
                         }    
                         else if (SDF_k_i_n!=defaut_dst)
                         {
                             new_dist = SDF_k_i_n;
+                            num++;
                             if (new_dist<0 && new_dist>-1){
                                 //std::cout<<"GOTBACK, "<<new_dist<<std::endl;
                             }
                             else{
                                 //std::cout<<"GOTFRONT, "<<new_dist<<std::endl;
+                                
                             }
+                            
+                            
+                     
                             volument.setDistance(p_g.x(), p_g.y(), p_g.z(), new_dist);
                             assert (volument.getDistance(p_g.x(), p_g.y(), p_g.z()) == new_dist);
                         }
@@ -152,6 +176,9 @@ namespace kinect_fusion {
                 }
                
             }
+            std::cout << "num" << num << std::endl;
+            std::cout << "num same voxel" << num_same_voxel << std::endl;
+            std::cout << "num index" << num_index << std::endl;
         // i++;
         // }
         
