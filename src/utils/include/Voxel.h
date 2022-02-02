@@ -152,6 +152,24 @@ public:
         Distance[(ordX + originX) + (ordY + originY) * numX + (ordZ + originZ) * numX * numY] = newDistance;
         return true;
     }
+
+    void testDistance()
+    {
+        for (int voxel_xi = 0; voxel_xi < numX; voxel_xi++)
+            // for (int voxel_xi=75; voxel_xi<125; voxel_xi++)
+        {
+
+            for (int voxel_yi = 0; voxel_yi < numY; voxel_yi++)
+                // for(int voxel_yi=75; voxel_yi<125; voxel_yi++)
+            {
+                for (int voxel_zi = 0; voxel_zi < numZ; voxel_zi++)
+                {
+                    std::cout << "num x " << voxel_xi << "num Y" << voxel_yi << "numZ" << voxel_zi << std::endl;
+                    assert(getDistanceFromInt(voxel_xi, voxel_yi, voxel_zi) != defaultDistance);
+                }
+            }
+        }
+    }
     bool setWeight(float ordXf, float ordYf, float ordZf, float newWeight){
         int ordX = ordFromCont(ordXf);
         int ordY = ordFromCont(ordYf);
@@ -185,7 +203,8 @@ public:
     float defaultDistance = -100.;
     //float defaultWeight = -1.;
     float defaultWeight = 0.;
-    float truncateDistance = 200.;
+    //float truncateDistance = 200.;
+    float truncateDistance = 25.;
     float minimumResolution = 5.;
     int originX;
     int originY;

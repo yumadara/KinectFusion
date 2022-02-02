@@ -41,7 +41,7 @@ namespace kinect_fusion {
     Vector2i globalToScreen(const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p_g ,float x_z_limit, float y_z_limit)
     {
         Vector3f p_g_scaled;
-        p_g_scaled << p_g.x() / 1000., p_g.y() / 1000., p_g.z() / 1000.;
+        p_g_scaled << p_g.x() , p_g.y() , p_g.z() ;
         Matrix4f depthExtrinsicsInv = depthExtrinsics.inverse();
         Vector4f p = homogenisation(p_g_scaled);
         Vector4f p_k = depthExtrinsicsInv*p;
@@ -95,14 +95,7 @@ namespace kinect_fusion {
             float x_z_limit = sensor.get_tan_x_z();
             Map2Df depthMap_k_i{sensor.getDepth()};
             int num_index = 0;
-            for (int index = 0; index != depthMap_k_i.size(); index++)
-            {
-                if (depthMap_k_i.get(index) != MINF)
-                {
-                    //std::cout << "test" << depthMap_k_i.get(index) << std::endl;
-                    num_index++;
-                }
-            }
+            
 
             //float* depthMap_k_i = sensor.getDepth().data();;
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
@@ -140,7 +133,7 @@ namespace kinect_fusion {
                         }
                         const float lamda = Lamda(depthIntrinsics, x);
                         float SDF_k_i_n = SDF_k_i(mu / 1000, lamda, depthIntrinsics, depthExtrinsics, p_g, depth_k_i, defaut_dst/1000);
-                        SDF_k_i_n = SDF_k_i_n * 1000;
+                        //SDF_k_i_n = SDF_k_i_n * 1000;
                         p_g = p_g * 1000;
                         float F_k_i_j = volument.getDistance(p_g.x(), p_g.y(), p_g.z());
                         float new_dist;
@@ -163,9 +156,6 @@ namespace kinect_fusion {
                                 //std::cout<<"GOTFRONT, "<<new_dist<<std::endl;
                                 
                             }
-                            
-                            
-                     
                             volument.setDistance(p_g.x(), p_g.y(), p_g.z(), new_dist);
                             assert (volument.getDistance(p_g.x(), p_g.y(), p_g.z()) == new_dist);
                         }
@@ -178,7 +168,7 @@ namespace kinect_fusion {
             }
             std::cout << "num" << num << std::endl;
             std::cout << "num same voxel" << num_same_voxel << std::endl;
-            std::cout << "num index" << num_index << std::endl;
+            //std::cout << "num index" << num_index << std::endl;
         // i++;
         // }
         

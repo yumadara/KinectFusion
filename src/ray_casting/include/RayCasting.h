@@ -15,15 +15,27 @@ class RayCasting {
         this->minDistance = minDistance;
         this->maxDistance = maxDistance;
     }
-    RayCasting(Voxel TSDF, Camera camera){
+    RayCasting(Voxel TSDF, Camera camera) {
         this->camera = camera;
         this->TSDF = TSDF;
         Surface surface(camera.getHeight(), camera.getWidth());
-        Map2Df depthMap = Map2Df(camera.getHeight(), camera.getWidth(),MINF);
+        Map2Df depthMap = Map2Df(camera.getHeight(), camera.getWidth(), MINF);
         this->surface = surface;
         this->depthMap = depthMap;
-        this->minDistance = 200. ;
-        this->maxDistance = 800. ;
+        //this->minDistance = 200. ;
+        this->minDistance = 400;
+        this->maxDistance = 8000.;
+    }
+    RayCasting(Voxel TSDF, Camera camera, Map2Df depth){
+        this->camera = camera;
+        this->TSDF = TSDF;
+        Surface surface(camera.getHeight(), camera.getWidth());
+        //Map2Df depthMap = Map2Df(camera.getHeight(), camera.getWidth(),MINF);
+        this->surface = surface;
+        this->depthMap = depth;
+        //this->minDistance = 200. ;
+        this->minDistance = 400;
+        this->maxDistance = 8000. ;
     }
     void do_work(){
         for (int j = 0;j< this->surface.getHeight();j++){
@@ -42,10 +54,13 @@ class RayCasting {
         Vector3f direction  = Vector3f((XInPixel - cX) / fovX , (YInPixel - cY) / fovY , 1.);
         // Vector3f direction = camera.inverseCalibrationMatrix * Vector3f(float(XInPixel), float(YInPixel), 1.);
         float stepLength =  TSDF.truncateDistance/2.;
+        //TSDF.testDistance();
         //std::cout<<"pixel corrd: "<<XInPixel<<","<<YInPixel<<std::endl;
         Ray ray = Ray(stepLength, this->minDistance, this->maxDistance, direction);
         float currF = TSDF.defaultDistance;
         float lastF = TSDF.defaultDistance;
+
+
         while(ray.isInBound()){
             Vector3f currLocationCamera = ray.getCurrLocation();
             Vector3f LastLocationCamera = ray.getLastLocation();
@@ -56,7 +71,9 @@ class RayCasting {
             }
             lastF = currF;
             currF = TSDF.getDistance(currLocationWorld(0), currLocationWorld(1), currLocationWorld(2));
-            
+            //std::cout<<"distance from camera: "<<currLocationCamera.norm()<<std::endl;
+            //std::cout<<"currF: "<<currF<<std::endl;
+            //assert(currF == TSDF.defaultDistance);
             //std::cout<<"distance from camera: "<<currLocationCamera.norm()<<std::endl;
             //std::cout<<"currF: "<<currF<<std::endl;
             if (currF>=0 && lastF<=0 &&  TSDF.isKnown(lastF)){
@@ -66,16 +83,17 @@ class RayCasting {
                 return false;
             }
             if (currF<=0 && lastF>=0 && TSDF.isKnown(currF)){
-                //std::cout<<"RAYHITS,currF: "<<currF<<" lastF:"<<lastF<<std::endl;
+                std::cout<<"RAYHITS,currF: "<<currF<<" lastF:"<<lastF<<std::endl;
                 Vector3f vertexCamera = LastLocationCamera - (currLocationCamera-LastLocationCamera) * lastF /(currF -lastF+0.001);
                 //Vector3f normalWorld = TSDF.getNormal(LastLocationWorld(0), LastLocationWorld(1), LastLocationWorld(2));
                 //Vector3f vertexCamera = camera.worldToCameraVector(vertexWorld);
                 //Vector3f normalCamera = camera.worldToCameraVector(normalWorld);
                 //surface.setNormal(XInPixel, YInPixel, normalCamera);
-                
-                depthMap.set( YInPixel,XInPixel, vertexCamera.coeff(2) );
+                std::cout << "initial depth " << depthMap.get(YInPixel, XInPixel) << std::endl;
+                depthMap.set( YInPixel,XInPixel, vertexCamera.coeff(2) /1000);
                 //depthMap.set(XInPixel, YInPixel, vertexCamera.coeff(2) / 1000.);
-                //std::cout<<"new depth:"<<depthMap.get(YInPixel,XInPixel);
+                //assert(vertexCamera.coeff(2) / 1000. !=  )
+                std::cout<<"new depth:"<<depthMap.get(YInPixel,XInPixel)<<std::endl;
                 // surface.setVertex(XInPixel, YInPixel, vertexCamera);
                 return true;
             }

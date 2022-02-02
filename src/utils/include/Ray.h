@@ -10,7 +10,8 @@ class Ray {
         this->minDistance = minDistance;
         this->maxDistance = maxDistance;
         this->direction = direction / direction.norm();
-        this->currLocation = this->direction * minDistance;
+        //this->currLocation = this->direction * minDistance;
+        this->currLocation = this->direction * minDistance / (this->direction).norm();
         this->lastLocation = this->currLocation;
         
 
