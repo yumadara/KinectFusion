@@ -65,6 +65,43 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # Link libraries here
 link_directories(${FreeImage_LIBRARY_DIR})
 
+# Add google test library for unit tests
+add_subdirectory(${LIBRARY_DIR}/googletest)
+
+enable_testing() # For Google test unit tests
+
+find_package(CUDA 8.0)
+IF (CUDA_FOUND)
+    include_directories("${CUDA_INCLUDE_DIRS}")
+    # Optional: Specify the arch of your CUDA hardware here
+    # SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3;-std=c++11 -gencode arch=compute_20,code=sm_21)
+    MESSAGE("CUDA was found.Hurra!!!!")
+    set(CUDA_SOURCE_DIR ${SOURCE_DIR}/cuda)
+
+    include_directories(${CUDA_SOURCE_DIR})
+    include_directories(${CUDA_SOURCE_DIR}/utils/include) # We need it for legacy code
+    include_directories(${CUDA_SOURCE_DIR}/surface_measurement/include)
+
+    set(SOURCES ${SOURCES} 
+                ${CUDA_SOURCE_DIR}/surface_measurement/src/data_frame_cuda.cu
+                ${CUDA_SOURCE_DIR}/surface_measurement/src/surface_measurement_cuda.cu)
+
+    cuda_add_executable(
+        SurfaceMeasurementTestCuda
+        test/surface_measurement_test_cuda.cu
+        ${SOURCES}
+        )
+
+    target_link_libraries(
+        SurfaceMeasurementTestCuda
+        gtest # Google Test library
+        gtest_main
+        freeimage
+        Eigen3::Eigen
+        ${OpenCV_LIBS}
+    )
+ENDIF ()
+
 # Add executables
 #add_executable(
  #   SurfaceMeasurementApp # Name
@@ -91,11 +128,6 @@ target_link_libraries(
     Eigen3::Eigen
    ${OpenCV_LIBS}
 )
-
-# Add google test library for unit tests
-add_subdirectory(${LIBRARY_DIR}/googletest)
-
-enable_testing() # For Google test unit tests
 
 # Add tests
 

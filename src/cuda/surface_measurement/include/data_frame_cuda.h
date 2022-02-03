@@ -1,14 +1,16 @@
 #pragma once
 
-#include <Eigen.h>
 #include <iostream>
-#include <Surface.h>
+
+#include <type_definitions_cuda.h>
+#include <Eigen.h>
+#include <surface_cuda.h>
 
 namespace kinect_fusion {
 
-class FrameData {
+class FrameDataCuda {
     public:
-        FrameData() {};
+        FrameDataCuda() {};
         /**
          * @brief Construct a new Frame Data object
          * 
@@ -16,7 +18,7 @@ class FrameData {
          * @param[in] height Camera height, i.e. number of rows
          * @param[in] width Camera width, i.e. number of columns
          */
-        FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t height, std::size_t width);
+        FrameDataCuda(const Eigen::Matrix3f& cameraIntrinstics, std::size_t height, std::size_t width);
 
         /**
          * @brief Update frame data values with new depths map.
@@ -30,14 +32,14 @@ class FrameData {
          * 
          * @return Surface& Wrapper around normal and vertex maps
          */
-        Surface& getSurface(Level level = 0U) {
+        SurfaceCuda& getSurface(Level level = 0U) {
             return m_surfaces[level];
         }
 
         /**
          * @brief Get the filtered depths values.
          */
-        Map2Df& getFilteredDepths(Level level = 0U) {
+        Map2DfCuda& getFilteredDepths(Level level = 0U) {
             return m_filteredDepthMaps[level];
         }
 
@@ -50,12 +52,12 @@ class FrameData {
         {
             for (int i = 0; i != NUMBER_OF_LEVELS; i++)
             {
-                Map2DVector3f normal_map = m_surfaces[i].getNormalMap();
-                Map2DVector3f vertex_map = m_surfaces[i].getVertexMap();
+                Map2DVector3fCuda normal_map = m_surfaces[i].getNormalMap();
+                Map2DVector3fCuda vertex_map = m_surfaces[i].getVertexMap();
 
                 for (int j = 0; j != normal_map.size(); j++)
                 {
-                    std::cout << " vertex "  << vertex_map.get(j)<<std::endl;
+                    std::cout << " vertetx "  << vertex_map.get(j)<<std::endl;
                     std::cout << " normal " << normal_map.get(j) << std::endl;
 
                 }
@@ -65,17 +67,17 @@ class FrameData {
         /**
          * @brief Row depth map from sensor.
          */
-        Map2Df m_rowDepthMap;
+        Map2DfCuda m_rowDepthMap;
 
         /**
          * @brief Filtered depth maps.
          */
-        std::array<Map2Df, NUMBER_OF_LEVELS> m_filteredDepthMaps;
+        std::array<Map2DfCuda, NUMBER_OF_LEVELS> m_filteredDepthMaps;
 
         /**
          * @brief Vertex and normal maps for different levels (i.e. V matrices).
          */
-        std::array<Surface, NUMBER_OF_LEVELS> m_surfaces;
+        std::array<SurfaceCuda, NUMBER_OF_LEVELS> m_surfaces;
         
         /**
          * @brief Camera instrinstics for different levels, i.e. K.
