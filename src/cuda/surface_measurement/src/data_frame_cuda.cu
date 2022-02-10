@@ -34,10 +34,10 @@ FrameDataCuda::FrameDataCuda(const Eigen::Matrix3f& cameraIntrinstics, std::size
         for (std::size_t i = 0; i < NUMBER_OF_LEVELS - 1; i++) {
             subsample(m_filteredDepthMaps[i], m_filteredDepthMaps[i + 1]);
         }
-        // for (std::size_t i = 0; i < NUMBER_OF_LEVELS; i++) {
-        //     fillVertexMap(m_filteredDepthMaps[i], m_cameraIntrinstics[i], m_surfaces[i].getVertexMap());
-        //     // fillNormalMap(m_surfaces[i].getVertexMap(), m_surfaces[i].getNormalMap());
-        // }
+        for (std::size_t i = 0; i < NUMBER_OF_LEVELS; i++) {
+            fillVertexMap(m_filteredDepthMaps[i], m_cameraIntrinstics[i], m_surfaces[i].getVertexMap());
+            // fillNormalMap(m_surfaces[i].getVertexMap(), m_surfaces[i].getNormalMap());
+        }
     }
 
 } // namespace kinect_fusion
