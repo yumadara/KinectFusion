@@ -90,18 +90,18 @@ IF (CUDA_FOUND)
 ENDIF ()
 
 # Add executables
-#add_executable(
- #   SurfaceMeasurementApp # Name
- #   ${CMAKE_CURRENT_SOURCE_DIR}/executables/surface_measurement_app.cpp # File
- #   ${SOURCE}
-#)
+add_executable(
+   SurfaceMeasurementApp # Name
+   ${CMAKE_CURRENT_SOURCE_DIR}/executables/surface_measurement_app.cpp # File
+   ${SOURCES}
+)
 
-#target_link_libraries(
-#    SurfaceMeasurementApp
-#    freeimage
-#    Eigen3::Eigen
-#   ${OpenCV_LIBS}
-#)
+target_link_libraries(
+   SurfaceMeasurementApp
+   freeimage
+   Eigen3::Eigen
+  ${OpenCV_LIBS}
+)
 
 add_executable(
     KinectFusionApp # Name
