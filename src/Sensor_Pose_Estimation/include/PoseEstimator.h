@@ -70,21 +70,21 @@ namespace kinect_fusion {
         //std::cout << "in prunecorrespondences " << match.size() << std::endl;
         std::map<int, int> result_map; // maps from source index to target index
         
-        int valid_num = 0;
         std::map<int, int>::iterator it;
-
 
         float average_dis = 0;
         float loss = 0;
-
         int num_pair = 0;
-        
 
         //myfile.open("./test.txt");
         for (it = match.begin(); it != match.end(); it++) {
             //std::cout << "now match size in prune" << match.size() << std::endl;
             int index_target = it->first;
             int index_source = it->second;
+
+            if (index_source >= sourceNormals.size() || index_target >= targetNormals.size()) {
+                continue;
+            }
 
             Vector3f sourceNormal = sourceNormals.get(index_source);
             Vector3f targetNormal = targetNormals.get(index_target);
@@ -94,8 +94,6 @@ namespace kinect_fusion {
 
             //std::cout << "target Vertex " << targetVertex << std::endl;
             //std::cout << "source Vertex" << sourceVertex << std::endl;
-
-            
 
             if (!isnan(sourceVertex[0]) && !isnan(sourceVertex[1]) && !isnan(sourceVertex[2]) && !isnan(-sourceNormal[0]) && !isnan(-sourceNormal[1]) && !isnan(-sourceNormal[2])
                 && sourceVertex[0] != MINF && sourceVertex[1] != MINF && sourceVertex[2] != MINF && sourceNormal[0] != MINF && sourceNormal[1] != MINF && sourceNormal[2] != MINF &&
@@ -110,18 +108,18 @@ namespace kinect_fusion {
                 {
                     //std::cout << "cosin " << cosin << std::endl;
                     //std::cout << "dis" << dis << std::endl;
-                    valid_num++;
                     //std::cout << "after pruning, index target " << index_target << std::endl;
                     //std::cout << "after pruning, source target " << index_source << std::endl;
                     //result_map.insert(std::pair<int, int>(index_target, index_source));
                     
-                    //average_dis += (targetVertex - sourceVertex).norm();
-                    //loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
+                    // loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
                     if (result_map.find(index_source) == result_map.end())
                     {
                         num_pair++;
-                        result_map.insert(std::pair<int, int>(index_source, index_target));
                         loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
+                        average_dis += (targetVertex - sourceVertex).norm();
+
+                        result_map.insert(std::pair<int, int>(index_source, index_target));
                     }
                        
                     else
@@ -131,11 +129,12 @@ namespace kinect_fusion {
                         if (abs((targetVertex - sourceVertex).transpose() * sourceNormal) <
                             abs((targetVertex_ - sourceVertex).transpose() * sourceNormal))
                         {
-                            // if true, previous matching is worse, update
-                            //valid_num++;
                             result_map[index_source] = index_target;
+
                             loss += -abs((targetVertex_ - sourceVertex).transpose() * sourceNormal) + abs((targetVertex - sourceVertex).transpose() * sourceNormal);
+                            average_dis += -(targetVertex_ - sourceVertex).norm() + (targetVertex - sourceVertex).norm();
                         }
+                        // std::cout << "This is happening!" << std::endl;
                     }
 
 
@@ -144,10 +143,9 @@ namespace kinect_fusion {
             }
             
         }
-        std::cout << "After pruning, valid correspondences in total " << num_pair << std::endl;
-        std::cout << "Without bijective projection, valid correspondence number will be in " << valid_num << std::endl;
-        //std::cout << " Average distance " << average_dis/num_dis << std::endl;
-        std::cout << "Average loss for each valid correspondence " << loss / num_pair << std::endl;
+        std::cout << "Valid correspondences in total: " << num_pair << std::endl;
+        std::cout << "Average distance: " << average_dis/num_pair << std::endl;
+        std::cout << "Average loss for each valid correspondence: " << loss / num_pair << std::endl;
 
         return result_map;
     }
@@ -233,8 +231,8 @@ namespace kinect_fusion {
             result(3, 2) = 0;
             result(3, 0) = 0;
             
-            std::cout << "incremental matrix for this iteration: " << std::endl;
-            std::cout << result << std::endl;
+            // std::cout << "incremental matrix for this iteration: " << std::endl;
+            // std::cout << result << std::endl;
             return result;
         }
         /// <summary>
@@ -244,13 +242,13 @@ namespace kinect_fusion {
         /// <returns T g,k
         Eigen::MatrixXf frame2frameEstimation(Eigen::MatrixXf& inputTransformationMatrix)
         {
+            std::cout << "-------------------" << std::endl;
+            int iter_index = 0;
             Eigen::MatrixXf tempInputTransformation = inputTransformationMatrix;
             for (Level level : LEVELS)
             {
-            
                 int index = level; // index = 0, 1, 2
-                std::cout << "INEDX" << index << std::endl;
-                std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
+                std::cout << "Level: " << (2 - index + 1) << std::endl;
                 Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface(2 - index).getNormalMap();
                 Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(2 - index).getVertexMap();
 
@@ -259,12 +257,13 @@ namespace kinect_fusion {
 
                 for (int i = 0; i != iteration_num_with_level[level]; i++)
                 {
+                    std::cout << "Level iteration number: " << iter_index << std::endl;
                     //std::cout << "now we are at iteration " << i << std::endl;
                     //std::cout << "temp Input Transformation " << tempInputTransformation << std::endl;
                     projectiveCorrespondence pc(currentFrameVertex, currentFrameNormal, inputTransformationMatrix, tempInputTransformation, m_lastFrameData.getCameraIntrinsics(2 - index));
                     pc.matchPoint();
                     std::map<int, int> match = pc.getMatch();
-                    std::cout << "correspondence mapping " << match.size() << std::endl;
+                    std::cout << "Correspondence mapping:  " << match.size() << std::endl;
 
                     Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);
                     Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);
@@ -273,13 +272,15 @@ namespace kinect_fusion {
                     Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);
 
                     std::map<int, int> new_match = this->pruneCorrespondences(lastFrameNormal_transformed, currentFrameNormal_transformed, lastFrameVertex_transformed, currentVertex_transformed, match);
-                    std::cout << "after pruning the new match" << new_match.size() << std::endl;
+                    std::cout << "After pruning the new match: " << new_match.size() << std::endl;
                     Matrix4f incremental = calculateIncremental(currentVertex_transformed, lastFrameVertex_transformed, lastFrameNormal_transformed, new_match);
 
                     tempInputTransformation = incremental * tempInputTransformation;
-                    std::cout << "level " << index << "Iteration " << i << " Now tempInputTransformation " << tempInputTransformation << std::endl;
+                    iter_index++;
+                    // std::cout << "level " << index << "Iteration " << i << " Now tempInputTransformation " << tempInputTransformation << std::endl;
                 }
             }
+            std::cout << "-------------------" << std::endl;
 
             //Level level = FIRST_LEVEL;
             //int index = level; // index = 0, 1, 2

@@ -1,0 +1,123 @@
+Level: 3
+Level iteration number: 0
+Correspondence mapping:  13656
+Valid correspondences in total: 231
+Average distance: 0.00631273
+Average loss for each valid correspondence: 0.00416153
+After pruning the new match: 231
+Level iteration number: 1
+Correspondence mapping:  13656
+Valid correspondences in total: 2532
+Average distance: 0.00483002
+Average loss for each valid correspondence: 0.00296766
+After pruning the new match: 2532
+Level iteration number: 2
+Correspondence mapping:  13656
+Valid correspondences in total: 2539
+Average distance: 0.00328205
+Average loss for each valid correspondence: 0.000884882
+After pruning the new match: 2539
+Level iteration number: 3
+Correspondence mapping:  13656
+Valid correspondences in total: 2556
+Average distance: 0.00345694
+Average loss for each valid correspondence: 0.000861953
+After pruning the new match: 2556
+Level: 2
+Level iteration number: 4
+Correspondence mapping:  55639
+Valid correspondences in total: 4586
+Average distance: 0.00290993
+Average loss for each valid correspondence: 0.00132454
+After pruning the new match: 4586
+Level iteration number: 5
+Correspondence mapping:  55639
+Valid correspondences in total: 4595
+Average distance: 0.00279485
+Average loss for each valid correspondence: 0.00113664
+After pruning the new match: 4595
+Level iteration number: 6
+Correspondence mapping:  55639
+Valid correspondences in total: 4535
+Average distance: 0.00281784
+Average loss for each valid correspondence: 0.00113449
+After pruning the new match: 4535
+Level iteration number: 7
+Correspondence mapping:  55639
+Valid correspondences in total: 4528
+Average distance: 0.00282453
+Average loss for each valid correspondence: 0.00113773
+After pruning the new match: 4528
+Level iteration number: 8
+Correspondence mapping:  55639
+Valid correspondences in total: 4524
+Average distance: 0.00282149
+Average loss for each valid correspondence: 0.00113643
+After pruning the new match: 4524
+Level: 1
+Level iteration number: 9
+Correspondence mapping:  226121
+Valid correspondences in total: 8471
+Average distance: 0.00288234
+Average loss for each valid correspondence: 0.00164515
+After pruning the new match: 8471
+Level iteration number: 10
+Correspondence mapping:  226121
+Valid correspondences in total: 8670
+Average distance: 0.00304031
+Average loss for each valid correspondence: 0.00183404
+After pruning the new match: 8670
+Level iteration number: 11
+Correspondence mapping:  226121
+Valid correspondences in total: 8931
+Average distance: 0.00331104
+Average loss for each valid correspondence: 0.00203264
+After pruning the new match: 8931
+Level iteration number: 12
+Correspondence mapping:  226121
+Valid correspondences in total: 8918
+Average distance: 0.00337495
+Average loss for each valid correspondence: 0.00203844
+After pruning the new match: 8918
+Level iteration number: 13
+Correspondence mapping:  226121
+Valid correspondences in total: 8867
+Average distance: 0.00315205
+Average loss for each valid correspondence: 0.00197688
+After pruning the new match: 8867
+Level iteration number: 14
+Correspondence mapping:  226121
+Valid correspondences in total: 8870
+Average distance: 0.00317449
+Average loss for each valid correspondence: 0.00194082
+After pruning the new match: 8870
+Level iteration number: 15
+Correspondence mapping:  226121
+Valid correspondences in total: 8794
+Average distance: 0.00320209
+Average loss for each valid correspondence: 0.00192367
+After pruning the new match: 8794
+Level iteration number: 16
+Correspondence mapping:  226121
+Valid correspondences in total: 8792
+Average distance: 0.00322948
+Average loss for each valid correspondence: 0.00191731
+After pruning the new match: 8792
+Level iteration number: 17
+Correspondence mapping:  226121
+Valid correspondences in total: 8719
+Average distance: 0.00322362
+Average loss for each valid correspondence: 0.00192099
+After pruning the new match: 8719
+Level iteration number: 18
+Correspondence mapping:  226121
+Valid correspondences in total: 8664
+Average distance: 0.00320633
+Average loss for each valid correspondence: 0.00191947
+After pruning the new match: 8664
+-------------------
+Current transformation:
+   0.999948  0.00687065  -0.0091358  0.00207031
+-0.00687745    0.999981 -0.00165992  0.00628463
+ 0.00912732  0.00171668    0.999972   0.0112658
+          0           0           0           1

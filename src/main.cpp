@@ -9,7 +9,7 @@
 using namespace kinect_fusion;
 
 int main(int argc, char *argv[]) {
-    std::string filenameIn{ "/mnt/d/Users/chiyu/1 semester/KinectFusion/data/rgbd_dataset_freiburg1_xyz/" };
+    std::string filenameIn{ "./data/rgbd_dataset_freiburg1_xyz/" };
     std::string filenameBaseOut = std::string("./mesh/mesh_");
     VirtualSensor sensor;
     sensor.init(filenameIn);
@@ -19,10 +19,12 @@ int main(int argc, char *argv[]) {
     sensor.processNextFrame();
     Map2Df depth = sensor.getDepth();
     previous_dataFrame.updateValues(depth);
+    std::cout << "first frame" << std::endl;
 
     MatrixXf previousTransformation = Matrix4f::Identity();
     MatrixXf currentTransformation = Matrix4f::Identity();
     update_volument(sensor, volum, previousTransformation);
+    std::cout << "volument updated" << std::endl;
     
     std::string frameZero{ std::string("./mesh/""frame_0_not_transformed") + std::string(".off") };
     SimpleMesh meshZero{ previous_dataFrame.getSurface().getVertexMap(), previousTransformation, 0.1f };

@@ -104,6 +104,20 @@ target_link_libraries(
 )
 
 add_executable(
+   PoseEstimationApp # Name
+   ${CMAKE_CURRENT_SOURCE_DIR}/executables/pose_estimation_app.cpp # File
+   ${SOURCES}
+)
+
+target_link_libraries(
+   PoseEstimationApp
+   freeimage
+   Eigen3::Eigen
+  ${OpenCV_LIBS}
+)
+
+
+add_executable(
     KinectFusionApp # Name
     ${SOURCE_DIR}/main.cpp # File
     ${SOURCES}
