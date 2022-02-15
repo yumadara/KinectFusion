@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     sensor.init(DATASET_PATH);
 
     Voxel volum(200, 200, 300, 100, 100, 0, -100, 0);
-    
+
     FrameData previousDataFrame{sensor.getDepthIntrinsics(), sensor.getDepthImageHeight(), sensor.getDepthImageWidth() };
     FrameData currentDataFrame{ sensor.getDepthIntrinsics(), sensor.getDepthImageHeight(), sensor.getDepthImageWidth() };
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Raycasting performed... " << std::flush;
 
         // Render raycasting results
-        std::string frameK{OUTPUT_PREFIX + std::string("/merged_meshes/frame_") + std::to_string(i) + std::string(".off") };
+        std::string frameK{OUTPUT_PREFIX + std::string("/merged_meshes/frame_") + std::to_string(i) + std::string("raycasted.off") };
         SimpleMesh meshK{currentDataFrame.getSurface().getVertexMap(), currentTransformation, 0.1f };
         meshK.writeMesh(frameK);
         std::cout << "Mesh written!" << std::endl;
