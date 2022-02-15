@@ -166,6 +166,10 @@ public:
 		return m_depthImageWidth * m_depthImageHeight;
 	}
 
+	unsigned int getNumberOfFrames() {
+		return m_filenameColorImages.size();
+	}
+
 	// get current trajectory transformation
 	Eigen::Matrix4f getTrajectory() {
 		return m_currentTrajectory;

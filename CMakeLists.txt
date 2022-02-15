@@ -53,11 +53,12 @@ include_directories(${SOURCE_DIR}/utils/include) # We need it for legacy code
 include_directories(${SOURCE_DIR}/surface_measurement/include)
 include_directories(${SOURCE_DIR}/ray_casting/include)
 include_directories(${SOURCE_DIR}/surface_reconstruction/include)
+include_directories(${SOURCE_DIR}/sensor_pose_estimation/include)
 
 # Define our source files
 set(SOURCES ${SOURCE_DIR}/utils/src/free_image_helper.cpp
             ${SOURCE_DIR}/surface_measurement/src/data_frame.cpp
-            ${SOURCE_DIR}/surface_measurement/src/surface_measurement.cpp)
+            ${SOURCE_DIR}/surface_measurement/src/surface_measurement_utils.cpp)
 
 # Add libraries directories for includes
 include_directories(${LIBRARY_DIR}/eigen)
@@ -77,7 +78,7 @@ IF (CUDA_FOUND)
     # Optional: Specify the arch of your CUDA hardware here
     # SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3;-std=c++11 -gencode arch=compute_20,code=sm_21)
     SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-std=c++11)
-    MESSAGE("CUDA was found.Hurra!!!!")
+    MESSAGE("CUDA was found. Hurra!!!!")
     set(CUDA_SOURCE_DIR ${SOURCE_DIR}/cuda)
 
     include_directories(${CUDA_SOURCE_DIR})
@@ -116,10 +117,9 @@ target_link_libraries(
   ${OpenCV_LIBS}
 )
 
-
 add_executable(
     KinectFusionApp # Name
-    ${SOURCE_DIR}/main.cpp # File
+    ${CMAKE_CURRENT_SOURCE_DIR}/executables/main.cpp # File
     ${SOURCES}
 )
 
@@ -131,7 +131,6 @@ target_link_libraries(
 )
 
 # Add tests
-
 add_executable(
     DataPipelineTest # Test name
     test/data_pipeline_test.cpp # Test file
@@ -140,13 +139,7 @@ add_executable(
 
 add_executable(
     PoseEstimatorTest # Test name
-    test/PoseEstimatorTest.cpp # Test file
-    ${SOURCES}
-)
-
-add_executable(
-    DepthImgPreprocessingTest # Test name
-    test/DepthImgPreprocessingTest.cpp # Test file
+    test/pose_estimator_test.cpp # Test file
     ${SOURCES}
 )
 
@@ -157,37 +150,27 @@ add_executable(
 )
 add_executable(
     CameraTest
-    test/CameraTest.cpp
+    test/camera_test.cpp
     ${SOURCES}
 )
 add_executable(
     SurfaceTest
-    test/SurfaceTest.cpp
+    test/surface_test.cpp
     ${SOURCES}
 )
 
 add_executable(
     RayCastingTest
-    test/RayCastingTest.cpp
-    ${SOURCES}
-)
-#add_executable(
-#    ReconstructTest
-#    test/recon_test.cpp
-#    ${SOURCES}
-#)
-#enable_testing()
-add_executable(
-    VoxelTest # Test name
-    test/VoxelTest.cpp # Test file
+    test/ray_casting_test.cpp
     ${SOURCES}
 )
 
-#add_executable(
-#    RayCastingRecTest # Test name
-#    test/surfacereconstruction_raycastingTest.cpp # Test file
-#    ${SOURCES}
-#) 
+add_executable(
+    VoxelTest # Test name
+    test/voxel_test.cpp # Test file
+    ${SOURCES}
+)
+
 add_executable(
    ReconstructTest
    test/recon_test.cpp
@@ -198,8 +181,6 @@ add_executable(
    test/surface_measurement_test.cpp
    ${SOURCES}
 )
-
-# enable_testing()
 
 
 # Link test with google test library
@@ -231,14 +212,6 @@ target_link_libraries(
 )
 
 target_link_libraries(
-    DepthImgPreprocessingTest # Out test
-    gtest # Google Test library
-    gtest_main
-    freeimage
-    Eigen3::Eigen
-    ${OpenCV_LIBS}
-)
-target_link_libraries(
     RayTest # Out test
     gtest # Google Test library
     gtest_main
@@ -254,6 +227,7 @@ target_link_libraries(
     Eigen3::Eigen
     ${OpenCV_LIBS}
 )
+
 target_link_libraries(
     SurfaceTest # Out test
     gtest # Google Test library
@@ -264,7 +238,6 @@ target_link_libraries(
 )
 
 target_link_libraries(
-
     RayCastingTest # Out test
     gtest # Google Test library
     gtest_main
@@ -290,17 +263,10 @@ target_link_libraries(
     Eigen3::Eigen
    ${OpenCV_LIBS}
 )
-#target_link_libraries(
-#    RayCastingRecTest
-#    gtest # Google Test library
-#    gtest_main
-#    freeimage
-#    Eigen3::Eigen
- #  ${OpenCV_LIBS}
-#)
 
 # Yes, we have tests!
 include(GoogleTest)
+enable_testing()
 gtest_discover_tests(DataPipelineTest)
 gtest_discover_tests(SurfaceMeasurementTest)
 # gtest_discover_tests(ReconstructTest)

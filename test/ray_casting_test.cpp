@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <RayCasting.h>
+#include <ray_casting.h>
 #include <type_definitions.h>
-#include <Camera.h>
-#include <Voxel.h>
+#include <camera.h>
+#include <voxel.h>
 
 namespace kinect_fusion {
 

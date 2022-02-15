@@ -1,11 +1,13 @@
-#include <virtual_sensor.h>
-#include "utils/include/type_definitions.h"
-#include <data_frame.h>
-#include"surface_reconstruct.h"
-#include <simple_mesh.h>
-#include <Camera.h>
-#include <RayCasting.h>
 #include <gtest/gtest.h>
+
+#include <virtual_sensor.h>
+#include <type_definitions.h>
+#include <data_frame.h>
+#include <surface_reconstruct.h>
+#include <simple_mesh.h>
+#include <camera.h>
+#include <ray_casting.h>
+
 namespace kinect_fusion {
 
 

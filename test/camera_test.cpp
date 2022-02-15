@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <Camera.h>
+#include <camera.h>
 
 #include "Eigen.h"
 

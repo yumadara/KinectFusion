@@ -2,11 +2,12 @@
 
 #include <cassert>
 
-#include "Eigen.h"
+#include <Eigen.h>
 
 namespace kinect_fusion {
 
 class Camera {
+    
     public:
     Camera(MatrixXf poseEstimation, Matrix3f CalibrationMatrix,
     int pictureHeightInPixel, int pictureWidthInPixel,

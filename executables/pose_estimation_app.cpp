@@ -4,12 +4,15 @@
 #include <type_definitions.h>
 #include <data_frame.h>
 #include <simple_mesh.h>
-#include "Sensor_Pose_Estimation/include/PoseEstimator.h"
+#include <pose_estimator.h>
 
 using namespace kinect_fusion;
 
+const std::string DATASET_PATH = "./data/rgbd_dataset_freiburg1_xyz/";
+const std::string OUTPUT_PREFIX = "./executables/generated_data";
+
 int main(int argc, char *argv[]) {
-    std::string filenameIn{"./data/rgbd_dataset_freiburg1_xyz/"};
+    std::string filenameIn{DATASET_PATH};
 
     VirtualSensor sensor;
     sensor.init(filenameIn);
@@ -23,7 +26,7 @@ int main(int argc, char *argv[]) {
     sensor.processNextFrame();
     previousDataFrame.updateValues(sensor.getDepth());
 
-    std::string frameZero{ std::string("./executables/generated_data/merged_meshes/frame_0_not_transformed") + std::string(".off") };
+    std::string frameZero{OUTPUT_PREFIX + "/merged_meshes/frame_0_not_transformed.off"};
     SimpleMesh meshZero{previousDataFrame.getSurface().getVertexMap(), currentTransformation, 0.1f};
     meshZero.writeMesh(frameZero);
 
@@ -32,16 +35,16 @@ int main(int argc, char *argv[]) {
 
         Map2Df& depths{sensor.getDepth()};
         currentDataFrame.updateValues(depths);
+        std::cout << "Surface measurement completed... " << std::flush;
 
         PoseEstimator pose_estimator(currentDataFrame, previousDataFrame, previousTransformation, currentTransformation, sensor);
         currentTransformation = pose_estimator.frame2frameEstimation(previousTransformation);
-        std::cout << "Current transformation:\n" << currentTransformation << std::endl;
+        std::cout << "Pose estimation obtained... " << std::flush;
 
-        std::string frameK{std::string("./executables/generated_data/merged_meshes/frame_") + std::to_string(i) + std::string(".off") };
+        std::string frameK{OUTPUT_PREFIX + std::string("/merged_meshes/frame_") + std::to_string(i) + std::string(".off") };
         SimpleMesh meshK{currentDataFrame.getSurface().getVertexMap(), currentTransformation, 0.1f };
         meshK.writeMesh(frameK);
-        // meshZero = SimpleMesh::joinMeshes(meshZero, meshK);
-        std::cout << "Mesh written " << std::endl;
+        std::cout << "Mesh written!" << std::endl;
 
         previousTransformation = currentTransformation;
         previousDataFrame = currentDataFrame;

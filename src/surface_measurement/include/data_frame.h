@@ -1,8 +1,10 @@
 #pragma once
 
-#include <Eigen.h>
 #include <iostream>
-#include <Surface.h>
+
+#include <Eigen.h>
+
+#include <surface.h>
 
 namespace kinect_fusion {
 
@@ -41,26 +43,19 @@ class FrameData {
             return m_filteredDepthMaps[level];
         }
 
-        Eigen::Matrix3f& getCameraIntrinsics(Level level)
+        /**
+         * @brief Get the camera Intrinsics
+         */
+        Eigen::Matrix3f& getCameraIntrinsics(Level level = 0U)
         {
             return m_cameraIntrinstics[static_cast<std::size_t>(level)];
         }
 
-        void printDataFrame()
-        {
-            for (int i = 0; i != NUMBER_OF_LEVELS; i++)
-            {
-                Map2DVector3f normal_map = m_surfaces[i].getNormalMap();
-                Map2DVector3f vertex_map = m_surfaces[i].getVertexMap();
+        /**
+         * @brief Print the vertex and normal maps for 3 levels for debugging.
+         */
+        void printDataFrame();
 
-                for (int j = 0; j != normal_map.size(); j++)
-                {
-                    std::cout << " vertex "  << vertex_map.get(j)<<std::endl;
-                    std::cout << " normal " << normal_map.get(j) << std::endl;
-
-                }
-            }
-        }
     private:
         /**
          * @brief Row depth map from sensor.

@@ -1,28 +1,32 @@
-#include "ProjectiveCorrespondenceSearch.h"
-extern float epsilon_theta = 0.996;
-extern float epsilon_d = 0.01;
+#include <fstream>
+
+#include <projective_correspondence_search.h>
 #include <virtual_sensor.h>
 #include <data_frame.h>
 #include <type_definitions.h>
-#include <fstream>
 #include <simple_mesh.h>
-extern std::map<kinect_fusion::Level, int> iteration_num_with_level = { {kinect_fusion::FIRST_LEVEL, 4}, {kinect_fusion::SECOND_LEVEL,5}, {kinect_fusion::THIRD_LEVEL,10} };
+
 
 namespace kinect_fusion {
+
+    constexpr bool PRINT_STATS{false};
+
+    constexpr float EPSILON_THETA = 0.996;
+    constexpr float EPSILON_D = 0.01;
+
+    std::map<kinect_fusion::Level, int> iteration_num_with_level = { {kinect_fusion::FIRST_LEVEL, 4}, {kinect_fusion::SECOND_LEVEL,5}, {kinect_fusion::THIRD_LEVEL,10} };
 
 	class PoseEstimator {
 	public:
 		PoseEstimator(FrameData& currentFrameData, FrameData& lastFrameData, Eigen::MatrixXf& lastTransformation , Eigen::MatrixXf& currentTransformation, VirtualSensor& sensor)
 		{
-            
             m_currentFrameData = currentFrameData;
             m_lastFrameData = lastFrameData;
 			m_lastTransformation = lastTransformation;
             m_currentTransformation = currentTransformation;
             m_sensor = sensor;
-            //std::cout << "current frame data second level in constructor" << currentFrameData.getSurface(kinect_fusion::SECOND_LEVEL).getVertexMap().size() << std::endl;
-            //std::cout << "current frame data second level in constructor" << m_currentFrameData.getSurface(kinect_fusion::SECOND_LEVEL).getVertexMap().size() << std::endl;
 		}
+
         Vector3f TransformVertex(Vector3f vertex, Eigen::MatrixXf Transformation)
         {
             return Transformation.block(0, 0, 3, 3) * vertex + Transformation.block(0,3,3,1);
@@ -67,7 +71,6 @@ namespace kinect_fusion {
         const Map2DVector3f& sourceVertices,
         const Map2DVector3f& targetVertices,
         std::map<int, int>& match) {
-        //std::cout << "in prunecorrespondences " << match.size() << std::endl;
         std::map<int, int> result_map; // maps from source index to target index
         
         std::map<int, int>::iterator it;
@@ -76,9 +79,7 @@ namespace kinect_fusion {
         float loss = 0;
         int num_pair = 0;
 
-        //myfile.open("./test.txt");
         for (it = match.begin(); it != match.end(); it++) {
-            //std::cout << "now match size in prune" << match.size() << std::endl;
             int index_target = it->first;
             int index_source = it->second;
 
@@ -92,9 +93,6 @@ namespace kinect_fusion {
             Vector3f sourceVertex = sourceVertices.get(index_source);
             Vector3f targetVertex = targetVertices.get(index_target);
 
-            //std::cout << "target Vertex " << targetVertex << std::endl;
-            //std::cout << "source Vertex" << sourceVertex << std::endl;
-
             if (!isnan(sourceVertex[0]) && !isnan(sourceVertex[1]) && !isnan(sourceVertex[2]) && !isnan(-sourceNormal[0]) && !isnan(-sourceNormal[1]) && !isnan(-sourceNormal[2])
                 && sourceVertex[0] != MINF && sourceVertex[1] != MINF && sourceVertex[2] != MINF && sourceNormal[0] != MINF && sourceNormal[1] != MINF && sourceNormal[2] != MINF &&
                 !isnan(targetVertex[0]) && !isnan(targetVertex[1]) && !isnan(targetVertex[2]) && !isnan(-targetNormal[0]) && !isnan(-targetNormal[1]) && !isnan(-targetNormal[2])
@@ -104,15 +102,8 @@ namespace kinect_fusion {
                     (sourceNormal.norm() * targetNormal.norm() + std::numeric_limits<float>::epsilon() );
                 float dis = (sourceVertex - targetVertex).norm();
 
-                if (cosin >= epsilon_theta && dis <= epsilon_d)
+                if (cosin >= EPSILON_THETA && dis <= EPSILON_D)
                 {
-                    //std::cout << "cosin " << cosin << std::endl;
-                    //std::cout << "dis" << dis << std::endl;
-                    //std::cout << "after pruning, index target " << index_target << std::endl;
-                    //std::cout << "after pruning, source target " << index_source << std::endl;
-                    //result_map.insert(std::pair<int, int>(index_target, index_source));
-                    
-                    // loss += abs((targetVertex - sourceVertex).transpose() * sourceNormal);
                     if (result_map.find(index_source) == result_map.end())
                     {
                         num_pair++;
@@ -134,7 +125,6 @@ namespace kinect_fusion {
                             loss += -abs((targetVertex_ - sourceVertex).transpose() * sourceNormal) + abs((targetVertex - sourceVertex).transpose() * sourceNormal);
                             average_dis += -(targetVertex_ - sourceVertex).norm() + (targetVertex - sourceVertex).norm();
                         }
-                        // std::cout << "This is happening!" << std::endl;
                     }
 
 
@@ -143,9 +133,11 @@ namespace kinect_fusion {
             }
             
         }
-        std::cout << "Valid correspondences in total: " << num_pair << std::endl;
-        std::cout << "Average distance: " << average_dis/num_pair << std::endl;
-        std::cout << "Average loss for each valid correspondence: " << loss / num_pair << std::endl;
+        if (PRINT_STATS) {
+            std::cout << "Valid correspondences in total: " << num_pair << std::endl;
+            std::cout << "Average distance: " << average_dis/num_pair << std::endl;
+            std::cout << "Average loss for each valid correspondence: " << loss / num_pair << std::endl;
+        }
 
         return result_map;
     }
@@ -172,19 +164,10 @@ namespace kinect_fusion {
             for (it = match.begin(); it != match.end(); it++) {
                 int index_target = it->second;
                 int index_source = it->first;
-                
-                //std::cout << "index_target while calculate " << index_target << std::endl;
-                //std::cout << "index_source while calculate " << index_source << std::endl;
-
 
                 Eigen::Vector3f targetPoint = targetVertex.get(index_target);
                 Eigen::Vector3f sourcePoint = sourceVertex.get(index_source);
                 Eigen::Vector3f sourceNormal = sourceNormals.get(index_source);
-                //std::cout << "target point  " << targetPoint << std::endl;
-                //std::cout << "source point " << sourcePoint << std::endl;
-                //std::cout << "source normal" << sourceNormal << std::endl;
-                
-                //assert(abs((targetPoint - sourcePoint).norm()) < 0.01);
 
                 MatrixXf  G = MatrixXf::Zero(3,6);
                 G(0, 0) = 0;
@@ -200,8 +183,6 @@ namespace kinect_fusion {
                 G(1, 4) = 1;
                 G(2, 5) = 1;
 
-                //std::cout << "G is " << G << std::endl;
-
                 Eigen::MatrixXf tempA = MatrixXf::Zero(6, 6);
                 Eigen::VectorXf tempbias = VectorXf::Zero(6);
                 tempA = G.transpose() * sourceNormal * sourceNormal.transpose() * G;
@@ -209,9 +190,8 @@ namespace kinect_fusion {
 
                 A = A + tempA;
                 b = b + tempbias;
-
-                
             }
+
             Matrix4f result;
             VectorXf x = A.ldlt().solve(b);
             result(0, 0) = 1;
@@ -231,8 +211,6 @@ namespace kinect_fusion {
             result(3, 2) = 0;
             result(3, 0) = 0;
             
-            // std::cout << "incremental matrix for this iteration: " << std::endl;
-            // std::cout << result << std::endl;
             return result;
         }
         /// <summary>
@@ -242,13 +220,11 @@ namespace kinect_fusion {
         /// <returns T g,k
         Eigen::MatrixXf frame2frameEstimation(Eigen::MatrixXf& inputTransformationMatrix)
         {
-            std::cout << "-------------------" << std::endl;
             int iter_index = 0;
             Eigen::MatrixXf tempInputTransformation = inputTransformationMatrix;
             for (Level level : LEVELS)
             {
                 int index = level; // index = 0, 1, 2
-                std::cout << "Level: " << (2 - index + 1) << std::endl;
                 Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface(2 - index).getNormalMap();
                 Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(2 - index).getVertexMap();
 
@@ -257,13 +233,9 @@ namespace kinect_fusion {
 
                 for (int i = 0; i != iteration_num_with_level[level]; i++)
                 {
-                    std::cout << "Level iteration number: " << iter_index << std::endl;
-                    //std::cout << "now we are at iteration " << i << std::endl;
-                    //std::cout << "temp Input Transformation " << tempInputTransformation << std::endl;
                     projectiveCorrespondence pc(currentFrameVertex, currentFrameNormal, inputTransformationMatrix, tempInputTransformation, m_lastFrameData.getCameraIntrinsics(2 - index));
                     pc.matchPoint();
                     std::map<int, int> match = pc.getMatch();
-                    std::cout << "Correspondence mapping:  " << match.size() << std::endl;
 
                     Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);
                     Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);
@@ -272,53 +244,19 @@ namespace kinect_fusion {
                     Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);
 
                     std::map<int, int> new_match = this->pruneCorrespondences(lastFrameNormal_transformed, currentFrameNormal_transformed, lastFrameVertex_transformed, currentVertex_transformed, match);
-                    std::cout << "After pruning the new match: " << new_match.size() << std::endl;
                     Matrix4f incremental = calculateIncremental(currentVertex_transformed, lastFrameVertex_transformed, lastFrameNormal_transformed, new_match);
-
                     tempInputTransformation = incremental * tempInputTransformation;
+
+                    if (PRINT_STATS) {
+                        std::cout << "Level: " << (2 - index + 1) << std::endl;
+                        std::cout << "Global iteration number: " << iter_index << std::endl;
+                        std::cout << "Correspondence mapping:  " << match.size() << std::endl;
+                        std::cout << "After pruning the new match: " << new_match.size() << std::endl;
+                    }
+
                     iter_index++;
-                    // std::cout << "level " << index << "Iteration " << i << " Now tempInputTransformation " << tempInputTransformation << std::endl;
                 }
             }
-            std::cout << "-------------------" << std::endl;
-
-            //Level level = FIRST_LEVEL;
-            //int index = level; // index = 0, 1, 2
-            //std::cout << "LEVEL INDEX" << index << std::endl;
-            //std::cout << "level iteration number " << iteration_num_with_level[level] << std::endl;
-            //Map2DVector3f currentFrameNormal = this->m_currentFrameData.getSurface( index).getNormalMap();// camera space
-            //Map2DVector3f currentFrameVertex = this->m_currentFrameData.getSurface(index).getVertexMap();//camera space
-
-            //Map2DVector3f lastFrameNormal = this->m_lastFrameData.getSurface( index).getNormalMap();//camera space
-            //Map2DVector3f lastFrameVertex = this->m_lastFrameData.getSurface( index).getVertexMap();//camera space
-
-            //for (int i = 0; i != iteration_num_with_level[level]; i++)
-            //{
-            //    std::cout << std::endl;
-            //    std::cout << std::endl;
-            //    std::cout << "OPTIMIZATION OF ITERATION " << i << 
-            //        " BEGINS: " <<std::endl;
-            //    projectiveCorrespondence pc(currentFrameVertex, currentFrameNormal, inputTransformationMatrix, tempInputTransformation, m_lastFrameData.getCameraIntrinsics(index));
-            //    pc.matchPoint();
-            //    std::map<int, int> match = pc.getMatch();
-            //    std::cout << "Correspondence mapped number " << match.size() << std::endl;
-
-            //    Map2DVector3f lastFrameNormal_transformed = this->TransformNormalMap(lastFrameNormal, inputTransformationMatrix);// world space
-            //    Map2DVector3f lastFrameVertex_transformed = this->TransformVertexMap(lastFrameVertex, inputTransformationMatrix);//world space
-
-            //    Map2DVector3f currentFrameNormal_transformed = this->TransformNormalMap(currentFrameNormal, tempInputTransformation);//world space
-            //    Map2DVector3f currentVertex_transformed = this->TransformVertexMap(currentFrameVertex, tempInputTransformation);//world space
-
-            //    std::map<int, int> new_match = this->pruneCorrespondences(lastFrameNormal_transformed, currentFrameNormal_transformed, lastFrameVertex_transformed, currentVertex_transformed, match);
-            //    std::cout << "After pruning the new match" << new_match.size() << std::endl;
-            //    Matrix4f incremental = calculateIncremental(currentVertex_transformed, lastFrameVertex_transformed, lastFrameNormal_transformed, new_match);
-
-            //    tempInputTransformation = incremental * tempInputTransformation;
-            //    std::cout << "Level " << index << " Iteration " << i << " after this iteration, currently estimated pose is " << std::endl;
-            //    std::cout << tempInputTransformation << std::endl;
-
-         
-            //}
 
             return tempInputTransformation;
         }

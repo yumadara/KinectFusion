@@ -1,5 +1,6 @@
-#include "../src/Sensor_Pose_Estimation/include/PoseEstimator.h"
 #include <gtest/gtest.h>
+
+#include <pose_estimator.h>
 #include <simple_mesh.h>
 namespace kinect_fusion {
 	TEST(PoseEstimatorTest, checkPoseEstimation) {

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <Voxel.h>
+#include <voxel.h>
 
 namespace kinect_fusion {
 

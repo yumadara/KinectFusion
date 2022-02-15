@@ -1,9 +1,11 @@
 #include <math.h>
 
-#include "Eigen.h"
-#include <data_frame.h>
-#include <Surface.h>
+#include <Eigen.h>
+
 #include <iostream>
+
+#include <data_frame.h>
+#include <surface.h>
 
 namespace kinect_fusion {
 
@@ -46,16 +48,10 @@ public:
 				vertex[0] != MINF && vertex[1] != MINF && vertex[2] != MINF &&
 				normal[0] != MINF && normal[1]!=MINF && normal[2] != MINF)
 			{
-				//std::cout << "input target point  " << m_targetVertexMap.get(i) << std::endl;
-				//std::cout << "target normal  " << m_targetNormalMap.get(i) << std::endl;
-				//std::cout << "target index " << i << std::endl;
 				int correspondenceIndexInSurface = findCorrespondence(m_targetVertexMap.get(i));
 				if (correspondenceIndexInSurface != -1) // found correspondence
 				{
-
-					//assert(i == correspondenceIndexInSurface);
-					match.insert(std::pair<int, int>(i, correspondenceIndexInSurface));
-					
+					match.insert(std::pair<int, int>(i, correspondenceIndexInSurface));	
 				}
 			}
 			
@@ -69,32 +65,20 @@ public:
 	/// <returns index of source point ( k-1 frame) which corresponds target (k frame)
 	int findCorrespondence(const Eigen::Vector3f& targetPoint)
 	{
-
-		//point(3) = 1;
 		Eigen::MatrixXf Transformation = m_previousTransformation.inverse()* m_currentTransformation;
 		Eigen::Matrix3f intrinsics = m_cameraIntrinsics; // should be k-1 th frame intrinsic
 		unsigned int depthHeight = m_targetVertexMap.getHeight();
 		unsigned int depthWidth = m_targetVertexMap.getWidth();
-		//std::cout << "intrinsics " << intrinsics << std::endl;
-		//std::cout << "target point" << targetPoint << std::endl;
-		//std::cout << "previous transformation " << m_previousTransformation << std::endl;
-		//std::cout << "current transformation " << m_currentTransformation << std::endl;
-		//std::cout << "result is " << intrinsics * (Transformation.block(0, 0, 3, 3) * targetPoint + Transformation.block(0, 3, 3, 1)) << std::endl;
 
 		Vector3f point = (Transformation.block(0, 0, 3, 3) * targetPoint + Transformation.block(0, 3, 3, 1));// k -1 frame 
-			//Vector3f image_plane_point = intrinsics*point;
-			//std::cout << "image plane point " << image_plane_point << std::endl;
-		//std::cout << "source point" << point << std::endl;
+
 		int imagePlaneCoordinateX = round(intrinsics(0, 0) * point.x() / point.z() + intrinsics(0, 2) );
 		int imagePlaneCoordinateY = round(intrinsics(1, 1) * point.y() / point.z() + intrinsics(1, 2) );
-		//std::cout << "image X " << imagePlaneCoordinateX << std::endl;
-		//std::cout << "image Y " << imagePlaneCoordinateY << std::endl;
 
 		if (imagePlaneCoordinateX > depthWidth || imagePlaneCoordinateY > depthHeight|| imagePlaneCoordinateX < 0 || imagePlaneCoordinateY<0)
 		{
 			return -1;
 		}
-		//std::cout << "source index " << imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX << std::endl;
 		return imagePlaneCoordinateY * depthWidth + imagePlaneCoordinateX;
 	}
 
@@ -103,8 +87,6 @@ public:
 		return match;
 	}
 private:
-	
-	//std::vector<Eigen::Vector3f> m_surfacePoints;
 	std::map<int, int> match;
 	Eigen::MatrixXf m_previousTransformation; //T_{g,k-1}
 	Eigen::MatrixXf m_currentTransformation; //T_{g,k}, initial setting will be T_{g, k-1}

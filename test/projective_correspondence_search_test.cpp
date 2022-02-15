@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include "../src/Sensor_Pose_Estimation/include/ProjectiveCorrespondenceSearch.h"
+
+#include <projective_correspondence_search.h>
 #include <virtual_sensor.h>
 
 namespace kinect_fusion {

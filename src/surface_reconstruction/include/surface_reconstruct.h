@@ -1,10 +1,12 @@
 #include <iostream>
-#include "Eigen.h"
-#include"Voxel.h"
-#include"virtual_sensor.h"
-#include"type_definitions.h"
 #include <chrono>
 #include <cassert>
+
+#include <Eigen.h>
+
+#include <voxel.h>
+#include <virtual_sensor.h>
+#include <type_definitions.h>
 
 namespace kinect_fusion {
     //camera coordinate -> pixel coordinate
@@ -30,11 +32,9 @@ namespace kinect_fusion {
         int sign = x>0? 1:-1;
         if (x > -mu)
         {
-            //return fmin(1, abs(x / mu)) * sign;
             return fmin(1, x / mu) * sign;
         }
         else
-            //return default_sdf;
             return default_sdf;
     }
     //equation (8)
@@ -45,7 +45,7 @@ namespace kinect_fusion {
         Matrix4f depthExtrinsicsInv = depthExtrinsics.inverse();
         Vector4f p = homogenisation(p_g_scaled);
         Vector4f p_k = depthExtrinsicsInv*p;
-        //Vector4f p_k = depthExtrinsics * p;
+        
         if (p_k.z()<0){
             return Vector2i(MINF,MINF);
         }
@@ -60,35 +60,27 @@ namespace kinect_fusion {
     float Lamda(const Matrix3f& depthIntrinsics, const Vector2i& pixel_coord)
     {
         Matrix3f K_Inv = depthIntrinsics.inverse();
-        //Matrix3f K_Inv = depthIntrinsics;
         Vector3f homo_pixel_coord = homogenisation(pixel_coord.cast<float>());
         Vector3f temp = K_Inv*homo_pixel_coord;
         float lamda = temp.norm();
         return lamda;
 
     }
+
     //equation （6) for each point (modified)
     float SDF_k_i(const float mu, float lamda, const Matrix3f& depthIntrinsics, const Matrix4f& depthExtrinsics, const Vector3f& p, const float depth_k_i, const float& default_sdf)
     {
         Vector3f translation;
         translation << depthExtrinsics.topRightCorner(3,1);
         float sdf_k_i;
-        //float Eta =depth_k_i*1000 - (translation*1000 - p).norm()/lamda ;//change of unit from m to mm
-        float Eta =    (translation - p).norm() / lamda - depth_k_i;
+        float Eta = (translation - p).norm() / lamda - depth_k_i;
         sdf_k_i = SDF_truncation(Eta, mu, default_sdf);
         return sdf_k_i;
     }
-    //
-    //void update_volument(VirtualSensor& sensor, Voxel& volument, const float defaut_dst )
-    //{
+
     void update_volument(VirtualSensor& sensor, Voxel& volument, const Matrix4f depthExtrinsics )
     {
-        // Vector3i orig = volument.getOrig();
-        // std::cout<<"test====="<<std::endl;
-        // const unsigned int k = 3;//TODO:??
-        // unsigned int i = 0;
             const float defaut_dst = volument.getDefaultDist();//TODO: get wrong intial value
-        // while (sensor.processNextFrame() && i <= k) {
             int num = 0;
             int num_same_voxel = 0;
             float y_z_limit = sensor.get_tan_y_z();
@@ -96,25 +88,17 @@ namespace kinect_fusion {
             Map2Df depthMap_k_i{sensor.getDepth()};
             int num_index = 0;
             
-
-            //float* depthMap_k_i = sensor.getDepth().data();;
             const Matrix3f depthIntrinsics = sensor.getDepthIntrinsics();
-            //const Matrix4f depthExtrinsics = sensor.getDepthExtrinsics();
-            // const Matrix4f depthExtrinsics = depthExtrinsics;
             const unsigned int width = sensor.getDepthImageWidth();
             const unsigned int height = sensor.getDepthImageHeight();
             const float mu = volument.truncateDistance;//TODO: right? wirte a config file
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             for (int voxel_xi=0; voxel_xi<volument.numX; voxel_xi++)
-            // for (int voxel_xi=75; voxel_xi<125; voxel_xi++)
             {
                 end = std::chrono::steady_clock::now();
-                //std::cout<<"x:"<<voxel_xi<<std::endl;
-                //std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
                 begin = end;
                 for(int voxel_yi=0; voxel_yi<volument.numY; voxel_yi++)
-                // for(int voxel_yi=75; voxel_yi<125; voxel_yi++)
                 {
                    
                     for(int voxel_zi=0; voxel_zi<volument.numZ; voxel_zi++)
@@ -133,7 +117,7 @@ namespace kinect_fusion {
                         }
                         const float lamda = Lamda(depthIntrinsics, x);
                         float SDF_k_i_n = SDF_k_i(mu / 1000, lamda, depthIntrinsics, depthExtrinsics, p_g, depth_k_i, defaut_dst/1000);
-                        //SDF_k_i_n = SDF_k_i_n * 1000;
+
                         p_g = p_g * 1000;
                         float F_k_i_j = volument.getDistance(p_g.x(), p_g.y(), p_g.z());
                         float new_dist;
@@ -149,13 +133,6 @@ namespace kinect_fusion {
                         {
                             new_dist = SDF_k_i_n;
                             num++;
-                            if (new_dist<0 && new_dist>-1){
-                                //std::cout<<"GOTBACK, "<<new_dist<<std::endl;
-                            }
-                            else{
-                                //std::cout<<"GOTFRONT, "<<new_dist<<std::endl;
-                                
-                            }
                             volument.setDistance(p_g.x(), p_g.y(), p_g.z(), new_dist);
                             assert (volument.getDistance(p_g.x(), p_g.y(), p_g.z()) == new_dist);
                         }
@@ -166,12 +143,6 @@ namespace kinect_fusion {
                 }
                
             }
-            std::cout << "num" << num << std::endl;
-            std::cout << "num same voxel" << num_same_voxel << std::endl;
-            //std::cout << "num index" << num_index << std::endl;
-        // i++;
-        // }
-        
     }
 
 } // namespace kinect_fusion

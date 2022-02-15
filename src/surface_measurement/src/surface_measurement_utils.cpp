@@ -11,7 +11,7 @@ void fillVertexMap(const Map2Df& depths, const Eigen::Matrix3f& depthIntrinsics,
     float cX = depthIntrinsics(0, 2);
     float cY = depthIntrinsics(1, 2);
 
-            // For every pixel row.
+    // For every pixel row.
     #pragma omp parallel for
             for (int row = 0; row < depths.getHeight(); ++row) {
                 // For every pixel in a row.

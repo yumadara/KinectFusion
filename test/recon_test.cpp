@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
-#include "surface_reconstruct.h"
-#include"virtual_sensor.h"
-#include "Voxel.h"
+
+#include <surface_reconstruct.h>
+#include <virtual_sensor.h>
+#include <voxel.h>
 
 namespace kinect_fusion {
 TEST(ReconstructTest, BasicAssertions) {

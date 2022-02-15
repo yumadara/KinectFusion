@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <Ray.h>
+#include <ray.h>
 
 namespace kinect_fusion {
 

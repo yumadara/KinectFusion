@@ -77,7 +77,7 @@ void fillNormalMap(const Map2DVector3f& vertexMap, Map2DVector3f& normalMap);
 void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap);
 
 /**
- * @brief Apply biliteral filter.
+ * @brief Apply bilateral filter.
  * 
  * @param[in] unfilteredMap Input unfiltered map
  * @param[out] filteredMap Output filtered map that should be filled
