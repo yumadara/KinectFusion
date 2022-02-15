@@ -94,7 +94,7 @@ void subsample(const Map2Df& previousDepthMap, Map2Df& nextDepthMap)
     }
 }
 
-void applyBiliteralFilter(Map2Df& unfilteredMap, Map2Df& filteredMap) {
+void applyBilateralFilter(Map2Df& unfilteredMap, Map2Df& filteredMap) {
     const cv::Mat cvUnfilteredMap(unfilteredMap.getNumberOfColumns(), unfilteredMap.getNumberOfRows(), CV_32F, 
                 reinterpret_cast<void*>(unfilteredMap.data()));
     cv::Mat cvFilteredMap(filteredMap.getNumberOfColumns(), filteredMap.getNumberOfRows(), CV_32F, 

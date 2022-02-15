@@ -24,8 +24,7 @@ FrameData::FrameData(const Eigen::Matrix3f& cameraIntrinstics, std::size_t heigh
     void FrameData::updateValues(Map2Df& depths) {
         m_rowDepthMap = depths;
         
-        applyBiliteralFilter(depths, m_filteredDepthMaps[0]); // Do not filter now
-        // m_filteredDepthMaps[0] = depths;
+        applyBilateralFilter(depths, m_filteredDepthMaps[0]);
         for (std::size_t i = 0; i < NUMBER_OF_LEVELS - 1; i++) {
             subsample(m_filteredDepthMaps[i], m_filteredDepthMaps[i + 1]);
         }
